@@ -14,7 +14,7 @@ import {Input} from "@heroui/input";
 import {link as linkStyles} from "@heroui/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
-
+import Image from 'next/image'
 import {siteConfig} from "@/config/site";
 import {ThemeSwitch} from "@/components/theme-switch";
 import {
@@ -25,6 +25,7 @@ import {
     SearchIcon,
     Logo,
 } from "@/components/icons";
+import {Calendar, CalendarDays} from "lucide-react";
 
 export const Navbar = () => {
     const searchInput = (
@@ -52,17 +53,25 @@ export const Navbar = () => {
         <HeroUINavbar maxWidth="xl" position="sticky">
             <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
                 <NavbarBrand as="li" className="gap-3 max-w-fit">
-                    <NextLink className="flex justify-start items-center gap-1" href="/">
-                        <Logo/>
-                        <p className="font-bold text-inherit">ACME</p>
+                    <NextLink className="flex justify-start items-center gap-5" href="/">
+                        {/*<Image src="/loga/bebrave_black.png" width={150} height={41}  alt={"logo"} className="pb-2"/>*/}
+                        <Image src="/loga/b_black.png" width={24} height={24}  alt={"logo"} className=" "/>
                     </NextLink>
                 </NavbarBrand>
-                <ul className="hidden lg:flex gap-4 justify-start ml-2">
+            </NavbarContent>
+
+            <NavbarContent className="" justify="center">
+                <ul className="hidden md:flex gap-8 justify-start ml-2">
                     {siteConfig.navItems.map((item) => (
-                        <NavbarItem key={item.href}>
+                        <NavbarItem key={item.href} className={""}>
                             <NextLink
                                 className={clsx(
                                     linkStyles({color: "foreground"}),
+                                    "font-normal",
+                                    // add animation on hover, 1sec
+                                    "transition-all duration-100 ease-in-out",
+                                    //"w-16 justify-center",
+                                    "hover:font-bold",
                                     "data-[active=true]:text-primary data-[active=true]:font-medium",
                                 )}
                                 color="foreground"
@@ -75,42 +84,22 @@ export const Navbar = () => {
                 </ul>
             </NavbarContent>
 
-            <NavbarContent
-                className="hidden sm:flex basis-1/5 sm:basis-full"
-                justify="end"
-            >
-                <NavbarItem className="hidden sm:flex gap-2">
-                    <Link isExternal aria-label="Twitter" href={siteConfig.links.twitter}>
-                        <TwitterIcon className="text-default-500"/>
-                    </Link>
-                    <Link isExternal aria-label="Discord" href={siteConfig.links.discord}>
-                        <DiscordIcon className="text-default-500"/>
-                    </Link>
-                    <Link isExternal aria-label="Github" href={siteConfig.links.github}>
-                        <GithubIcon className="text-default-500"/>
-                    </Link>
-                    <ThemeSwitch/>
-                </NavbarItem>
-                <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-                <NavbarItem className="hidden md:flex">
+            <NavbarContent className="hidden sm:flex basis-1/5 sm:basis-full" justify="end" >
+                <NavbarItem className="hidden sm:flex">
                     <Button
                         isExternal
                         as={Link}
                         className="text-sm font-normal text-default-600 bg-default-100"
                         href={siteConfig.links.sponsor}
-                        startContent={<HeartFilledIcon className="text-danger"/>}
+                        startContent={<CalendarDays className={"pb-0.5"} size={24}  />}
                         variant="flat"
                     >
-                        Sponsor
+                        Rezervovat
                     </Button>
                 </NavbarItem>
             </NavbarContent>
 
-            <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
-                <Link isExternal aria-label="Github" href={siteConfig.links.github}>
-                    <GithubIcon className="text-default-500"/>
-                </Link>
-                <ThemeSwitch/>
+            <NavbarContent className=" basis-1 pl-4x sm:hidden " justify="end">
                 <NavbarMenuToggle/>
             </NavbarContent>
 

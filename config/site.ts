@@ -1,27 +1,23 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-    name: "Next.js + HeroUI",
-    description: "Make beautiful websites regardless of your design experience.",
+    name: "BeBrave Studio",
+    description: "Group fitness classes",
     navItems: [
         {
-            label: "Home",
-            href: "/",
+            label: "Lekce",
+            href: "/lekce",
         },
         {
-            label: "Docs",
-            href: "/docs",
-        },
-        {
-            label: "Pricing",
-            href: "/pricing",
+            label: "Instruktoři",
+            href: "/instruktori",
         },
         {
             label: "Blog",
             href: "/blog",
         },
         {
-            label: "About",
+            label: "O Nás",
             href: "/about",
         },
     ],

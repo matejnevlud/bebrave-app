@@ -11,7 +11,7 @@ const config = {
         extend: {
             fontFamily: {
                 sans: ["var(--font-sans)"],
-                serif: ["var(--font-serif)"],
+                serif: ["var(--font-runalto)"],
                 mono: ["var(--font-mono)"],
             },
         },

@@ -43,20 +43,20 @@ export default function RootLayout({
         >
 
         <Providers themeProps={{attribute: "class", defaultTheme: "light"}}>
-            <div className="relative flex flex-col h-screen">
+            <div className="relative flex flex-col min-h-screen">
                 <Navbar/>
-                <main className="container mx-auto max-w-7xl pt-16 px-6 flex-1">
+                <main className="container mx-auto max-w-7xl pt-0 px-6 flex-1">
                     {children}
                 </main>
-                <footer className="w-full bg-red-500 flex items-center justify-center py-3">
+                <footer className="w-full flex items-center justify-center py-8">
                     <Link
                         isExternal
                         className="flex items-center gap-1 text-current"
-                        href="https://heroui.com?utm_source=next-app-template"
-                        title="heroui.com homepage"
+                        href="https://nevlud.com"
+                        title="NEVLUD Industries"
                     >
-                        <span className="text-default-600">Powered by</span>
-                        <p className="text-primary">NEVLUD Industries</p>
+                        <span className="text pe-1">Made by</span>
+                        <img src="/loga/nevlud.png" alt="heroui.com logo" height={2} width={150}/>
                     </Link>
                 </footer>
             </div>

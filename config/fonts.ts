@@ -3,7 +3,7 @@ import localFont from 'next/font/local'
 
 export const fontRunalto = localFont({
     src: './fonts/runalto.woff2',
-    variable: '--font-serif',
+    variable: '--font-runalto',
 })
 
 
