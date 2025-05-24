@@ -32,7 +32,7 @@ export default function Home() {
 
             <div className="flex flex-col sm:flex-row gap-8">
                 <div className="flex-[2] bg-red-300 block">
-                    <img src="/photos/nahledy/bebrave-3-crop.jpg"/>
+                    <img src="/photos/nahledy/bebrave-3-crop.jpg" alt={"Test"}/>
                 </div>
                 <div className="leading-7 flex-1 content-center">
                     <h1 className="font-sans font-bold text-2xl sm:text-4xl">Kdo jsme</h1>
@@ -92,7 +92,7 @@ export default function Home() {
                     </p>
                 </div>
                 <div className="flex-1">
-                    <img src="/photos/nahledy/bebrave-6.jpg" width="1067" height="1600" />
+                    <img src="/photos/nahledy/bebrave-6.jpg" width="1067" height="1600" alt="be" />
                 </div>
             </div>
 
