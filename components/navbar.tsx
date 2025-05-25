@@ -87,10 +87,9 @@ export const Navbar = () => {
             <NavbarContent className="hidden sm:flex basis-1/5 sm:basis-full" justify="end" >
                 <NavbarItem className="hidden sm:flex">
                     <Button
-                        isExternal
                         as={Link}
                         className="text-sm font-normal text-default-600 bg-default-100"
-                        href={"siteConfig.links.sponsor"}
+                        href={"/reservation"}
                         startContent={<CalendarDays className={"pb-0.5"} size={24}  />}
                         variant="flat"
                     >

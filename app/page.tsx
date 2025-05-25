@@ -3,6 +3,7 @@ import {Button} from "@heroui/button";
 import {ArrowRight} from "lucide-react";
 import Image from "next/image";
 import { Image as HeroImage } from "@heroui/image";
+import {Link} from "@heroui/link";
 export default function Home() {
     return (
         <section className={"max-w-7xl mx-auto"}>
@@ -26,6 +27,8 @@ export default function Home() {
                 </div>
                 <div >
                     <Button
+                        as={Link}
+                        href="/reservation"
                         color="success"
                         style={{ color: '#ffffff' }}
                         variant="shadow"
