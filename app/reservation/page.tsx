@@ -2,8 +2,8 @@
 
 import {title} from "@/components/primitives";
 
-import {Tab, Image, Card, CardBody, Calendar, Divider, SelectItem, Select, SelectedItems, Avatar} from "@heroui/react";
-import React, {useEffect, useState} from "react";
+import {Tab, Image, Card, CardBody, Calendar, Divider, SelectItem, Select, SelectedItems, Avatar, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell} from "@heroui/react";
+import React, {Fragment, useEffect, useState} from "react";
 import {today, getLocalTimeZone, isWeekend, CalendarDate, ZonedDateTime, CalendarDateTime, getDayOfWeek} from "@internationalized/date";
 import {I18nProvider, useLocale} from "@react-aria/i18n";
 import {Divide, Icon, SeparatorVertical} from "lucide-react";
@@ -191,6 +191,7 @@ export default function ReservationPage() {
         return availableClasses;
     }, [selectedClassType, selectedTrainer, classes, trainers]);
 
+
     const availableClassesForDate = React.useMemo(() => {
         if (!selectedDate) return [];
 
@@ -199,11 +200,32 @@ export default function ReservationPage() {
         });
     }, [selectedDate, availableClassesBasedOnSelection]);
 
-    console.log(availableClassesBasedOnSelection);
+    const classesToRender = React.useMemo(() => {
+        let classesToRender = selectedDate ? availableClassesForDate : availableClassesBasedOnSelection;
+
+        // Order by date and time
+        classesToRender.sort((a, b) => {
+            const dateA = new Date(a.date);
+            const dateB = new Date(b.date);
+            return dateA.getTime() - dateB.getTime() || a.time.localeCompare(b.time);
+        });
+
+        // Group classes by date
+        let groupedClasses: Record<string, Class[]> = {};
+        classesToRender.forEach((c) => {
+            const dateKey = c.date.toString();
+            if (!groupedClasses[dateKey]) {
+                groupedClasses[dateKey] = [];
+            }
+            groupedClasses[dateKey].push(c);
+        });
+
+        return groupedClasses;
+    }, [selectedDate, availableClassesBasedOnSelection, availableClassesForDate]);
+
     let isDateUnavailable = (date: any) => !availableClassesBasedOnSelection.some((c) => date.toString() === c.date.toString());
 
 
-    // @ts-ignore
     return (
         <div className="mx-auto flex flex-col items-center justify-center gap-4 pt-4 max-w-7xl">
 
@@ -333,27 +355,91 @@ export default function ReservationPage() {
             </I18nProvider>
 
             <section className="w-full max-w-3xl pt-6">
-                <h2 className="text-xl font-bold text-center">
-                    {selectedDate?.toDate(getLocalTimeZone()).toLocaleDateString('cs-CZ', { weekday: 'long' })} {selectedDate?.day}. {selectedDate?.month}. {selectedDate?.year}
-                </h2>
+                {/*
+                <Table aria-label="Example empty table" rowHeight={80} removeWrapper>
+                    <TableHeader>
+                        <TableColumn>ČAS</TableColumn>
+                        <TableColumn>NÁZEV LEKCE</TableColumn>
+                        <TableColumn>TRENÉR</TableColumn>
+                        <TableColumn align="end"> </TableColumn>
+                    </TableHeader>
+                    <TableBody emptyContent={"Žádné lekce k zobrazení"} items={(selectedDate ? availableClassesForDate : availableClassesBasedOnSelection)}>
+                        {(item) => (
+                            <TableRow key={item.id} className="h-[4.5rem]">
+                                <TableCell>
+                                    <b>{item.time}</b>
+                                    <br/>
+                                    <span className="text-tiny">{item.classType.duration} min</span>
+                                </TableCell>
+                                <TableCell>
+                                    <Avatar
+                                        alt={item.classType?.name}
+                                        className="inline-flex me-2 hover:scale-125 transition-transform duration-200"
+                                        size="md"
+                                        src={item.classType?.image as any}
+                                    />
+                                    <b>{item.classType?.name}</b>
+                                </TableCell>
+                                <TableCell>
+                                    <Avatar
+                                        alt={item.trainer?.name}
+                                        className="inline-flex me-2 hover:scale-125 transition-transform duration-200"
+                                        size="md"
+                                        src={item.trainer?.profilePicture as any}
+                                    />
+                                    <span>{item.trainer?.name}</span>
+                                </TableCell>
+                                <TableCell>
+                                    <Button color="primary" size="md">Rezervace</Button>
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+                */}
 
-                {availableClassesForDate.map((c: any) => (
-                    <Card key={c.id} className="my-6">
-                        <CardBody className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-0">
-                            <Image
-                                src={c.classType.image}
-                                alt={c.classType.name}
-                                className="w-32 h-32 rounded-none object-cover"
-                            />
-                            <div className="flex-1">
-                                <h3 className="text-lg font-semibold">{c.classType.name}</h3>
-                                <p>{c.classType.description}</p>
-                                <p className="text-sm text-default-500">Trenér: {c.trainer.name}</p>
-                                <p className="text-sm text-default-500">Čas: {new Date(c.date).toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' })}</p>
+                {Object.entries(classesToRender).map(([date, classes]) => (
+                    <Fragment>
+                        <h2 className="text-xl font-bold text-center py-3">{new Date(date).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(date).toLocaleDateString()}</h2>
+                        {classes.map((c: Class) => (
+                            <div className="flex my-6 gap-6 items-center">
+                                <div className="items-center flex flex-col justify-center ">
+                                    <b>{c.time}</b>
+                                    <span className="text-tiny">{c.classType.duration} min</span>
+                                </div>
+                                <Card key={c.id} className="">
+                                    <CardBody className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-0 h-36">
+                                        <Image
+                                            src={c.classType.image}
+                                            alt={c.classType.name}
+                                            className="w-36 h-36 rounded-none object-cover"
+                                        />
+                                        <div className="flex-1 h-full flex flex-col justify-between py-2">
+                                            <div>
+                                                <h3 className="text-md font-semibold">{c.classType.name}</h3>
+                                                <p className="text-small line-clamp-3">{c.classType.description}</p>
+                                            </div>
+                                            <div>
+                                                <Avatar
+                                                    alt={c.trainer?.name}
+                                                    className="inline-flex me-2 hover:scale-125 transition-transform duration-200"
+                                                    size="sm"
+                                                    src={c.trainer?.profilePicture as any}
+                                                />
+                                                <span>{c.trainer?.name}</span>
+                                            </div>
+
+                                        </div>
+                                        <div className="me-6">
+                                            <Button color="primary" variant="solid" size="md">Rezervace</Button>
+                                        </div>
+                                    </CardBody>
+                                </Card>
                             </div>
-                        </CardBody>
-                    </Card>
+                        ))}
+                    </Fragment>
                 ))}
+
 
             </section>
 

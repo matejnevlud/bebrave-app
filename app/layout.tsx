@@ -45,7 +45,7 @@ export default function RootLayout({
                 <main className="container mx-auto max-w-7xl pt-0 px-6 flex-1">
                     {children}
                 </main>
-                <footer className="w-full flex items-center justify-center py-8">
+                <footer className="w-full flex items-center justify-center py-8 ">
                     <Link
                         isExternal
                         className="flex items-center gap-1 text-current"
@@ -53,7 +53,7 @@ export default function RootLayout({
                         title="NEVLUD Industries"
                     >
                         <span className="text pe-1">Made by</span>
-                        <img src="/loga/nevlud.png" alt="heroui.com logo" height={2} width={150}/>
+                        <img src="/loga/nevlud.png" alt="nevlud.com logo" height={2} width={150}/>
                     </Link>
                 </footer>
             </div>
