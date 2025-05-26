@@ -1,9 +1,9 @@
 "use server";
 
 import { db } from "@/db";
-import {Class, ClassType, classTypesTable, Trainer, trainersTable} from "@/db/schema";
+import {Class, ClassType, classTypesTable, ClassWithRelations, Trainer, trainersTable, TrainerWithRelations} from "@/db/schema";
 
-export async function getTrainers(): Promise<Trainer[]> {
+export async function getTrainers(): Promise<TrainerWithRelations[]> {
     const data = await db.query.trainersTable.findMany({
         with: {
             trainerClassTypes: {
@@ -20,7 +20,7 @@ export async function getTrainers(): Promise<Trainer[]> {
         }
     });
 
-    return data as Trainer[];
+    return data as TrainerWithRelations[];
 }
 
 export async function getClassTypes(): Promise<ClassType[]> {
@@ -43,7 +43,7 @@ export async function getClassTypes(): Promise<ClassType[]> {
     return data;
 }
 
-export async function getClasses(): Promise<Class[]> {
+export async function getClasses(): Promise<ClassWithRelations[]> {
     const data = await db.query.classesTable.findMany({
         with: {
             classType: true,

@@ -8,7 +8,7 @@ import {today, getLocalTimeZone, isWeekend, CalendarDate, ZonedDateTime, Calenda
 import {I18nProvider, useLocale} from "@react-aria/i18n";
 import {Divide, Icon, SeparatorVertical} from "lucide-react";
 import {db} from "@/db";
-import {Class, ClassType, Trainer, trainersTable} from "@/db/schema";
+import {Class, ClassType, ClassWithRelations, Trainer, trainersTable, TrainerWithRelations} from "@/db/schema";
 import {getClasses, getClassTypes, getTrainers} from "@/db/actions";
 import HorizontalSteps from "@/components/blocks/HorizontalSteps";
 import {Button} from "@heroui/button";
@@ -102,9 +102,9 @@ export default function ReservationPage() {
 
     const [selected, setSelected] = useState("videos");
 
-    const [trainers, setTrainers] = useState<Trainer[]>([]);
+    const [trainers, setTrainers] = useState<TrainerWithRelations[]>([]);
 
-    const [classes, setClasses] = useState<Class[]>([]);
+    const [classes, setClasses] = useState<ClassWithRelations[]>([]);
     const [classTypes, setClassTypes] = useState<ClassType[]>([]);
 
     const [isFetchingData, setIsFetchingData] = useState<boolean>(true);
@@ -177,9 +177,7 @@ export default function ReservationPage() {
     }
 
     const availableClassesBasedOnSelection = React.useMemo(() => {
-
-
-        var availableClasses: Class[] = classes
+        let availableClasses: ClassWithRelations[] = classes
 
         if(selectedClassType)
             availableClasses = classes.filter(c => c.classTypeId == selectedClassType.id);
@@ -211,7 +209,7 @@ export default function ReservationPage() {
         });
 
         // Group classes by date
-        let groupedClasses: Record<string, Class[]> = {};
+        let groupedClasses: Record<string, ClassWithRelations[]> = {};
         classesToRender.forEach((c) => {
             const dateKey = c.date.toString();
             if (!groupedClasses[dateKey]) {
@@ -401,7 +399,7 @@ export default function ReservationPage() {
                 {Object.entries(classesToRender).map(([date, classes]) => (
                     <Fragment>
                         <h2 className="text-xl font-bold text-center py-3">{new Date(date).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(date).toLocaleDateString()}</h2>
-                        {classes.map((c: Class) => (
+                        {classes.map((c: ClassWithRelations) => (
                             <div className="flex my-6 gap-6 items-center">
                                 <div className="items-center flex flex-col justify-center ">
                                     <b>{c.time}</b>
@@ -410,7 +408,7 @@ export default function ReservationPage() {
                                 <Card key={c.id} className="">
                                     <CardBody className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-0 h-36">
                                         <Image
-                                            src={c.classType.image}
+                                            src={c.classType.image as any}
                                             alt={c.classType.name}
                                             className="w-36 h-36 rounded-none object-cover"
                                         />

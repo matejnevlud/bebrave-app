@@ -10,21 +10,11 @@ const timestamps ={
 
 
 
-export type Trainer = {
-    id: number;
-    name: string;
-    email: string;
-    bio: string;
-    expertise?: string;
-    profilePicture?: string; // URL to the trainer's profile picture
-    updatedAt: Date;
-    createdAt: Date;
-    deletedAt?: Date;
-
-    trainerClassTypes?: any[];
-    classes?: Class[];
-
-};
+export type Trainer = typeof trainersTable.$inferSelect;
+export type TrainerWithRelations = Trainer & {
+    trainerClassTypes: any[];
+    classes: ClassWithRelations[];
+}
 export const trainersTable = pgTable("trainers", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     name: varchar({ length: 255 }).notNull(),
@@ -92,6 +82,11 @@ export const classTypesRelations = relations(classTypesTable, ({ many }) => ({
 
 
 export type Class = typeof classesTable.$inferSelect;
+export type ClassWithRelations = Class & {
+    classType: ClassType;
+    trainer: Trainer;
+    reservations: Reservation[];
+}
 export const classesTable = pgTable("classes", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     classTypeId: integer().notNull(),
