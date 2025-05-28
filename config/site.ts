@@ -6,53 +6,37 @@ export const siteConfig = {
     navItems: [
         {
             label: "Lekce",
-            href: "/lekce",
+            href: "/",
         },
         {
             label: "Instruktoři",
-            href: "/instruktori",
+            href: "/",
         },
         {
             label: "Blog",
-            href: "/blog",
+            href: "/",
         },
         {
             label: "O Nás",
-            href: "/about",
+            href: "/",
         },
     ],
     navMenuItems: [
         {
-            label: "Profile",
-            href: "/profile",
+            label: "Lekce",
+            href: "/",
         },
         {
-            label: "Dashboard",
-            href: "/dashboard",
+            label: "Instruktoři",
+            href: "/",
         },
         {
-            label: "Projects",
-            href: "/projects",
+            label: "Blog",
+            href: "/",
         },
         {
-            label: "Team",
-            href: "/team",
-        },
-        {
-            label: "Calendar",
-            href: "/calendar",
-        },
-        {
-            label: "Settings",
-            href: "/settings",
-        },
-        {
-            label: "Help & Feedback",
-            href: "/help-feedback",
-        },
-        {
-            label: "Logout",
-            href: "/logout",
+            label: "O Nás",
+            href: "/",
         },
     ],
     links: {
