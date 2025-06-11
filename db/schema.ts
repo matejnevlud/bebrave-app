@@ -113,9 +113,12 @@ export const classesRelations = relations(classesTable, ({ one, many }) => ({
 export type Reservation = typeof reservationsTable.$inferSelect;
 export const reservationsTable = pgTable("reservations", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
-    userId: integer().notNull(),
+    userId: integer(),
     classId: integer().notNull(),
     status: varchar({ length: 50 }).notNull(), // e.g., 'confirmed', 'cancelled'
+    name: varchar({ length: 255 }),
+    email: varchar({ length: 255 }),
+    phone: varchar({ length: 255 }),
     ...timestamps,
 });
 export const reservationsRelations = relations(reservationsTable, ({ one }) => ({
