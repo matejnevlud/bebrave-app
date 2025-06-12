@@ -28,28 +28,27 @@ export default function Home() {
                 <div >
                     <Button
                         as={Link}
-                        //href="/reservation"
-                        color="default"
-                        style={{ color: '#ffffff', display: 'visible' }}
+                        href="/reservation"
+                        color="success"
+                        style={{ color: '#ffffff' }}
                         variant="shadow"
                         size="lg"
-                        disabled
                         endContent={<ArrowRight />}
-                        className="disabled animate-pulse-scale transition-transform duration-1000"
+                        className="animate-pulse-scale transition-transform duration-1000"
                     >
-                        Rezervace budou spustěny brzy
+                        Vybrat lekci
                     </Button>
                 </div>
             </div>
 
 
-            <div className="flex flex-col sm:flex-row gap-8 overflow-visible">
+            <div className="flex flex-col md:flex-row gap-8 overflow-visible">
                 <div className="flex-[2]  block overflow-visible">
                     <HeroImage
                         isBlurred
                         alt="HeroUI Album Cover"
                         className="rounded-md"
-                        src="/photos/nahledy/bebrave-3-crop.jpg"
+                        src="/photos/nahledy/bebrave-54_websize.jpg"
                     />
                 </div>
                 <div className="leading-7 flex-1 content-start">

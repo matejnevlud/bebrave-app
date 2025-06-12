@@ -373,10 +373,22 @@ export default function AdminPage() {
                                     src={item.trainer?.profilePicture as any}
                                 />
                                 <span>{item.trainer?.name}</span>
+                                {item.secondTrainer && (
+                                    <span className="text-default-400">
+                                        <br/>
+                                        <Avatar
+                                            alt={item.secondTrainer?.name}
+                                            className="inline-flex me-2 hover:scale-125 transition-transform duration-200"
+                                            size="sm"
+                                            src={item.secondTrainer?.profilePicture as any}
+                                        />
+                                        {item.secondTrainer?.name}
+                                    </span>
+                                )}
                             </TableCell>
 
                             <TableCell>
-                                <b>{item.reservations?.length} / {item.classType.capacity}</b>
+                                <b>{item.reservations?.length} / {item.capacity}</b>
                             </TableCell>
 
                             <TableCell>

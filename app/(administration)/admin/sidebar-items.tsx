@@ -13,9 +13,9 @@ export const items: SidebarItem[] = [
         key: "home",
         href: "#",
         icon: "solar:home-2-linear",
-        title: "Home",
+        title: "Přehled",
     },
-    {
+    /*{
         key: "projects",
         href: "#",
         icon: "solar:widget-2-outline",
@@ -75,7 +75,7 @@ export const items: SidebarItem[] = [
         href: "#",
         icon: "solar:settings-outline",
         title: "Settings",
-    },
+    },*/
 ];
 
 export const sectionItems: SidebarItem[] = [

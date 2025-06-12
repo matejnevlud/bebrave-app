@@ -89,11 +89,11 @@ export const Navbar = () => {
                     <Button
                         as={Link}
                         className="text-sm font-normal text-default-600 bg-default-100"
-                        //href={"/reservation"}
+                        href={"/reservation"}
                         startContent={<CalendarDays className={"pb-0.5"} size={24}  />}
                         variant="flat"
                     >
-                        Rezervace budou spustěny brzy
+                        Rezervovat
                     </Button>
                 </NavbarItem>
             </NavbarContent>

@@ -48,12 +48,12 @@ export default function RootLayout({
                 <footer className="w-full flex items-center justify-center py-8 ">
                     <Link
                         isExternal
-                        className="flex items-center gap-1 text-current"
+                        className="flex items-center gap-1 text-current text-tiny"
                         href="https://nevlud.com"
                         title="NEVLUD Industries"
                     >
                         <span className="text pe-1">Made by</span>
-                        <img src="/loga/nevlud.png" alt="nevlud.com logo" height={2} width={150}/>
+                        <img src="/loga/nevlud.png" alt="nevlud.com logo" height={2} width={120}/>
                     </Link>
                 </footer>
             </div>

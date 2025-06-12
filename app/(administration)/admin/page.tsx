@@ -1,7 +1,7 @@
 "use client";
 
-import React, {useEffect, useState} from "react";
-import {Avatar, ScrollShadow} from "@heroui/react";
+import React, {useEffect, useMemo, useState} from "react";
+import {Avatar, Modal, ModalContent, ScrollShadow, Spinner, useDisclosure} from "@heroui/react";
 import {items} from "./sidebar-items";
 import Sidebar from "@/components/admin/sidebar";
 import{SVGProps} from "react";
@@ -21,6 +21,9 @@ import {ClassType, ClassWithRelations, TrainerWithRelations} from "@/db/schema";
 import {getClasses, getClassTypes, getTrainers} from "@/db/actions";
 import {getLocalTimeZone, today} from "@internationalized/date";
 import {Button} from "@heroui/button";
+import {CameraIcon} from "lucide-react";
+import {Icon} from "@iconify/react";
+import {ModalBody, ModalFooter, ModalHeader} from "@heroui/modal";
 
 type IconSvgProps = SVGProps<SVGSVGElement> & {
     size?: number;
@@ -260,7 +263,38 @@ export default function AdminPage() {
     }, [])
 
 
+    const lastClassInEachDay = useMemo(() => {
+        if (classes.length === 0) return [];
 
+        const groupedByDate = classes.reduce((acc, c) => {
+            const date = new Date(c.date).toLocaleDateString('cs-CZ');
+            if (!acc[date]) {
+                acc[date] = [];
+            }
+            acc[date].push(c);
+            return acc;
+        }, {} as Record<string, ClassWithRelations[]>);
+
+        const lastClasses = Object.entries(groupedByDate).map(([date, classList]) => {
+            const lastClass = classList
+                .sort((a, b) => new Date(a.date + 'T' + a.time).getTime() - new Date(b.date + 'T' + b.time).getTime())
+                .pop();
+            //return { ...lastClass, date };
+            return lastClass?.id ?? -1;
+        });
+
+        console.log("Last classes in each day:", lastClasses);
+
+        return lastClasses;
+    }, [classes]);
+
+
+    const [selectedClass, setSelectedClass] = useState<ClassWithRelations>();
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
+    function openReservationModal(c: ClassWithRelations) {
+        setSelectedClass(c);
+        onOpen();
+    }
 
 
 
@@ -322,6 +356,7 @@ export default function AdminPage() {
             <Table
                 aria-label="Example table with custom cells"
                 className="hidden"
+                removeWrapper
             >
                 <TableHeader columns={columns}>
                     {(column) => (
@@ -347,9 +382,9 @@ export default function AdminPage() {
                     <TableColumn>OBSAZENOST</TableColumn>
                     <TableColumn align="end"> </TableColumn>
                 </TableHeader>
-                <TableBody emptyContent={"Žádné classes k zobrazení"} items={classes}>
+                <TableBody emptyContent={"Žádné lekce k zobrazení"} items={classes} loadingContent={<Spinner label="Načítám..." />} isLoading={isFetchingData}>
                     {(item) => (
-                        <TableRow key={item.id} className="h-[4.5rem] hover:bg-default-100 cursor-pointer">
+                        <TableRow key={item.id} className={"h-[4.5rem] hover:bg-default-100 cursor-pointer" + (lastClassInEachDay.includes(item.id) ? "  border-b-gray-200  border-b-1.5" : "")} onClick={() => openReservationModal(item)}>
                             <TableCell>
                                 <b>{new Date(item.date).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(item.date).toLocaleDateString()}</b>
                                 <br/>
@@ -375,10 +410,23 @@ export default function AdminPage() {
                                     src={item.trainer?.profilePicture as any}
                                 />
                                 <span>{item.trainer?.name}</span>
+                                {item.secondTrainer && (
+                                    <div className="inline-block ml-4">
+                                        <Avatar
+                                            alt={item.secondTrainer?.name}
+                                            className="inline-flex me-2 hover:scale-125 transition-transform duration-200"
+                                            size="md"
+                                            src={item.secondTrainer?.profilePicture as any}
+                                        />
+                                        <span>{item.secondTrainer?.name}</span>
+                                    </div>
+                                )}
                             </TableCell>
 
                             <TableCell>
-                                <b>{item.reservations?.length} / {item.classType.capacity}</b>
+                                <Button color="success"  variant={"bordered"} onPress={() => openReservationModal(item)}>
+                                    {item.reservations?.length} / {item.capacity}
+                                </Button>
                             </TableCell>
 
                             <TableCell>
@@ -388,6 +436,37 @@ export default function AdminPage() {
                     )}
                 </TableBody>
             </Table>
+
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange} scrollBehavior="inside" size="5xl">
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1">Rezervace pro {selectedClass?.classType.name} - {new Date(selectedClass?.date ?? 0).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(selectedClass?.date ?? 0).toLocaleDateString()}</ModalHeader>
+                            <ModalBody>
+                                <Table aria-label="Example empty table" rowHeight={80} removeWrapper>
+                                    <TableHeader>
+                                        <TableColumn>Klient</TableColumn>
+                                        <TableColumn>Datum rezervace</TableColumn>
+                                    </TableHeader>
+                                    <TableBody emptyContent={"Žádné rezervace k zobrazení"} items={selectedClass?.reservations || []}>
+                                        {(item) => (
+                                            <TableRow key={item.id} className="h-[4.5rem] hover:bg-default-100 cursor-pointer">
+                                                <TableCell className="flex-col flex gap-2">
+                                                    <span className="font-medium text-medium">{item.name}</span>
+                                                    <span className="text-small">{item.phone}</span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <span className="text-medium">{new Date(item.createdAt ?? 0).toLocaleString()}</span>
+                                                </TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </ModalBody>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
         </div>
     );
 }

@@ -26,7 +26,8 @@ export const trainersTable = pgTable("trainers", {
 })
 export const trainersRelations = relations(trainersTable, ({ many }) => ({
     trainerClassTypes: many(trainerClassTypesTable),
-    classes: many(classesTable),
+    classes: many(classesTable, { relationName: "trainer" }),
+    secondClasses: many(classesTable, { relationName : "secondTrainer" })
 }));
 
 
@@ -70,7 +71,7 @@ export const classTypesTable = pgTable("class_types", {
     name: varchar({ length: 255 }).notNull(),
     description: varchar({ length: 500 }).notNull(),
     image: varchar({ length: 255 }), // URL to the class type image
-    capacity: integer().notNull(), // Maximum number of participants
+    defaultCapacity: integer().notNull(), // Maximum number of participants
     duration: integer().notNull(), // Duration in minutes
     price: integer().notNull(), // Price in crowns
 })
@@ -85,15 +86,18 @@ export type Class = typeof classesTable.$inferSelect;
 export type ClassWithRelations = Class & {
     classType: ClassType;
     trainer: Trainer;
+    secondTrainer?: Trainer;
     reservations: Reservation[];
 }
 export const classesTable = pgTable("classes", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     classTypeId: integer().notNull(),
     trainerId: integer().notNull(),
+    secondTrainerId: integer(), // Optional secondary trainer
     date: varchar({ length: 50 }).notNull(), // Date in YYYY-MM-DD format
     time: varchar({ length: 5 }).notNull(), // Time in HH:MM format
     location: varchar({ length: 255 }).notNull(),
+    capacity: integer().notNull(), // Maximum number of participants
     ...timestamps,
 })
 export const classesRelations = relations(classesTable, ({ one, many }) => ({
@@ -104,6 +108,12 @@ export const classesRelations = relations(classesTable, ({ one, many }) => ({
     trainer: one(trainersTable, {
         fields: [classesTable.trainerId],
         references: [trainersTable.id],
+        relationName : "trainer",
+    }),
+    secondTrainer: one(trainersTable, {
+        fields: [classesTable.secondTrainerId],
+        references: [trainersTable.id],
+        relationName: "secondTrainer",
     }),
     reservations: many(reservationsTable),
 }));

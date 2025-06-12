@@ -18,7 +18,8 @@ import {CardHeader} from "@heroui/card";
 import {Badge} from "@heroui/badge";
 import {ModalBody, ModalFooter, ModalHeader} from "@heroui/modal";
 import {Resend} from "resend";
-
+// @ts-ignore
+import confetti from 'canvas-confetti';
 
 
 
@@ -156,6 +157,9 @@ export default function ReservationPage() {
     const [selectedDate, setSelectedDate] = useState<CalendarDate | null>(null);
     const [selectedClass, setSelectedClass] = useState<ClassWithRelations | null>(null);
 
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+    const [isFormSubmitted, setIsFormSubmitted] = useState<boolean>(false);
+
     function determineStep() {
         var step = 0;
 
@@ -165,6 +169,8 @@ export default function ReservationPage() {
         if (selectedDate) step = 3;
 
         if (selectedClass) step = 4;
+
+        if (isFormSubmitted) step = 5;
 
         return step; // Example: returning step 1 as the current step
     }
@@ -227,6 +233,17 @@ export default function ReservationPage() {
             groupedClasses[dateKey].push(c);
         });
 
+        // Sort groupedClasses by time in that date, the time field is a string in HH:MM format, from the earliest to the latest
+        // firt create date time objects from the time strings, then sort them
+        Object.keys(groupedClasses).forEach((dateKey) => {
+            groupedClasses[dateKey].sort((a, b) => {
+                const timeA = a.time.split(":").map(Number);
+                const timeB = b.time.split(":").map(Number);
+                return timeA[0] - timeB[0] || timeA[1] - timeB[1];
+            });
+        });
+
+
         return groupedClasses;
     }, [selectedDate, availableClassesBasedOnSelection, availableClassesForDate]);
 
@@ -237,27 +254,41 @@ export default function ReservationPage() {
         if (!c.reservations || c.reservations.length === 0) {
             return true; // No reservations means free spot
         }
-        // Check if the class is fully booked (assuming a max capacity of 10 for simplicity)
-        return c.reservations.length < c.classType.capacity;
+        return c.reservations.length < c.capacity;
     }
 
 
-    function handleReservationSubmit(event: any) {
+    async function handleReservationSubmit(event: any) {
         event.preventDefault();
-        let userData = Object.fromEntries(new FormData(event.currentTarget));
-        createReservation(selectedClass as ClassWithRelations, undefined, userData).then(
-            (success) => {
-                if (success) {
-                    alert("Rezervace úspěšně vytvořena!");
-                } else {
-                    alert("Chyba při vytváření rezervace. Zkuste to prosím znovu.");
-                }
-            },
-            (error) => {
-                console.error("Error creating reservation:", error);
-                alert("Došlo k chybě při vytváření rezervace. Zkuste to prosím znovu později.");
+
+        const form = event.currentTarget;
+        console.log(form)
+
+        setIsSubmitting(true);
+
+        try {
+            // wait for 2 seconds to simulate a network request
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            let userData = Object.fromEntries(new FormData(form));
+
+            const response = await createReservation(selectedClass as ClassWithRelations, undefined, userData)
+
+            if (response) {
+                setIsFormSubmitted(true);
+                confetti({
+                    particleCount: 200,
+                    startVelocity: 60,
+                });
+            } else {
+                alert("Chyba při vytváření rezervace. Zkuste to prosím znovu.");
             }
-        )
+        } catch (error) {
+            console.error("Error submitting reservation form:", error);
+            alert("Došlo k chybě při odesílání rezervace. Zkuste to prosím znovu později.");
+        } finally {
+            setIsSubmitting(false)
+        }
     }
 
     return (
@@ -269,7 +300,7 @@ export default function ReservationPage() {
                 currentStep={determineStep()}
                 steps={[
                     {
-                        title: "Vyberte typ classes",
+                        title: "Vyberte typ lekce",
                     },
                     {
                         title: "Vyberte trenéra",
@@ -290,7 +321,7 @@ export default function ReservationPage() {
 
 
             {/*If state = 4, then hidden*/}
-            <section className={"w-full max-w-3xl " + (determineStep() === 4 ? "hidden" : "")}>
+            <section className={"w-full max-w-3xl " + (determineStep() >= 4 ? "hidden" : "")}>
                 <div className="w-full max-w-3xl flex flex-col sm:flex-row gap-4 my-4 items-center justify-center">
                     <Select
                         aria-label="Select Class Type"
@@ -347,7 +378,7 @@ export default function ReservationPage() {
                         items={trainers}
                         placeholder="Vybrat trenéra"
                         maxListboxHeight={400}
-                        renderValue={(items: SelectedItems<Trainer>) => {
+                        renderValue={(items: SelectedItems<TrainerWithRelations>) => {
                             return items.map((item) => (
                                 <div key={item.key} className="flex items-center gap-2">
                                     <Avatar
@@ -358,7 +389,7 @@ export default function ReservationPage() {
                                     />
                                     <div className="flex flex-col">
                                         <span>{item.data?.name}</span>
-                                        <span className="text-default-500 text-tiny">{item.data?.expertise}</span>
+                                        <span className="text-default-500 text-tiny">{item.data?.trainerClassTypes?.map(tcp => tcp.classType?.name).join(', ')}</span>
                                     </div>
                                 </div>
                             ));
@@ -370,7 +401,7 @@ export default function ReservationPage() {
                                     <Avatar alt={user.name} className="flex-shrink-0" size="sm" src={user.profilePicture as any} />
                                     <div className="flex flex-col">
                                         <span className="text-small">{user.name}</span>
-                                        <span className="text-tiny text-default-400">{user.expertise}</span>
+                                        <span className="text-tiny text-default-400">{user?.trainerClassTypes?.map(tcp => tcp.classType?.name).join(', ')}</span>
                                     </div>
                                 </div>
                             </SelectItem>
@@ -401,7 +432,7 @@ export default function ReservationPage() {
                             <h2 className="text-xl font-bold text-center py-3">{new Date(date).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(date).toLocaleDateString()}</h2>
                             {classes.map((c: ClassWithRelations) => (
                                 <div className="flex my-6 gap-3 sm:gap-6 items-center">
-                                    <div className="items-center flex flex-col justify-center ">
+                                    <div className="lg:absolute lg:ml-[-5rem] items-center flex flex-col justify-center lg:w-14">
                                         <b>{c.time}</b>
                                         <span className="text-tiny">{c.classType.duration} min</span>
                                     </div>
@@ -426,6 +457,17 @@ export default function ReservationPage() {
                                                         src={c.trainer?.profilePicture as any}
                                                     />
                                                     <span className="text-small sm:text-medium" >{c.trainer?.name}</span>
+                                                    { c.secondTrainer && (
+                                                        <div className="inline-block ml-4">
+                                                            <Avatar
+                                                                alt={c.secondTrainer?.name}
+                                                                className="inline-flex me-2 hover:scale-125 transition-transform duration-200"
+                                                                size="sm"
+                                                                src={c.secondTrainer?.profilePicture as any}
+                                                            />
+                                                            <span className="text-small sm:text-medium" >{c.secondTrainer?.name}</span>
+                                                        </div>
+                                                    )}
                                                     <div className="flex-1"></div>
                                                     {!hasClassFreeSpot(c) && <Chip size="md" color="danger" className={"sm:hidden"}>Vyprodáno</Chip>}
                                                 </div>
@@ -448,10 +490,11 @@ export default function ReservationPage() {
 
             <section className={"w-full max-w-3xl " + (determineStep() === 4 ? "shown" : "hidden")}>
 
+
                 <h2 className="text-xl text-center font-bold pt-6">{new Date(selectedClass?.date ?? 0 ).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(selectedClass?.date ?? 0).toLocaleDateString()} v {selectedClass?.time}</h2>
 
                 <div className="flex my-6 gap-3 sm:gap-6 items-center">
-                    <div className="items-center flex flex-col justify-center ">
+                    <div className="lg:absolute lg:ml-[-5rem] items-center flex flex-col justify-center lg:w-14">
                         <b>{selectedClass?.time}</b>
                         <span className="text-tiny">{selectedClass?.classType.duration} min</span>
                     </div>
@@ -515,7 +558,7 @@ export default function ReservationPage() {
                         </div>*/}
                     </CardHeader>
                     <CardBody>
-                        <Form validationBehavior="native" onSubmit={handleReservationSubmit}>
+                        <Form validationBehavior="native" onSubmit={(e) => handleReservationSubmit(e)}>
                             <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
                                 {/* Username */}
                                 <Input
@@ -553,13 +596,29 @@ export default function ReservationPage() {
                                 <Button variant="light" onPress={() => setSelectedClass(null)}>
                                     Zpět
                                 </Button>
-                                <Button color="primary" type="submit">
+                                <Button color="primary" type="submit" isLoading={isSubmitting}>
                                     Odeslat rezervaci
                                 </Button>
                             </div>
                         </Form>
                     </CardBody>
                 </Card>
+            </section>
+
+            <section className={"w-full max-w-3xl " + (determineStep() === 5 ? "shown" : "hidden")}>
+                <div className="flex flex-col items-center justify-center gap-4 pt-20">
+                    <Image
+                        src={selectedClass?.trainer.profilePicture ?? "/photos/trainers/martina.jpg"}
+                        alt="Děkujeme za vaši rezervaci!"
+                        className="w-72 h-72 rounded-full object-cover"
+                    />
+
+                    <h1 className="text-4xl text-center font-bold pt-4 pb-2">Děkujeme za vaši rezervaci!</h1>
+                    <p className="text-lg text-center">
+                        Vaše rezervace na lekci <b>{selectedClass?.classType.name}</b>  dne <b>{new Date(selectedClass?.date ?? -1).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(selectedClass?.date ?? -1).toLocaleDateString()} v {selectedClass?.time}</b> byla úspěšně odeslána. Těšíme se na vás, tým BeBrave.
+                    </p>
+                </div>
+
             </section>
 
 
