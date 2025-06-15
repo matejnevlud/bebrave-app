@@ -5,10 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="878e36bd-1ad8-483a-aae1-c8c02b1128eb" name="Changes" comment="init base">
-      <change afterPath="$PROJECT_DIR$/db/reservation_email.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(administration)/admin/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(administration)/admin/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/actions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/reservation_email.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/reservation_email.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -117,7 +115,7 @@
       <workItem from="1749725597966" duration="1536000" />
       <workItem from="1749727156855" duration="22000" />
       <workItem from="1749727188958" duration="128000" />
-      <workItem from="1749727324996" duration="30434000" />
+      <workItem from="1749727324996" duration="31212000" />
     </task>
     <task id="LOCAL-00001" summary="init base">
       <option name="closed" value="true" />

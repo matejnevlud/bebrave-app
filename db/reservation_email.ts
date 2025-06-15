@@ -70,7 +70,7 @@ export const reservationEmail = `
         <tr>
           <td style="padding:0 40px 24px 40px;">
             <p style="font-size:14px;margin:0 0 16px 0;color:#000;">Ve studiu jsme se snažili připravit vše pro vaše maximální pohodlí. Proto věříme, že se u nás budete cítit jako doma !</p>
-            <p style="font-size:14px;margin:0 0 16px 0;color:#000;">Máte otázky? Odpovězte na tento e-mail nebo nám zavolejte na <a href="tel:603 111 002" style="color:#0066cc;text-decoration:none;">603 111 002</a>.</p>
+            <p style="font-size:14px;margin:0 0 16px 0;color:#000;">Máte otázky? Odpovězte na tento e-mail nebo nám zavolejte na <a href="tel:731 906 623" style="color:#0066cc;text-decoration:none;">731 906 623</a>.</p>
             <p style="font-size:14px;margin:0;color:#000;"><strong>Tým BeBrave.</strong></p>
           </td>
         </tr>
