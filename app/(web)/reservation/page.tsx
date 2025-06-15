@@ -6,7 +6,7 @@ import {Tab, Image, Card, CardBody, Calendar, Divider, SelectItem, Select, Selec
 import React, {Fragment, useEffect, useState} from "react";
 import {today, getLocalTimeZone, isWeekend, CalendarDate, ZonedDateTime, CalendarDateTime, getDayOfWeek} from "@internationalized/date";
 import {I18nProvider, useLocale} from "@react-aria/i18n";
-import {Divide, Icon, SeparatorVertical} from "lucide-react";
+import {Divide, SeparatorVertical} from "lucide-react";
 import {db} from "@/db";
 import {Class, ClassType, ClassWithRelations, Trainer, trainersTable, TrainerWithRelations} from "@/db/schema";
 import {createReservation, getClasses, getClassTypes, getTrainers} from "@/db/actions";
@@ -20,6 +20,9 @@ import {ModalBody, ModalFooter, ModalHeader} from "@heroui/modal";
 import {Resend} from "resend";
 // @ts-ignore
 import confetti from 'canvas-confetti';
+import PaymentMethodRadioGroup from "@/components/blocks/PaymentMethodRadio";
+import {Link} from "@heroui/link";
+import { Icon } from "@iconify/react";
 
 
 
@@ -320,7 +323,7 @@ export default function ReservationPage() {
 
 
 
-            {/*If state = 4, then hidden*/}
+            {/* Calendar chooser */}
             <section className={"w-full max-w-3xl " + (determineStep() >= 4 ? "hidden" : "")}>
                 <div className="w-full max-w-3xl flex flex-col sm:flex-row gap-4 my-4 items-center justify-center">
                     <Select
@@ -429,7 +432,7 @@ export default function ReservationPage() {
                 <div className="w-full max-w-3xl pt-6">
                     {Object.entries(classesToRender).map(([date, classes]) => (
                         <Fragment>
-                            <h2 className="text-xl font-bold text-center py-3">{new Date(date).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(date).toLocaleDateString()}</h2>
+                            <h2 className="text-xl font-bold text-center py-3">{new Date(date).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(date).toLocaleDateString('cs-CZ')}</h2>
                             {classes.map((c: ClassWithRelations) => (
                                 <div className="flex my-6 gap-3 sm:gap-6 items-center">
                                     <div className="lg:absolute lg:ml-[-5rem] items-center flex flex-col justify-center lg:w-14">
@@ -447,7 +450,7 @@ export default function ReservationPage() {
                                             <div className="flex-1 h-full flex flex-col justify-between py-2 pe-2">
                                                 <div>
                                                     <h3 className="text-md font-semibold">{c.classType.name}</h3>
-                                                    <p className="text-small line-clamp-3">{c.classType.description}</p>
+                                                    <p className="text-small line-clamp-3 text-justify text-justify">{c.classType.description}</p>
                                                 </div>
                                                 <div className="flex items-center">
                                                     <Avatar
@@ -470,6 +473,7 @@ export default function ReservationPage() {
                                                     )}
                                                     <div className="flex-1"></div>
                                                     {!hasClassFreeSpot(c) && <Chip size="md" color="danger" className={"sm:hidden"}>Vyprodáno</Chip>}
+                                                    {hasClassFreeSpot(c) && <span className="float-right mt-1.5 sm:mt-1 mr-4 text-small sm:text-medium" >{c?.classType?.price} Kč</span>}
                                                 </div>
 
                                             </div>
@@ -488,10 +492,18 @@ export default function ReservationPage() {
                 </div>
             </section>
 
+            {/* Reservation form */}
             <section className={"w-full max-w-3xl " + (determineStep() === 4 ? "shown" : "hidden")}>
 
 
-                <h2 className="text-xl text-center font-bold pt-6">{new Date(selectedClass?.date ?? 0 ).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(selectedClass?.date ?? 0).toLocaleDateString()} v {selectedClass?.time}</h2>
+                <div>
+                    <Link isBlock onPress={() => setSelectedClass(null)} color={"foreground"} className="absolute mt-6 hover:cursor-pointer !text-xl text-center font-bold">
+                        <Icon icon={"weui:back-filled"} className="inline-block me-2" />
+                        Zpět
+                    </Link>
+                    <h2 className="text-xl text-center font-bold pt-6">{new Date(selectedClass?.date ?? 0 ).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(selectedClass?.date ?? 0).toLocaleDateString('cs-CZ')} v {selectedClass?.time}</h2>
+                </div>
+
 
                 <div className="flex my-6 gap-3 sm:gap-6 items-center">
                     <div className="lg:absolute lg:ml-[-5rem] items-center flex flex-col justify-center lg:w-14">
@@ -508,7 +520,7 @@ export default function ReservationPage() {
                             <div className="flex-1 h-full flex flex-col justify-between py-2 pe-2">
                                 <div>
                                     <h3 className="text-md font-semibold">{selectedClass?.classType.name}</h3>
-                                    <p className="text-small line-clamp-3">{selectedClass?.classType.description}</p>
+                                    <p className="text-small line-clamp-3 text-justify pe-3">{selectedClass?.classType.description}</p>
                                 </div>
                                 <div>
                                     <Avatar
@@ -518,6 +530,19 @@ export default function ReservationPage() {
                                         src={selectedClass?.trainer?.profilePicture as any}
                                     />
                                     <span className="text-small sm:text-medium" >{selectedClass?.trainer?.name}</span>
+
+                                    { selectedClass?.secondTrainer && (
+                                        <div className="inline-block ml-4">
+                                            <Avatar
+                                                alt={selectedClass?.secondTrainer?.name}
+                                                className="inline-flex me-2 hover:scale-125 transition-transform duration-200"
+                                                size="sm"
+                                                src={selectedClass?.secondTrainer?.profilePicture as any}
+                                            />
+                                            <span className="text-small sm:text-medium" >{selectedClass?.secondTrainer?.name}</span>
+                                        </div>
+                                    )}
+                                    <span className="float-right mt-1.5 sm:mt-1 mr-4 text-small sm:text-medium" >{selectedClass?.classType?.price} Kč</span>
                                 </div>
 
                             </div>
@@ -528,48 +553,28 @@ export default function ReservationPage() {
 
 
                 <Card className="p-2 mt-8">
-                    <CardHeader className="flex flex-col items-start px-4 pb-0 pt-2">
-                        {/*<div className="hidden flex flex-row  items-start  gap-5 mt-[-1.5rem] ml-[-1.5rem] h-48">
-                            <Image
-                                src={selectedClass?.classType.image as any}
-                                alt={selectedClass?.classType.name}
-                                className="w-36 h-36 sm:w-48 sm:h-48 rounded-none object-cover"
-                            />
-                            <div className="flex-1 h-full flex flex-col justify-between pt-4">
-                                <h2 className="text-xl font-bold ">{new Date(selectedClass?.date).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(selectedClass?.date).toLocaleDateString()} v {selectedClass?.time}</h2>
-                                <div>
-                                    <h3 className="text-sm font-semibold">{selectedClass?.classType.name}</h3>
-                                    <p className="text-sm line-clamp-3">{selectedClass?.classType.description}</p>
-                                </div>
-
-                                <div className="flex gap-2">
-                                    <Avatar
-                                        alt={selectedClass?.trainer?.name}
-                                        className="inline-flex me-2 hover:scale-125 transition-transform duration-200"
-                                        size="lg"
-                                        src={selectedClass?.trainer?.profilePicture as any}
-                                    />
-                                    <div className="flex flex-col items-start justify-center">
-                                        <p className="text-sm font-medium">{selectedClass?.trainer?.name}</p>
-                                        <span className="text-sm text-default-500">{selectedClass?.trainer?.expertise}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>*/}
-                    </CardHeader>
                     <CardBody>
                         <Form validationBehavior="native" onSubmit={(e) => handleReservationSubmit(e)}>
+
+                            <span className="relative text-foreground-500">Osobní údaje</span>
                             <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
-                                {/* Username */}
+
                                 <Input
                                     isRequired
-                                    name="name"
-                                    label="Jméno a příjmení"
+                                    name="firstName"
+                                    label="Jméno"
                                     labelPlacement="outside"
-                                    placeholder="Zadejte jméno a příjmení"
-                                    autoComplete="name"
+                                    placeholder="Zadejte jméno"
+                                    autoComplete="firstName"
                                 />
-                                {/* Email */}
+                                <Input
+                                    isRequired
+                                    name="lastName"
+                                    label="Příjmení"
+                                    labelPlacement="outside"
+                                    placeholder="Zadejte příjmení"
+                                    autoComplete="lastName"
+                                />
                                 <Input
                                     isRequired
                                     name="email"
@@ -589,13 +594,19 @@ export default function ReservationPage() {
                                     type="tel"
                                     autoComplete="tel"
                                 />
-
                             </div>
 
-                            <div className="pt-6 flex w-full justify-between gap-2">
-                                <Button variant="light" onPress={() => setSelectedClass(null)}>
-                                    Zpět
-                                </Button>
+
+                            <span className="relative text-foreground-500 pt-6">Platební metoda</span>
+                            <PaymentMethodRadioGroup/>
+
+
+
+
+
+
+                            <div className="pt-6 flex w-full justify-end gap-2">
+
                                 <Button color="primary" type="submit" isLoading={isSubmitting}>
                                     Odeslat rezervaci
                                 </Button>
@@ -605,6 +616,7 @@ export default function ReservationPage() {
                 </Card>
             </section>
 
+            {/* Thank You page */}
             <section className={"w-full max-w-3xl " + (determineStep() === 5 ? "shown" : "hidden")}>
                 <div className="flex flex-col items-center justify-center gap-4 pt-20">
                     <Image
@@ -615,17 +627,11 @@ export default function ReservationPage() {
 
                     <h1 className="text-4xl text-center font-bold pt-4 pb-2">Děkujeme za vaši rezervaci!</h1>
                     <p className="text-lg text-center">
-                        Vaše rezervace na lekci <b>{selectedClass?.classType.name}</b>  dne <b>{new Date(selectedClass?.date ?? -1).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(selectedClass?.date ?? -1).toLocaleDateString()} v {selectedClass?.time}</b> byla úspěšně odeslána. Těšíme se na vás, tým BeBrave.
+                        Vaše rezervace na lekci <b>{selectedClass?.classType.name}</b>  dne <b>{new Date(selectedClass?.date ?? -1).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(selectedClass?.date ?? -1).toLocaleDateString('cs-CZ')} v {selectedClass?.time}</b> byla úspěšně odeslána. Těšíme se na vás, tým BeBrave.
                     </p>
                 </div>
 
             </section>
-
-
-
-
-
-
 
         </div>
     );

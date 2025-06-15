@@ -4,6 +4,14 @@ import { db } from "@/db";
 import {Class, classesTable, ClassType, classTypesTable, ClassWithRelations, reservationsTable, Trainer, trainersTable, TrainerWithRelations} from "@/db/schema";
 import { desc } from "drizzle-orm";
 import {Resend} from "resend";
+import axios from "axios";
+
+
+// Keep inmemory last access token
+const CLOUD_ID = process.env.CLOUD_ID || '373067553';
+const REFRESH_TOKEN = process.env.REFRESH_TOKEN || 'f4813dc9dd81ebcc58dbefa452a3295c';
+var ACCESS_TOKEN: string | PromiseLike<string | null> | null = null;
+
 
 export async function getTrainers(): Promise<TrainerWithRelations[]> {
     const data = await db.query.trainersTable.findMany({
@@ -52,11 +60,7 @@ export async function getClasses(): Promise<ClassWithRelations[]> {
             classType: true,
             trainer: true,
             secondTrainer: true,
-            reservations: {
-                with: {
-                    user: true,
-                }
-            },
+            reservations: true,
         }
     });
 
@@ -71,19 +75,35 @@ export async function getClasses(): Promise<ClassWithRelations[]> {
 }
 
 
-export async function createReservation(classWithRelations: ClassWithRelations, userId?: number | string, userData?: any): Promise<boolean> {
+export async function createReservation(classWithRelations: ClassWithRelations, userId?: string, userData?: any): Promise<boolean> {
+
+
+    if (!userId && !userData) {
+        throw new Error("Either userId or userData must be provided to create a reservation");
+    }
 
     try {
+
+        let dotyposUserId = userId ? String(userId) : null;
+        // If userId is not provided, create a new customer in Dotypos
+        if (!dotyposUserId)
+            dotyposUserId = await dotyposCreateCustomer(userData);
+
         // insert reservation into the database
         await db.insert(reservationsTable).values({
             classId: classWithRelations.id,
-            userId: userId ? Number(userId) : null,
+            userId: dotyposUserId,
             status: 'confirmed', // or 'confirmed' based on your logic
-            name: userData?.name,
+            firstName: userData?.firstName,
+            lastName: userData?.lastName,
             email: userData?.email,
             phone: userData?.phone,
         })
 
+
+
+
+        return Promise.resolve(true);
 
         const resend = new Resend('re_fPhhnprW_2SD7UaFhoM9ZdPo7bhWeMqxc');
 
@@ -105,4 +125,119 @@ export async function createReservation(classWithRelations: ClassWithRelations, 
         return Promise.reject("Došlo k chybě při vytváření rezervace. Zkuste to prosím znovu později.");
     }
 
+}
+
+
+async function getNewAccessToken(): Promise<string | null> {
+    if (!REFRESH_TOKEN) {
+        console.error("No refresh token provided");
+        return null;
+    }
+
+    const response = await axios({
+        "method": "POST",
+        "url": "https://api.dotykacka.cz/v2/signin/token",
+        "headers": {
+            "Content-Type": "application/json; charset=UTF-8",
+            "Accept": "application/json; charset=UTF-8",
+            "Authorization": `User ${REFRESH_TOKEN}`,
+        },
+        "data": {
+            "_cloudId": CLOUD_ID,
+        }
+    })
+
+
+    ACCESS_TOKEN = response.data?.accessToken;
+
+    return ACCESS_TOKEN;
+}
+
+async function dotyposCreateCustomer(userData: any): Promise<string | null> {
+    if (!ACCESS_TOKEN) {
+        ACCESS_TOKEN = await getNewAccessToken();
+    }
+
+    if (!ACCESS_TOKEN) {
+        throw new Error("No access token available");
+    }
+
+    console.log("Creating customer in Dotypos with data:", userData);
+    console.log(`email|like|${userData.email}`);
+    console.log(`CLOUD_ID: ${CLOUD_ID}`);
+    console.log(`Bearer ${ACCESS_TOKEN}`);
+
+
+    try {
+        const response = await axios({
+            "method": "GET",
+            "url": `https://api.dotykacka.cz/v2/clouds/${CLOUD_ID}/customers`,
+            "params": {
+                "filter" : `email|like|${userData.email}`,
+            },
+            "headers": {
+                "Content-Type": "application/json; charset=UTF-8",
+                "Accept": "application/json; charset=UTF-8",
+                "Authorization": `Bearer ${ACCESS_TOKEN}`,
+            }
+        })
+
+        console.log("Response from Dotypos:", response.data);
+
+        if (response.data?.totalItemsCount > 0) {
+            // Customer already exists, return the first one
+            return response.data.data[0]?.id;
+        }
+    } catch (error) {
+
+        // if response 404, then the customer does not exist
+        if (axios.isAxiosError(error) && error.response?.status === 404) {
+            // Create a new customer
+            const createResponse = await axios({
+                "method": "POST",
+                "url": `https://api.dotykacka.cz/v2/clouds/${CLOUD_ID}/customers`,
+                "headers": {
+                    "Content-Type": "application/json; charset=UTF-8",
+                    "Accept": "application/json; charset=UTF-8",
+                    "Authorization": `Bearer ${ACCESS_TOKEN}`,
+                },
+                "data": [
+                    {
+                        "_cloudId": CLOUD_ID,
+                        "firstName": userData.firstName,
+                        "lastName": userData.lastName,
+                        "phone": String(userData.phone),
+                        "email": userData.email,
+
+                        //"externalId": "",
+                        "internalNote": "",
+
+                        "addressLine1": "",
+                        //"city": "",
+                        //"country": "",
+                        "zip": "",
+
+                        "barcode": "",
+                        "companyId": "",
+                        "companyName": "",
+                        "deleted": false,
+                        "display": true,
+                        "headerPrint": "",
+                        "hexColor": "#000000",
+                        "points": 0,
+                        "tags": [],
+                        "vatId": "",
+                        "flags": "0"
+                    }
+                ]
+            });
+
+            return createResponse.data[0]?.id || null;
+        } else {
+            console.error("Error fetching customer:", error);
+            throw new Error("Nastala se chyba při vytváření zákazníka v Dotykačce. Zkuste to prosím znovu později.");
+        }
+    }
+
+    return null;
 }

@@ -5,40 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="878e36bd-1ad8-483a-aae1-c8c02b1128eb" name="Changes" comment="init base">
-      <change afterPath="$PROJECT_DIR$/public/photos/classes/absburn.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/classes/bodyattack.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/classes/bodybalance.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/classes/bodypump.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/classes/bodystep.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/classes/bootyboost.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/classes/jogalates.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/classes/lmcore.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/classes/lmgrit.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/classes/pilates.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/classes/trx.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/classes/yoga.jpeg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/nahledy/bebrave-54_websize.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/trainers (kopie)/andrea.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/trainers (kopie)/diana.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/trainers (kopie)/dominik.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/trainers (kopie)/lucka.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/trainers (kopie)/martina.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/trainers (kopie)/terka.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/trainers/andrea.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/trainers/diana.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/trainers/dominik.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/trainers/lucka.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/trainers/martina.jpg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/public/photos/trainers/terka.jpg" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/blocks/PaymentMethodItem.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/blocks/PaymentMethodRadio.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(administration)/admin/calendar/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(administration)/admin/calendar/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(administration)/admin/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(administration)/admin/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(administration)/admin/sidebar-items.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(administration)/admin/sidebar-items.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(web)/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/layout.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(web)/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(web)/reservation/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/reservation/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/bun.lock" beforeDir="false" afterPath="$PROJECT_DIR$/bun.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/navbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/navbar.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/actions.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db/schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/schema.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
@@ -51,8 +23,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="TypeScript File" />
         <option value="TypeScript JSX File" />
+        <option value="TypeScript File" />
       </list>
     </option>
   </component>
@@ -148,7 +120,7 @@
       <workItem from="1749725597966" duration="1536000" />
       <workItem from="1749727156855" duration="22000" />
       <workItem from="1749727188958" duration="128000" />
-      <workItem from="1749727324996" duration="13453000" />
+      <workItem from="1749727324996" duration="27958000" />
     </task>
     <task id="LOCAL-00001" summary="init base">
       <option name="closed" value="true" />

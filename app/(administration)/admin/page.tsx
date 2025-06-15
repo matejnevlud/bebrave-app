@@ -424,7 +424,7 @@ export default function AdminPage() {
                             </TableCell>
 
                             <TableCell>
-                                <Button color="success"  variant={"bordered"} onPress={() => openReservationModal(item)}>
+                                <Button color={item.reservations?.length > 0 ? "warning" : item.reservations?.length >=3 ? "success" : undefined}  variant={"bordered"} onPress={() => openReservationModal(item)}>
                                     {item.reservations?.length} / {item.capacity}
                                 </Button>
                             </TableCell>
@@ -452,7 +452,7 @@ export default function AdminPage() {
                                         {(item) => (
                                             <TableRow key={item.id} className="h-[4.5rem] hover:bg-default-100 cursor-pointer">
                                                 <TableCell className="flex-col flex gap-2">
-                                                    <span className="font-medium text-medium">{item.name}</span>
+                                                    <span className="font-medium text-medium">{item.firstName} {item.lastName}</span>
                                                     <span className="text-small">{item.phone}</span>
                                                 </TableCell>
                                                 <TableCell>
