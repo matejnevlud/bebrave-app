@@ -424,7 +424,7 @@ export default function AdminPage() {
                             </TableCell>
 
                             <TableCell>
-                                <Button color={item.reservations?.length > 0 ? "warning" : item.reservations?.length >=3 ? "success" : undefined}  variant={"bordered"} onPress={() => openReservationModal(item)}>
+                                <Button color={item.reservations?.length >= 3 ? "success" : item.reservations?.length > 0 ? "warning" : undefined}  variant={"bordered"} onPress={() => openReservationModal(item)}>
                                     {item.reservations?.length} / {item.capacity}
                                 </Button>
                             </TableCell>

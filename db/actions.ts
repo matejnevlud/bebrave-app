@@ -5,6 +5,7 @@ import {Class, classesTable, ClassType, classTypesTable, ClassWithRelations, res
 import { desc } from "drizzle-orm";
 import {Resend} from "resend";
 import axios from "axios";
+import {reservationEmail} from "@/db/reservation_email";
 
 
 // Keep inmemory last access token
@@ -101,19 +102,25 @@ export async function createReservation(classWithRelations: ClassWithRelations, 
         })
 
 
+        let htmlString = reservationEmail;
+        // Replace placeholders with actual data
+        htmlString = htmlString.replace('{{studio_name}}', 'BeBrave Studio');
+        htmlString = htmlString.replace('{{first_name}}', userData?.firstName || 'Zákazník');
+        htmlString = htmlString.replace('{{date}}', new Date(classWithRelations?.date ?? -1).toLocaleDateString('cs-CZ', { weekday: 'long' }) + ', ' + new Date(classWithRelations?.date ?? -1).toLocaleDateString('cs-CZ', { year: 'numeric', month: 'long', day: 'numeric' }));
+        htmlString = htmlString.replace('{{time}}', classWithRelations?.time || 'Neznámý čas');
+        htmlString = htmlString.replace('{{class_name}}', classWithRelations.classType.name);
+        htmlString = htmlString.replace('{{trainer_name}}', classWithRelations.trainer.name);
+        htmlString = htmlString.replace('{{price}}', classWithRelations.classType.price ? `${classWithRelations.classType.price} Kč` : 'Cena není stanovena');
 
-
-        return Promise.resolve(true);
-
+        // Send email using Resend
         const resend = new Resend('re_fPhhnprW_2SD7UaFhoM9ZdPo7bhWeMqxc');
 
         // set js Date locale to Czech
-        const locale = 'cs-CZ';
         resend.emails.send({
             from: 'BeBrave Studio <info@bebravestudio.cz>',
             to: [userData?.email],
-            subject: 'Rezervace potvrzena',
-            html: '<p>Dobrý den,</p><p>Vaše rezervace byla úspěšně potvrzena.</p><p>Podrobnosti o vaší rezervaci:</p><ul><li>Cvičení: ' + classWithRelations.classType.name + '</li><li>Trenér: ' + classWithRelations.trainer.name + '</li><li>Datum a čas: ' + `${new Date(classWithRelations?.date ?? -1).toLocaleDateString('cs-CZ', { weekday: 'long' })} ${new Date(classWithRelations?.date ?? -1).toLocaleDateString('cs-CZ')} v ${classWithRelations?.time}` + '</li></ul><p>Těšíme se na vás, tým BeBrave.</p>',
+            subject: `Rezervace lekce ${classWithRelations.classType.name} - ${new Date(classWithRelations.date).toLocaleDateString('cs-CZ', { year: 'numeric', month: 'long', day: 'numeric' })}`,
+            html: htmlString,
         }).catch(err => {
             console.error("Error sending email:", err);
             alert("Došlo k chybě při odesílání rezervace. Zkuste to prosím znovu později.");
