@@ -77,7 +77,12 @@ export const PayPalIcon: React.FC<IconSvgProps> = ({width = 24, height = 24, ...
 };
 
 
-const PaymentMethodRadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(
+type PaymentMethodGroupProps = {
+    allowQr?: boolean;
+    allowOsobne?: boolean;
+} & RadioGroupProps;
+
+const PaymentMethodRadioGroup = React.forwardRef<HTMLDivElement, PaymentMethodGroupProps>(
     ({className, classNames, ...props}, ref) => {
         return (
             <RadioGroup
@@ -87,7 +92,8 @@ const PaymentMethodRadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps
                     base: cn("mt-0 w-full", classNames?.base, className),
                     wrapper: cn("grid md:grid-cols-2", classNames?.wrapper),
                 }}
-                defaultValue="osobne"
+                value={props.allowQr ? "qr" : props.allowOsobne ? "osobne" : null}
+
                 orientation="horizontal"
             >
                 <PaymentMethodItem
@@ -99,12 +105,12 @@ const PaymentMethodRadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps
                     value="card"
                 />
                 <PaymentMethodItem
-                    isDisabled
+                    isDisabled={!props.allowQr}
                     className="bg-content2 dark:bg-content1"
-                    description="Připravujeme"
-                    icon={<Icon icon="fontisto:apple-pay" height={30} width={30}/>}
-                    label="Apple Pay"
-                    value="applepay"
+                    description={props.allowQr ? "Bankovní převod přes QR kód" : "Připravujeme"}
+                    icon={<Icon icon="mdi:qrcode" height={30} width={30}/>}
+                    label="QR platba"
+                    value="qr"
                 />
                 <PaymentMethodItem
                     isDisabled
@@ -116,8 +122,9 @@ const PaymentMethodRadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps
                 />
 
                 <PaymentMethodItem
+                    isDisabled={!props.allowOsobne}
                     className="bg-content2 dark:bg-content1"
-                    description="Hotově nebo kartou"
+                    description={props.allowOsobne ? "Platba hotově nebo kartou na místě" : "Nepovoleno"}
                     icon={<Icon icon="mdi:cash-multiple" height={30} width={30}/>}
                     label="Na místě"
                     value="osobne"

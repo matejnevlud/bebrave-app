@@ -208,6 +208,7 @@ export default function ReservationPage() {
     }, [selectedClassType, selectedTrainer, classes, trainers]);
 
 
+
     const availableClassesForDate = React.useMemo(() => {
         if (!selectedDate) return [];
 
@@ -260,6 +261,11 @@ export default function ReservationPage() {
         return c.reservations.length < c.capacity;
     }
 
+    // allow QR only on class id 2
+    const [allowQr, setAllowQr] = useState<boolean>(false);
+    useEffect(() => {
+        setAllowQr(selectedClass?.classTypeId === 12); // Assuming classType.id 2 is the one that allows QR payment
+    }, [selectedClass]);
 
     async function handleReservationSubmit(event: any) {
         event.preventDefault();
@@ -598,7 +604,7 @@ export default function ReservationPage() {
 
 
                             <span className="relative text-foreground-500 pt-6">Platební metoda</span>
-                            <PaymentMethodRadioGroup/>
+                            <PaymentMethodRadioGroup allowQr={allowQr} allowOsobne={!allowQr}/>
 
 
 

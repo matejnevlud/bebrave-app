@@ -5,8 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="878e36bd-1ad8-483a-aae1-c8c02b1128eb" name="Changes" comment="init base">
+      <change afterPath="$PROJECT_DIR$/db/reservation_500_email.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/public/photos/classes/matcha.jpeg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/reservation_email.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/reservation_email.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(web)/reservation/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/reservation/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/blocks/PaymentMethodRadio.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/blocks/PaymentMethodRadio.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/actions.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +52,7 @@
     "git-widget-placeholder": "main",
     "js.debugger.nextJs.config.created.client": "true",
     "js.debugger.nextJs.config.created.server": "true",
-    "last_opened_file_path": "/Users/matejnevlud/github/bebrave-app/app/(administration)/admin/calendar",
+    "last_opened_file_path": "/Users/matejnevlud/github/bebrave-app/db",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -61,18 +65,18 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/db" />
       <recent name="$PROJECT_DIR$/app/(administration)/admin/calendar" />
       <recent name="$PROJECT_DIR$/app/(administration)/admin" />
       <recent name="$PROJECT_DIR$/app/(administration)" />
       <recent name="$PROJECT_DIR$/public" />
-      <recent name="$PROJECT_DIR$/app/reservation" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/public/photos/classes" />
       <recent name="$PROJECT_DIR$/db" />
       <recent name="$PROJECT_DIR$/public/photos/nahledy" />
       <recent name="$PROJECT_DIR$/app/(web)" />
       <recent name="$PROJECT_DIR$" />
-      <recent name="$PROJECT_DIR$/public" />
     </key>
   </component>
   <component name="RunManager" selected="npm.Next.js: server-side">
@@ -116,6 +120,8 @@
       <workItem from="1749727156855" duration="22000" />
       <workItem from="1749727188958" duration="128000" />
       <workItem from="1749727324996" duration="31212000" />
+      <workItem from="1750062934791" duration="96000" />
+      <workItem from="1750063051041" duration="3407000" />
     </task>
     <task id="LOCAL-00001" summary="init base">
       <option name="closed" value="true" />

@@ -6,6 +6,7 @@ import { desc } from "drizzle-orm";
 import {Resend} from "resend";
 import axios from "axios";
 import {reservationEmail} from "@/db/reservation_email";
+import {reservation500Email} from "@/db/reservation_500_email";
 
 
 // Keep inmemory last access token
@@ -103,6 +104,8 @@ export async function createReservation(classWithRelations: ClassWithRelations, 
 
 
         let htmlString = reservationEmail;
+        if(classWithRelations.classTypeId === 12)
+            htmlString = reservation500Email;
         // Replace placeholders with actual data
         htmlString = htmlString.replace('{{studio_name}}', 'BeBrave Studio');
         htmlString = htmlString.replace('{{first_name}}', userData?.firstName || 'Zákazník');
