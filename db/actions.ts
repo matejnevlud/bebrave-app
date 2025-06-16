@@ -164,9 +164,7 @@ async function getNewAccessToken(): Promise<string | null> {
 }
 
 async function dotyposCreateCustomer(userData: any): Promise<string | null> {
-    if (!ACCESS_TOKEN) {
-        ACCESS_TOKEN = await getNewAccessToken();
-    }
+    ACCESS_TOKEN = await getNewAccessToken();
 
     if (!ACCESS_TOKEN) {
         throw new Error("No access token available");
