@@ -73,6 +73,12 @@ export async function getClasses(): Promise<ClassWithRelations[]> {
         return dateA.getTime() - dateB.getTime();
     });
 
+    // Filter out classes that are in the past
+    data = data.filter((classItem) => {
+        const classDate = new Date(classItem.date + 'T' + classItem.time);
+        return classDate.getTime() >= Date.now();
+    });
+
     return data as ClassWithRelations[];
 }
 
