@@ -325,12 +325,18 @@ export default function LekcePage() {
 
             if (data.file && data.file instanceof File) {
                 const file = data.file;
-                const filePath = `/uploads/${file.name}`;
+
+                // get filetype
+                const fileType = file.type.split('/')[1]; // e.g. 'png', 'jpg', etc.
+                // create random file name
+                const randomFileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileType}`;
+
+                const filePath = `/uploads/${randomFileName}`;
                 // Here you would typically call an API to upload the file
                 // For example, using fetch or axios to send the file to your server
                 const fileFormData = new FormData();
                 fileFormData.append('file', file);
-                const response = await fetch(`/uploads/${file.name}`, {
+                const response = await fetch(`/uploads/${randomFileName}`, {
                     method: 'POST',
                     body: fileFormData,
                 });
