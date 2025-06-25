@@ -6,11 +6,22 @@ import React from "react";
 import {Logo} from "@/components/icons";
 import {Link} from "@heroui/link";
 
+
+
+
+
+
 export default function BlogLayout({
                                        children,
                                    }: {
     children: React.ReactNode;
 }) {
+
+    // determine current path
+    const currentPath = typeof window !== 'undefined' ? window.location.pathname : '';
+    // Check if the current path is the home page
+
+
     return (
         <section className="flex items-center h-screen justify-start max-h-screen">
 
@@ -22,7 +33,7 @@ export default function BlogLayout({
                     </div>
 
 
-                    <Sidebar defaultSelectedKey="home" items={items} />
+                    <Sidebar defaultSelectedKey="" items={items} />
 
                     <div className="w-full flex items-center justify-center ">
                         <Link

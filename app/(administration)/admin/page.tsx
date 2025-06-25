@@ -1,7 +1,7 @@
 "use client";
 
 import React, {useEffect, useMemo, useState} from "react";
-import {Avatar, Modal, ModalContent, ScrollShadow, Spinner, useDisclosure} from "@heroui/react";
+import {Avatar, DatePicker, Form, Modal, ModalContent, NumberInput, ScrollShadow, Select, SelectItem, Spinner, TimeInput, useDisclosure} from "@heroui/react";
 import {items} from "./sidebar-items";
 import Sidebar from "@/components/admin/sidebar";
 import{SVGProps} from "react";
@@ -17,13 +17,15 @@ import {
     Tooltip,
     ChipProps,
 } from "@heroui/react";
-import {ClassType, ClassWithRelations, TrainerWithRelations} from "@/db/schema";
-import {getClasses, getClassTypes, getTrainers} from "@/db/actions";
-import {getLocalTimeZone, today} from "@internationalized/date";
+import {Class, ClassType, ClassWithRelations, TrainerWithRelations} from "@/db/schema";
+import {getClasses, getClassTypes, getTrainers, updateClass} from "@/db/actions";
+import {getLocalTimeZone, parseDate, parseTime, Time, today} from "@internationalized/date";
 import {Button} from "@heroui/button";
 import {CameraIcon} from "lucide-react";
 import {Icon} from "@iconify/react";
 import {ModalBody, ModalFooter, ModalHeader} from "@heroui/modal";
+import {Input} from "@heroui/input";
+import {I18nProvider} from "@react-aria/i18n";
 
 type IconSvgProps = SVGProps<SVGSVGElement> & {
     size?: number;
@@ -236,9 +238,22 @@ export default function AdminPage() {
 
     let now = today(getLocalTimeZone());
     const [trainers, setTrainers] = useState<TrainerWithRelations[]>([]);
+    const trainersKeyValueArray = useMemo(() => {
+        return trainers.map((trainer) => ({
+            key: trainer.id.toString(),
+            value: trainer.name,
+        }));
+    }, [trainers]);
+
+    const [classTypes, setClassTypes] = useState<ClassType[]>([]);
+    const classTypesKeyValueArray = useMemo(() => {
+        return classTypes.map((classType) => ({
+            key: classType.id.toString(),
+            value: classType.name,
+        }));
+    }, [classTypes]);
 
     const [classes, setClasses] = useState<ClassWithRelations[]>([]);
-    const [classTypes, setClassTypes] = useState<ClassType[]>([]);
 
     const [isFetchingData, setIsFetchingData] = useState<boolean>(true);
 
@@ -294,6 +309,42 @@ export default function AdminPage() {
     function openReservationModal(c: ClassWithRelations) {
         setSelectedClass(c);
         onOpen();
+    }
+
+
+    async function saveClassChanges(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        let data = Object.fromEntries(new FormData(e.currentTarget));
+        console.log(data);
+
+        // create class like object partial
+        const updatedClass: Partial<Class> = {
+            id: selectedClass?.id,
+            date: data.date as string,
+            time: (data.time as string).substring(0, 5), // Ensure time is in HH:MM format
+            capacity: Number(data.capacity),
+            classTypeId: Number(data.classTypeId),
+            trainerId: Number(data.trainerId),
+            secondTrainerId: data.secondTrainerId ? Number(data.secondTrainerId) : null,
+        };
+
+        console.log("Updated class data:", updatedClass);
+
+
+
+        const fetchedClass = await updateClass(selectedClass?.id, updatedClass);
+        console.log("Updated class:", fetchedClass);
+        setSelectedClass(fetchedClass as ClassWithRelations);
+
+        //@ts-ignore
+        setClasses((prevClasses) => {
+            return prevClasses.map((c) => (c.id === fetchedClass?.id ? fetchedClass : c));
+        });
+
+
+
+
+
     }
 
 
@@ -441,9 +492,64 @@ export default function AdminPage() {
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1">Rezervace pro {selectedClass?.classType.name} - {new Date(selectedClass?.date ?? 0).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(selectedClass?.date ?? 0).toLocaleDateString()}</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">Detail {selectedClass?.classType.name} - {new Date(selectedClass?.date ?? 0).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(selectedClass?.date ?? 0).toLocaleDateString()}</ModalHeader>
                             <ModalBody>
-                                <Table aria-label="Example empty table" rowHeight={80} removeWrapper>
+                                <Form
+                                    className="w-full max-w grid grid-cols-1 md:grid-cols-2 gap-4"
+                                    onSubmit={saveClassChanges}
+                                >
+                                    <I18nProvider locale="cs-CZ">
+                                        <DatePicker isRequired name="date" label="Datum" labelPlacement="outside" defaultValue={parseDate(selectedClass?.date ?? "") ?? undefined}  hourCycle={24} />
+                                    </I18nProvider>
+                                    <TimeInput isRequired name="time" label="Čas" labelPlacement="outside" defaultValue={parseTime(selectedClass?.time ?? "00:00")} hourCycle={24} granularity={"minute"} />
+
+                                    <NumberInput isRequired name="capacity" label="Kapacita lekce" labelPlacement="outside" defaultValue={selectedClass?.capacity} maxValue={100} minValue={1}  formatOptions={{ style: "decimal", minimumFractionDigits: 0, maximumFractionDigits: 0 }} />
+
+
+                                    <Select
+                                        name="classTypeId"
+                                        label="Typ lekce"
+                                        labelPlacement="outside"
+                                        placeholder="Vyberte ze seznamu"
+                                        items={classTypesKeyValueArray}
+                                        isRequired
+                                        defaultSelectedKeys={selectedClass?.classType?.id ? [selectedClass.classType.id.toString()] : undefined}
+                                    >
+                                        {(classTypeKV) => <SelectItem>{classTypeKV.value}</SelectItem>}
+                                    </Select>
+
+                                    <Select
+                                        name="trainerId"
+                                        label="Trenér"
+                                        labelPlacement="outside"
+                                        placeholder="Vyberte ze seznamu"
+                                        items={trainersKeyValueArray}
+                                        isRequired
+                                        defaultSelectedKeys={selectedClass?.trainerId ? [selectedClass.trainerId.toString()] : undefined}
+                                    >
+                                        {(trainerKV) => <SelectItem>{trainerKV.value}</SelectItem>}
+                                    </Select>
+
+                                    <Select
+                                        name="secondTrainerId"
+                                        label="Druhý trenér"
+                                        labelPlacement="outside"
+                                        placeholder="Vyberte ze seznamu"
+                                        items={trainersKeyValueArray}
+                                        defaultSelectedKeys={selectedClass?.secondTrainerId ? [selectedClass.secondTrainerId.toString()] : undefined}
+                                    >
+                                        {(trainerKV) => <SelectItem>{trainerKV.value}</SelectItem>}
+                                    </Select>
+
+                                    <div className="col-span-2">
+                                        <Button className="col-span-full" color="success" type="submit">
+                                            Uložit změny
+                                        </Button>
+                                    </div>
+
+                                </Form>
+
+                                <Table aria-label="Example empty table" rowHeight={80} removeWrapper className="mt-8">
                                     <TableHeader>
                                         <TableColumn>Klient</TableColumn>
                                         <TableColumn>Datum rezervace</TableColumn>

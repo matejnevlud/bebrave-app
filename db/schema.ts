@@ -32,7 +32,7 @@ export const trainersRelations = relations(trainersTable, ({ many }) => ({
 
 
 
-
+export type TrainerClassType = typeof trainerClassTypesTable.$inferSelect;
 export const trainerClassTypesTable = pgTable("trainer_class_types", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     trainerId: integer().notNull(),
@@ -66,6 +66,10 @@ export const usersRelations = relations(usersTable, ({ many }) => ({
 
 
 export type ClassType = typeof classTypesTable.$inferSelect;
+export type ClassTypeWithRelations = ClassType & {
+    trainerClassTypes: TrainerClassType[];
+    classes: ClassWithRelations[];
+}
 export const classTypesTable = pgTable("class_types", {
     id: integer().primaryKey().generatedAlwaysAsIdentity(),
     name: varchar({ length: 255 }).notNull(),

@@ -11,10 +11,16 @@ import TeamAvatar from "./team-avatar";
 export const items: SidebarItem[] = [
     {
         key: "home",
-        href: "#",
+        href: "/admin",
         icon: "solar:home-2-linear",
         title: "Přehled",
     },
+    {
+        key: "lekce",
+        href: "/admin/lekce",
+        icon: "solar:checklist-minimalistic-outline",
+        title: "Lekce",
+    }
     /*{
         key: "projects",
         href: "#",

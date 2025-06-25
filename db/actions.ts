@@ -1,8 +1,8 @@
 "use server";
 
 import { db } from "@/db";
-import {Class, classesTable, ClassType, classTypesTable, ClassWithRelations, reservationsTable, Trainer, trainersTable, TrainerWithRelations} from "@/db/schema";
-import { desc } from "drizzle-orm";
+import {Class, classesTable, ClassType, classTypesTable, ClassTypeWithRelations, ClassWithRelations, reservationsTable, Trainer, trainersTable, TrainerWithRelations} from "@/db/schema";
+import {desc, eq} from "drizzle-orm";
 import {Resend} from "resend";
 import axios from "axios";
 import {reservationEmail} from "@/db/reservation_email";
@@ -35,7 +35,7 @@ export async function getTrainers(): Promise<TrainerWithRelations[]> {
     return data as TrainerWithRelations[];
 }
 
-export async function getClassTypes(): Promise<ClassType[]> {
+export async function getClassTypes(): Promise<ClassTypeWithRelations[]> {
     const data = await db.query.classTypesTable.findMany({
         with: {
             trainerClassTypes: {
@@ -53,7 +53,7 @@ export async function getClassTypes(): Promise<ClassType[]> {
         }
     });
 
-    return data;
+    return data as any;
 }
 
 export async function getClasses(): Promise<ClassWithRelations[]> {
@@ -81,6 +81,176 @@ export async function getClasses(): Promise<ClassWithRelations[]> {
 
     return data as ClassWithRelations[];
 }
+
+
+
+
+export async function createClass(classData: Partial<Class>): Promise<ClassWithRelations | null> {
+    try {
+        // Ensure classData has all required fields
+        if (!classData.classTypeId || !classData.trainerId || !classData.date || !classData.time || !classData.location || !classData.capacity) {
+            throw new Error("Missing required fields to create a class");
+        }
+
+        console.log(classData)
+        // Insert the new class into the database
+        const [newClass] = await db.insert(classesTable)
+            .values(classData as any)
+            .returning();
+
+        // Fetch the newly created class with relations
+        const classWithRelations = await db.query.classesTable.findFirst({
+            where: eq(classesTable.id, newClass.id),
+            with: {
+                classType: true,
+                trainer: true,
+                secondTrainer: true,
+                reservations: true,
+            }
+        });
+
+        return classWithRelations as ClassWithRelations;
+    } catch (error) {
+        console.error("Error creating class:", error);
+        throw new Error("Nastala se chyba při vytváření lekce. Zkuste to prosím znovu později.");
+    }
+}
+
+export async function updateClass(classId: number | undefined, classData: Partial<Class>): Promise<ClassWithRelations | null> {
+    try {
+        if(!classId) {
+            throw new Error("Class ID is required to update a class");
+        }
+
+        //strip id from classData if it exists
+        if (classData.id) delete classData.id;
+
+
+        const updatedClass = await db.update(classesTable)
+            .set(classData)
+            .where(eq(classesTable.id, classId))
+            .returning();
+
+        if (updatedClass.length === 0) {
+            return null;
+        }
+
+        // Fetch the updated class with relations
+        const classWithRelations = await db.query.classesTable.findFirst({
+            where: eq(classesTable.id, classId),
+            with: {
+                classType: true,
+                trainer: true,
+                secondTrainer: true,
+                reservations: true,
+            }
+        });
+
+        return classWithRelations as ClassWithRelations;
+    } catch (error) {
+        console.error("Error updating class:", error);
+        throw new Error("Nastala se chyba při aktualizaci lekce. Zkuste to prosím znovu později.");
+    }
+}
+
+
+export async function deleteClass(classId: number): Promise<boolean> {
+    try {
+        // Delete the class from the database
+        const result = await db.delete(classesTable)
+            .where(eq(classesTable.id, classId));
+
+        return true
+    } catch (error) {
+        console.error("Error deleting class:", error);
+        throw new Error("Nastala se chyba při mazání lekce. Zkuste to prosím znovu později.");
+    }
+}
+
+
+
+export async function createClassType(classTypeData: Partial<ClassType>): Promise<ClassTypeWithRelations | null> {
+    try {
+        // Ensure classTypeData has all required fields
+        if (!classTypeData.name || !classTypeData.price) {
+            throw new Error("Missing required fields to create a class type");
+        }
+
+        // Insert the new class type into the database
+        const [newClassType] = await db.insert(classTypesTable)
+            .values(classTypeData as any)
+            .returning();
+
+        // Fetch the newly created class type with relations
+        const classTypeWithRelations = await db.query.classTypesTable.findFirst({
+            where: eq(classTypesTable.id, newClassType.id),
+            with: {
+                trainerClassTypes: {
+                    with: {
+                        trainer: true,
+                    }
+                },
+                classes: {
+                    with: {
+                        trainer: true,
+                        secondTrainer: true,
+                        reservations: true,
+                    }
+                },
+            }
+        });
+
+        return classTypeWithRelations as any as ClassTypeWithRelations;
+    } catch (error) {
+        console.error("Error creating class type:", error);
+        throw new Error("Nastala se chyba při vytváření typu lekce. Zkuste to prosím znovu později.");
+    }
+}
+
+export async function updateClassType(classTypeId: number | undefined, classTypeData: Partial<ClassType>): Promise<ClassTypeWithRelations | null> {
+    try {
+        if(!classTypeId) {
+            throw new Error("Class Type ID is required to update a class type");
+        }
+
+        //strip id from classTypeData if it exists
+        if (classTypeData.id) delete classTypeData.id;
+
+        const updatedClassType = await db.update(classTypesTable)
+            .set(classTypeData)
+            .where(eq(classTypesTable.id, classTypeId))
+            .returning();
+
+        if (updatedClassType.length === 0) {
+            return null;
+        }
+
+        // Fetch the updated class type with relations
+        const classTypeWithRelations = await db.query.classTypesTable.findFirst({
+            where: eq(classTypesTable.id, classTypeId),
+            with: {
+                trainerClassTypes: {
+                    with: {
+                        trainer: true,
+                    }
+                },
+                classes: {
+                    with: {
+                        trainer: true,
+                        secondTrainer: true,
+                        reservations: true,
+                    }
+                },
+            }
+        });
+
+        return classTypeWithRelations as any as ClassTypeWithRelations;
+    } catch (error) {
+        console.error("Error updating class type:", error);
+        throw new Error("Nastala se chyba při aktualizaci typu lekce. Zkuste to prosím znovu později.");
+    }
+}
+
 
 
 export async function createReservation(classWithRelations: ClassWithRelations, userId?: string, userData?: any): Promise<boolean> {
@@ -142,6 +312,8 @@ export async function createReservation(classWithRelations: ClassWithRelations, 
     }
 
 }
+
+
 
 
 async function getNewAccessToken(): Promise<string | null> {
