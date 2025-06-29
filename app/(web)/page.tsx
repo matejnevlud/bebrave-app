@@ -12,12 +12,8 @@ export default function Home() {
         <div className="">
 
             <div className="max-w-none w-screen ml-[-1.5rem] aspect-[3/4] sm:aspect-[3/2] lg:aspect-[2/1] 2xl:aspect-[21/9]   bg-white">
-                <video className="hidden absolute left-0 right-0 w-full aspect-[3/4] sm:aspect-[3/2] lg:aspect-[2/1] 2xl:aspect-[21/9] object-cover" autoPlay muted loop playsInline preload="auto" poster="/first_frame.jpg" >
-                    <source src="https://vz-affca140-be8.b-cdn.net/19067402-0d15-4eff-8550-073f1564cf7b/playlist.m3u8" type="application/x-mpegURL" />
-                    <source src="https://vz-affca140-be8.b-cdn.net/19067402-0d15-4eff-8550-073f1564cf7b/play_720p.mp4" type="video/mp4" />
-                </video>
 
-                <HlsPlayer src={"https://vz-affca140-be8.b-cdn.net/19067402-0d15-4eff-8550-073f1564cf7b/playlist.m3u8"} />
+                <HlsPlayer src={"https://customer-llaf4k9ibc46xjbf.cloudflarestream.com/d625d429477546b9d805abd99bff0cf9/manifest/video.m3u8"} />
                 <div className="relative h-full flex items-center justify-center pl-16 pr-8 sm:pl-20 sm:pr-16">
                     <Logo width={800} color={'white'} className="bg-blend-color-dodge" />
                 </div>
@@ -67,7 +63,7 @@ export default function Home() {
                             isBlurred
                             alt="HeroUI Album Cover"
                             className="rounded-md hover:scale-[1.02] transition-transform duration-300"
-                            src="/photos/nahledy/bebrave-54_websize.jpg"
+                            src="https://imagedelivery.net/eo8aTqb-9sQsvXZHFngPsQ/a8fd5b98-0384-462c-807e-a2ee774ca000/public"
                         />
                     </div>
                     <div className="leading-7 flex-1 content-start">
@@ -100,7 +96,7 @@ export default function Home() {
                             height={"30em"}
                             width={"100%"}
                             style={{ objectFit: "cover", objectPosition: "50% 50%" }}
-                            src="/photos/classes/bodypump.jpeg"
+                            src="https://imagedelivery.net/eo8aTqb-9sQsvXZHFngPsQ/6d2f366d-4444-43c2-09cd-56ce13324c00/public"
                         />
                     </div>
                     <div className="leading-7 flex-1 content-start">
@@ -131,7 +127,7 @@ export default function Home() {
                             height={"30em"}
                             width={"100%"}
                             style={{ objectFit: "cover", objectPosition: "50% 40%" }}
-                            src="/photos/classes/bodyattack.jpeg"
+                            src="https://imagedelivery.net/eo8aTqb-9sQsvXZHFngPsQ/07b9d292-a6e8-4cb5-94cd-98d8cad4a300/public"
                         />
                     </div>
                 </div>
@@ -145,7 +141,7 @@ export default function Home() {
                             height={"30em"}
                             width={"100%"}
                             style={{ objectFit: "cover", objectPosition: "50% 40%" }}
-                            src="/photos/classes/bodybalance.jpeg"
+                            src="https://imagedelivery.net/eo8aTqb-9sQsvXZHFngPsQ/b85a0ed2-a8e9-440a-f742-0ad1c6a5e000/public"
                         />
                     </div>
                     <div className="leading-7 flex-1 content-start">
@@ -176,7 +172,7 @@ export default function Home() {
                             height={"30em"}
                             width={"100%"}
                             style={{ objectFit: "cover", objectPosition: "50% 40%" }}
-                            src="/photos/classes/lmcore.jpeg"
+                            src="https://imagedelivery.net/eo8aTqb-9sQsvXZHFngPsQ/806fbd80-56e0-4e1a-c80e-1e43ac9c3200/public"
                         />
                     </div>
                 </div>
@@ -190,7 +186,7 @@ export default function Home() {
                             height={"30em"}
                             width={"100%"}
                             style={{ objectFit: "cover", objectPosition: "50% 10%" }}
-                            src="/photos/classes/lmgrit.jpeg"
+                            src="https://imagedelivery.net/eo8aTqb-9sQsvXZHFngPsQ/2a372e87-02cc-437a-03a3-356cf5b4b700/public"
                         />
                     </div>
                     <div className="leading-7 flex-1 content-start">
@@ -221,7 +217,7 @@ export default function Home() {
                             height={"30em"}
                             width={"100%"}
                             style={{ objectFit: "cover", objectPosition: "50% 20%" }}
-                            src="/photos/classes/bodystep.jpeg"
+                            src="https://imagedelivery.net/eo8aTqb-9sQsvXZHFngPsQ/b4605d34-5892-4ac8-6bae-517db5e61800/public"
                         />
                     </div>
                 </div>
@@ -235,7 +231,7 @@ export default function Home() {
                             height={"30em"}
                             width={"100%"}
                             style={{ objectFit: "cover", objectPosition: "50% 30%" }}
-                            src="/photos/classes/bootyboost.jpeg"
+                            src="https://imagedelivery.net/eo8aTqb-9sQsvXZHFngPsQ/94adf910-d5f6-4c5a-4f55-98d257df0700/public"
                         />
                     </div>
                     <div className="leading-7 flex-1 content-start">
@@ -266,7 +262,7 @@ export default function Home() {
                             height={"30em"}
                             width={"100%"}
                             style={{ objectFit: "cover", objectPosition: "50% 60%" }}
-                            src="/photos/classes/absburn.jpeg"
+                            src="https://imagedelivery.net/eo8aTqb-9sQsvXZHFngPsQ/deee7a03-94e7-406d-d95d-81991be26800/public"
                         />
                     </div>
                 </div>
@@ -281,7 +277,7 @@ export default function Home() {
                             height={"30em"}
                             width={"100%"}
                             style={{ objectFit: "cover", objectPosition: "50% 30%" }}
-                            src="/photos/classes/yoga.jpeg"
+                            src="https://imagedelivery.net/eo8aTqb-9sQsvXZHFngPsQ/06694bcc-b527-4dc1-5ecb-6ef7d3cde200/public"
                         />
                     </div>
                     <div className="leading-7 flex-1 content-start">
@@ -312,7 +308,7 @@ export default function Home() {
                             height={"30em"}
                             width={"100%"}
                             style={{ objectFit: "cover", objectPosition: "50% 60%" }}
-                            src="/photos/classes/pilates.jpeg"
+                            src="https://imagedelivery.net/eo8aTqb-9sQsvXZHFngPsQ/a4ccd189-8e2d-4965-1792-3e4ad5bd8100/public"
                         />
                     </div>
                 </div>
@@ -327,7 +323,7 @@ export default function Home() {
                             height={"30em"}
                             width={"100%"}
                             style={{ objectFit: "cover", objectPosition: "50% 20%" }}
-                            src="/photos/classes/jogalates.jpeg"
+                            src="https://imagedelivery.net/eo8aTqb-9sQsvXZHFngPsQ/6d922c7e-c9c9-4777-d02e-f8b149a70f00/public"
                         />
                     </div>
                     <div className="leading-7 flex-1 content-start">
@@ -357,7 +353,7 @@ export default function Home() {
                             height={"30em"}
                             width={"100%"}
                             style={{ objectFit: "cover", objectPosition: "50% 60%" }}
-                            src="/photos/classes/trx.jpg"
+                            src="https://imagedelivery.net/eo8aTqb-9sQsvXZHFngPsQ/a49e841d-3a1d-4ce1-3838-cdd9db0f1500/public"
                         />
                     </div>
                 </div>

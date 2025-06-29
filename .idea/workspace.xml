@@ -5,9 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="878e36bd-1ad8-483a-aae1-c8c02b1128eb" name="Changes" comment="init base">
-      <change afterPath="$PROJECT_DIR$/app/(web)/TrainersForClass.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(web)/Lectors.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/Lectors.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(web)/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/page.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -127,7 +125,7 @@
       <workItem from="1750843326529" duration="4477000" />
       <workItem from="1750861452255" duration="10523000" />
       <workItem from="1751013100005" duration="10772000" />
-      <workItem from="1751189078000" duration="13436000" />
+      <workItem from="1751189078000" duration="14800000" />
     </task>
     <task id="LOCAL-00001" summary="init base">
       <option name="closed" value="true" />
