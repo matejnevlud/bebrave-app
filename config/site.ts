@@ -5,21 +5,18 @@ export const siteConfig = {
     description: "Group fitness classes",
     navItems: [
         {
-            label: "Lekce",
-            href: "/",
-        },
-        {
-            label: "Instruktoři",
-            href: "/",
-        },
-        {
-            label: "Blog",
-            href: "/",
-        },
-        {
             label: "O Nás",
-            href: "/",
+            href: "#onas",
         },
+        {
+            label: "Lekce",
+            href: "#lekce",
+        },
+       {
+            label: "Instruktoři",
+            href: "#instruktori",
+        }
+
     ],
     navMenuItems: [
         {

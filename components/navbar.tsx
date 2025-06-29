@@ -92,6 +92,7 @@ export const Navbar = () => {
                         href={"/reservation"}
                         startContent={<CalendarDays className={"pb-0.5"} size={24}  />}
                         variant="flat"
+                        color="success"
                     >
                         Rezervovat
                     </Button>

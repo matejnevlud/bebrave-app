@@ -4,7 +4,7 @@ export default function BlogLayout({
     children: React.ReactNode;
 }) {
     return (
-        <section className="max-w-7xl">
+        <section className="">
             {children}
 
         </section>
