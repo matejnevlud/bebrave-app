@@ -6,6 +6,7 @@ import { Image as HeroImage } from "@heroui/image";
 import {Link} from "@heroui/link";
 import Lectors from "@/app/(web)/Lectors";
 import HlsPlayer from "@/components/HLSPlayer";
+import TrainersForClass from "@/app/(web)/TrainersForClass";
 export default function Home() {
     return (
         <div className="">
@@ -104,6 +105,7 @@ export default function Home() {
                     </div>
                     <div className="leading-7 flex-1 content-start">
                         <h1 className="font-sans font-bold text-2xl sm:text-4xl">BODYPUMP</h1>
+                        <TrainersForClass classTypeName="BODYPUMP" />
                         <p className=" mt-4">
                             Bodypump je silová lekce, při které si intenzitu volíte sami a to zátěží na ose či kotoučích. V celé lekci postupně posílíte každou svalovou partii a individuálně se tak zaměříte na svůj vysněný progress.
                             Pokud chcete tónovat či posilovat své tělo.
@@ -115,6 +117,7 @@ export default function Home() {
 
                     <div className="leading-7 flex-1 content-start text-right">
                         <h1 className="font-sans font-bold text-2xl sm:text-4xl ">BODYATTACK</h1>
+                        <TrainersForClass classTypeName="BODYATTACK" right/>
                         <p className=" mt-4">
                             Jedná se o cardio lekci, inspirovanou atletickým tréninkem. V 55’ nás čekají pomyslné dva bloky, ve kterých se postupně zvyšuje tepová frekvence, až do úplného maxima. Bodyattack je doplněný o chytlavou hudbu a spoustu zábavy, takže věříme, že chytne i tebe. Hodina cardia ještě nikdy neutekla tak rychle !
 
@@ -147,6 +150,7 @@ export default function Home() {
                     </div>
                     <div className="leading-7 flex-1 content-start">
                         <h1 className="font-sans font-bold text-2xl sm:text-4xl">BODYBALANCE</h1>
+                        <TrainersForClass classTypeName="BODYBALANCE"/>
                         <p className=" mt-4">
                             Bodybalance je jeden z nejklidnějších LesMills programů. Je to spojení jógy, tai-chi a pilates, v jehož první části tělo spíše posílíme a v druhé protáhneme a zklidníme. Celá lekce je zakončena relaxací, kdy si každý najde moment, aby se zastavil, uvolnil a vnímal pouze přítomný moment.
                             Pocit po téhle lekci bude k nezaplacení.
@@ -158,6 +162,7 @@ export default function Home() {
 
                     <div className="leading-7 flex-1 content-start text-right">
                         <h1 className="font-sans font-bold text-2xl sm:text-4xl">LM CORE</h1>
+                        <TrainersForClass classTypeName="LM CORE" right/>
                         <p className=" mt-4">
                             Lekce LesMills Core je koncipovaná tak, aby jste v jejím průběhu posílili nejen břicho, ale opravdu celý střed těla. Záda, hýždě a břicho budou v tomto tréninku dominovat.
                             Takže pokud chceš zlepšit základ každého pohybu, LesMills Core určitě nevynechej !
@@ -190,6 +195,7 @@ export default function Home() {
                     </div>
                     <div className="leading-7 flex-1 content-start">
                         <h1 className="font-sans font-bold text-2xl sm:text-4xl">LM GRIT</h1>
+                        <TrainersForClass classTypeName="LM GRIT"/>
                         <p className=" mt-4">
                             LesMills Grit je 30’ intenzivní HIIT lekce. Máme tři druhy a to Cardio - s vlastní váhou, Strength - s osou a kotouči a Athletic - je položený na Strength základech, ale přidáváme práci se stepem.
                             Zkrátka krátký trénink, který tě zaručeně nakopne do správného tempa !
@@ -201,6 +207,7 @@ export default function Home() {
 
                     <div className="leading-7 flex-1 content-start text-right">
                         <h1 className="font-sans font-bold text-2xl sm:text-4xl">BODYSTEP</h1>
+                        <TrainersForClass classTypeName="BODYSTEP" right/>
                         <p className=" mt-4">
                             Bodystep je nejstarší LesMills program a jedná se o trénink založený na stepaerobních základech, ale s cílem zaměřit se na tvarování spodní části těla a to i pomocí lehké zátěže.
                             Jedná se o rytmickou lekci, která tě zaručeně rozhýbe.
@@ -233,6 +240,7 @@ export default function Home() {
                     </div>
                     <div className="leading-7 flex-1 content-start">
                         <h1 className="font-sans font-bold text-2xl sm:text-4xl">BootyBoost</h1>
+                        <TrainersForClass classTypeName="BootyBoost"/>
                         <p className=" mt-4">
                             Chceš se se svým výkonem posouvat neustále dopředu, vytvořit si disciplínu a udržet motivaci? A nebo zvýšit svou kondici a hlavně - mít PEVNÝ ZADEK ?
                             Na této lekci aktivně zapojíme převážně spodek a střed těla a všechny předchozí body zaručeně naplníme !
@@ -245,6 +253,7 @@ export default function Home() {
 
                     <div className="leading-7 flex-1 content-start text-right">
                         <h1 className="font-sans font-bold text-2xl sm:text-4xl">AbsBurn</h1>
+                        <TrainersForClass classTypeName="AbsBurn" right/>
                         <p className=" mt-4">
                             Chceš cítit břicho tak, jak už dlouho ne? Tak jsi na tom správném místě. ABSBurn je krátká lekce, ale o to intenzivnější, kde procvičíme jak samotné břišní svaly, tak hluboký stabilizační systém.
                         </p>
@@ -277,6 +286,7 @@ export default function Home() {
                     </div>
                     <div className="leading-7 flex-1 content-start">
                         <h1 className="font-sans font-bold text-2xl sm:text-4xl">Interval Yoga</h1>
+                        <TrainersForClass classTypeName="Interval Yoga"/>
                         <p className=" mt-4">
                             Interval yoga je dynamická lekce, která propojuje plynulost a principy vinyasa jógy s prvky intervalového tréninku. Budete mít prostor pro vnímání sebe sama a relaxaci, ale zároveň nás intenzivní fyzická část rozproudí a dodá lekci energii.
                             Zapracujeme na kondici, flexibilitě i mentálním resetu – zklidníme mysl a zároveň probudíme tělo.
@@ -289,6 +299,7 @@ export default function Home() {
 
                     <div className="leading-7 flex-1 content-start text-right">
                         <h1 className="font-sans font-bold text-2xl sm:text-4xl">Pilates</h1>
+                        <TrainersForClass classTypeName="Pilates" right/>
                         <p className=" mt-4">
                             Na mých lekcích Pilates klademe důraz na plynulé, kontrolované pohyby, vědomé zapojení svalů a synchronizaci s dechem. Díky malým činkám, závažím a odporovým gumám dokážete efektivně cílit na hluboké svalové skupiny i problémové partie – břicho, hýždě či záda.
                         </p>
@@ -321,6 +332,7 @@ export default function Home() {
                     </div>
                     <div className="leading-7 flex-1 content-start">
                         <h1 className="font-sans font-bold text-2xl sm:text-4xl">Jogalates</h1>
+                        <TrainersForClass classTypeName="Jogalates"/>
                         <p className=" mt-4">
                             Jogalates je lekce, která propojuje posilující prvky Pilates s plynulými jógovými pozicemi a závěrečnou meditací pro zklidnění těla i mysli. Díky pomůckám i cvičení bez nich posílíte hluboký střed, zlepšíte pružnost a uvolníte napětí. Čeká vás motivující vedení, plynulé přechody mezi pozicemi a harmonická kombinace síly, flexibility a duševní obnovy. Skvělý start do nového týdne!
                         </p>
@@ -331,6 +343,7 @@ export default function Home() {
 
                     <div className="leading-7 flex-1 content-start text-right">
                         <h1 className="font-sans font-bold text-2xl sm:text-4xl">TRX</h1>
+                        <TrainersForClass classTypeName="TRX" right/>
                         <p className=" mt-4">
                             TRX – cvičení na závěsném systému, který nabízí obrovskou variabilitu pohybových možností a cviků.
                             Tyto pohyby dávají každému bez rozdílu věku a kondice možnost plně využít pohybový potenciál, posílit i protáhnout tělo, zvýšit rozsah pohybu. Díky tomu budete nejen dobře vypadat, ale budete se tak i cítit.

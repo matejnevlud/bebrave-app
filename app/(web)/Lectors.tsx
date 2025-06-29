@@ -24,8 +24,8 @@ export default function Lectors() {
             {trainers.map((trainer) => (
                 <Card key={trainer.id} className="col-span-12 sm:col-span-4 h-[500px] hover:scale-[1.02] transition-transform duration-300 relative">
                     <CardHeader className="absolute z-10 top-1 bottom-0 flex-col items-start justify-between">
-                        <p className="text-medium text-white/80 uppercase font-bold">{trainer.trainerClassTypes.map(tct => tct.classType.name).join(', ')}</p>
-                        <h4 className="text-white/100 font-medium text-7xl text-shadow-lg" style={{ textShadow: "2px 2px 8px rgba(0, 0, 0, 0.4)" }}>
+                        <p className="text-medium text-white/80 uppercase font-bold" style={{ textShadow: "2px 2px 8px rgba(0, 0, 0, 0.2)" }}>{trainer.trainerClassTypes.map(tct => tct.classType.name).join(', ')}</p>
+                        <h4 className="text-white/100 font-medium text-5xl text-shadow-lg" style={{ textShadow: "2px 2px 8px rgba(0, 0, 0, 0.2)" }}>
                             {trainer.name}
                         </h4>
                     </CardHeader>
