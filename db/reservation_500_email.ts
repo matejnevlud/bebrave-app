@@ -61,7 +61,7 @@ export const reservation500Email = `
               <strong>Poznámka:</strong> Pro tento typ lekce je nutné uhradit platbu předem pomocí QR platby, kterou naleznete níže. Rezervace bude platná až po připsání platby. Děkujeme za pochopení.
               <div style="margin-top:12px;text-align:center;">
                 <!-- ZDE VLOŽTE QR KÓD -->
-                <img src="https://api.paylibo.com/paylibo/generator/czech/image?compress=false&size=440&accountNumber=2106290578&bankCode=2700&amount=500&currency=CZK&message=MATCHA+RAVE+-+BeBrave+Studio" alt="QR kód pro platbu" style="max-width:200px;display:inline-block;" />
+                <img src="https://api.paylibo.com/paylibo/generator/czech/image?compress=false&size=440&accountNumber=2106290578&bankCode=2700&amount=300&currency=CZK&message=BODYPUMP+-+BeBrave+Studio" alt="QR kód pro platbu" style="max-width:200px;display:inline-block;" />
               </div>
             </div>
           </td>

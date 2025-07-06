@@ -264,7 +264,7 @@ export default function ReservationPage() {
     // allow QR only on class id 2
     const [allowQr, setAllowQr] = useState<boolean>(false);
     useEffect(() => {
-        setAllowQr(selectedClass?.classTypeId === 12); // Assuming classType.id 2 is the one that allows QR payment
+        setAllowQr(selectedClass?.classTypeId === 21); // Assuming classType.id 2 is the one that allows QR payment
     }, [selectedClass]);
 
     async function handleReservationSubmit(event: any) {
