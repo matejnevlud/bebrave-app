@@ -280,7 +280,7 @@ export async function createReservation(classWithRelations: ClassWithRelations, 
 
 
         let htmlString = reservationEmail;
-        if(classWithRelations.classTypeId === 12)
+        if(classWithRelations.classTypeId === 21)
             htmlString = reservation500Email;
         // Replace placeholders with actual data
         htmlString = htmlString.replace('{{studio_name}}', 'BeBrave Studio');
