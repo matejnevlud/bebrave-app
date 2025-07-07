@@ -330,7 +330,7 @@ export default function ReservationPage() {
 
 
             {/* Calendar chooser */}
-            <section className={"w-full max-w-3xl " + (determineStep() >= 4 ? "hidden" : "")}>
+            <section className={"w-full px-2 max-w-3xl " + (determineStep() >= 4 ? "hidden" : "")}>
                 <div className="w-full max-w-3xl flex flex-col sm:flex-row gap-4 my-4 items-center justify-center">
                     <Select
                         aria-label="Select Class Type"
@@ -440,8 +440,8 @@ export default function ReservationPage() {
                         <Fragment>
                             <h2 className="text-xl font-bold text-center py-3">{new Date(date).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(date).toLocaleDateString('cs-CZ')}</h2>
                             {classes.map((c: ClassWithRelations) => (
-                                <div className="flex my-6 gap-3 sm:gap-6 items-center">
-                                    <div className="lg:absolute lg:ml-[-5rem] items-center flex flex-col justify-center lg:w-14">
+                                <div className="flex my-6 gap-3 sm:gap-6 items-start sm:items-center flex-col sm:flex-row">
+                                    <div className=" ml-4 sm:ml-0 lg:absolute lg:ml-[-5rem] items-center flex flex-row sm:flex-col gap-2 justify-center lg:w-14">
                                         <b>{c.time}</b>
                                         <span className="text-tiny">{c.classType.duration} min</span>
                                     </div>
@@ -499,34 +499,34 @@ export default function ReservationPage() {
             </section>
 
             {/* Reservation form */}
-            <section className={"w-full max-w-3xl " + (determineStep() === 4 ? "shown" : "hidden")}>
+            <section className={"w-full px-2 max-w-3xl " + (determineStep() === 4 ? "shown" : "hidden")}>
 
 
                 <div>
                     <Link isBlock onPress={() => setSelectedClass(null)} color={"foreground"} className="absolute mt-6 hover:cursor-pointer !text-xl text-center font-bold">
                         <Icon icon={"weui:back-filled"} className="inline-block me-2" />
-                        Zpět
+
                     </Link>
                     <h2 className="text-xl text-center font-bold pt-6">{new Date(selectedClass?.date ?? 0 ).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(selectedClass?.date ?? 0).toLocaleDateString('cs-CZ')} v {selectedClass?.time}</h2>
                 </div>
 
 
-                <div className="flex my-6 gap-3 sm:gap-6 items-center">
-                    <div className="lg:absolute lg:ml-[-5rem] items-center flex flex-col justify-center lg:w-14">
+                <div className=" flex my-6 gap-3 sm:gap-6 items-start sm:items-center flex-col sm:flex-row">
+                    <div className=" ml-4 sm:ml-0 lg:absolute lg:ml-[-5rem] items-center flex flex-row sm:flex-col gap-2 justify-center lg:w-14">
                         <b>{selectedClass?.time}</b>
                         <span className="text-tiny">{selectedClass?.classType.duration} min</span>
                     </div>
                     <Card key={selectedClass?.id} className="hover:shadow-lg transition-shadow duration-200 flex-1" isPressable >
-                        <CardBody className="flex flex-row sm:flex-row items-start sm:items-center gap-3 p-0 h-36">
+                        <CardBody className="flex flex-row sm:flex-row  gap-3 p-0 min-h-36 ">
                             <Image
                                 src={selectedClass?.classType.image as any}
                                 alt={selectedClass?.classType.name}
-                                className="w-28 sm:w-36 h-36 rounded-none object-cover"
+                                className=" w-28 sm:w-36 rounded-none object-cover h-full"
                             />
-                            <div className="flex-1 h-full flex flex-col justify-between py-2 pe-2">
+                            <div className="flex-1 self-center h-full flex flex-col justify-between py-2 pe-2">
                                 <div>
                                     <h3 className="text-md font-semibold">{selectedClass?.classType.name}</h3>
-                                    <p className="text-small line-clamp-3 text-justify pe-3">{selectedClass?.classType.description}</p>
+                                    <p className="text-small  text-justify pe-3">{selectedClass?.classType.description}</p>
                                 </div>
                                 <div>
                                     <Avatar
@@ -623,7 +623,7 @@ export default function ReservationPage() {
             </section>
 
             {/* Thank You page */}
-            <section className={"w-full max-w-3xl " + (determineStep() === 5 ? "shown" : "hidden")}>
+            <section className={"w-full px-2 max-w-3xl " + (determineStep() === 5 ? "shown" : "hidden")}>
                 <div className="flex flex-col items-center justify-center gap-4 pt-20">
                     <Image
                         src={selectedClass?.trainer.profilePicture ?? "/photos/trainers/martina.jpg"}
