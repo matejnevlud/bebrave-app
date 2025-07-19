@@ -14,14 +14,31 @@ export async function POST(request: NextRequest) {
         console.log("Nexi webhook received:", body);
 
         // Extract relevant data from webhook
-        const {orderId, transactionId, amount, currency, status, operation} =
-            body;
+        const orderId = body.operation?.orderId || body.orderId;
+        const transactionId = body.operation?.operationId || body.transactionId;
+        const amount = body.operation?.operationAmount || body.amount;
+        const currency = body.operation?.operationCurrency || body.currency;
+        const status = body.operation?.operationResult || body.status;
+        const operation = body.operation;
 
         if (!orderId) {
-            console.error("Missing orderId in webhook");
+            console.error("Missing orderId in webhook", {
+                bodyKeys: Object.keys(body),
+                operationKeys: body.operation ? Object.keys(body.operation) : null,
+                fullBody: body
+            });
 
             return NextResponse.json({error: "Missing orderId"}, {status: 400});
         }
+
+        console.log("Extracted webhook data:", {
+            orderId,
+            transactionId,
+            amount,
+            currency,
+            status,
+            operationResult: body.operation?.operationResult
+        });
 
         // Find reservation by order ID (stored in paymentTransactionId)
         const reservation = await db.query.reservationsTable.findFirst({
@@ -40,6 +57,7 @@ export async function POST(request: NextRequest) {
         // Parse payment result from webhook
         const paymentResult = {
             success:
+                status === "EXECUTED" ||
                 status === "authorized" ||
                 status === "captured" ||
                 status === "success",

@@ -6,11 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="878e36bd-1ad8-483a-aae1-c8c02b1128eb" name="Changes" comment="init base">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(administration)/admin/treneri/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(administration)/admin/treneri/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(web)/reservation/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/reservation/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(web)/reservation/payment/success/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/reservation/payment/success/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/api/invoices/[id]/email/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/invoices/[id]/email/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/services/pdf-invoice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/pdf-invoice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/payment/webhook/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/payment/webhook/route.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -136,7 +132,7 @@
       <workItem from="1751911537552" duration="7052000" />
       <workItem from="1751993283928" duration="60000" />
       <workItem from="1752402684254" duration="1219000" />
-      <workItem from="1752761189519" duration="30545000" />
+      <workItem from="1752761189519" duration="31415000" />
     </task>
     <task id="LOCAL-00001" summary="init base">
       <option name="closed" value="true" />
