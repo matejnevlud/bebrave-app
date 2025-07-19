@@ -820,7 +820,7 @@ export default function ReservationPage() {
                                 allowQr={allowQr}
                                 value={formData.paymentMethod}
                                 onChange={(value) =>
-                                    handleFormFieldChange("paymentMethod", value)
+                                    handleFormFieldChange("paymentMethod", typeof value === 'string' ? value : value.target.value)
                                 }
                             />
 

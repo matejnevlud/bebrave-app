@@ -170,9 +170,11 @@ export default function TreneriPage() {
 
             console.log("Updated trainer:", fetched);
 
-            setTrainers((prevTrainers) =>
-                prevTrainers.map((t) => (t.id === selectedTrainer?.id ? fetched : t)),
-            );
+            if (fetched) {
+                setTrainers((prevTrainers) =>
+                    prevTrainers.map((t) => (t.id === selectedTrainer?.id ? fetched : t)),
+                );
+            }
         } catch (error) {
             console.error("Error updating trainer:", error);
             alert("Failed to update trainer. Please try again later.");
@@ -241,7 +243,9 @@ export default function TreneriPage() {
 
             console.log("New trainer created:", fetchedTrainer);
 
-            setTrainers((prevTrainers) => [...prevTrainers, fetchedTrainer]);
+            if (fetchedTrainer) {
+                setTrainers((prevTrainers) => [...prevTrainers, fetchedTrainer]);
+            }
         } catch (error) {
             console.error("Error creating trainer:", error);
             alert("Failed to create trainer. Please try again later.");
@@ -405,7 +409,7 @@ export default function TreneriPage() {
                                     />
 
                                     <Input
-                                        defaultValue={selectedTrainer?.bio}
+                                        defaultValue={selectedTrainer?.bio || ""}
                                         label="Biografie trenéra"
                                         labelPlacement="outside"
                                         maxLength={500}
@@ -414,7 +418,7 @@ export default function TreneriPage() {
                                     />
 
                                     <Input
-                                        defaultValue={selectedTrainer?.expertise}
+                                        defaultValue={selectedTrainer?.expertise || ""}
                                         label="Specializace trenéra"
                                         labelPlacement="outside"
                                         maxLength={255}
@@ -423,7 +427,7 @@ export default function TreneriPage() {
                                     />
 
                                     <Input
-                                        defaultValue={selectedTrainer?.profilePicture}
+                                        defaultValue={selectedTrainer?.profilePicture || ""}
                                         label="URL profilového obrázku"
                                         labelPlacement="outside"
                                         name="profilePicture"

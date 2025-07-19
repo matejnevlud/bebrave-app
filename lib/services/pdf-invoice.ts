@@ -302,12 +302,12 @@ export class PDFInvoiceService {
             <div class="billing-section">
                 <h3>Dodavatel</h3>
                 <div class="billing-details">
-                    ${companyInfo.name}<br>
-                    ${companyInfo.address}<br>
-                    ${companyInfo.postalCode} ${companyInfo.city}<br>
+                    Altin JM Group s.r.o.<br>
+                    Myslivecká 2370<br>
+                    735 32 Rychvald<br>
                     ${companyInfo.country}<br>
-                    IČO: ${companyInfo.ico}<br>
-                    DIČ: ${companyInfo.dic}
+                    IČO: 25366955<br>
+                    DIČ: CZ25366955
                 </div>
             </div>
             <div class="billing-section">

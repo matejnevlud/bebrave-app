@@ -695,7 +695,7 @@ async function generateInvoice(
             const pdfUrl = generateSecureInvoicePdfUrl(
                 baseUrl,
                 invoice.id,
-                invoice.customerEmail,
+                invoice.customerEmail || "",
                 invoice.createdAt,
             );
 
@@ -813,7 +813,7 @@ async function sendConfirmationEmail(
                         generateSecureInvoicePdfUrl(
                             "https://bebravestudio.cz",
                             invoice.id,
-                            invoice.customerEmail,
+                            invoice.customerEmail || "",
                             invoice.createdAt,
                         );
 
@@ -885,7 +885,7 @@ async function sendConfirmationEmail(
                     const pdfUrl = generateSecureInvoicePdfUrl(
                         baseUrl,
                         invoice.id,
-                        invoice.customerEmail,
+                        invoice.customerEmail || "",
                         invoice.createdAt,
                     );
                     const fileName = PDFInvoiceService.generateInvoiceFileName(
@@ -935,7 +935,7 @@ async function sendConfirmationEmail(
         console.log("Email sent successfully:", result);
     } catch (error) {
         console.error("Error sending confirmation email:", {
-            error: error.message,
+            error: error instanceof Error ? error.message : String(error),
             paymentMethod,
             reservationId,
             email: userData?.email,

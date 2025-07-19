@@ -7,6 +7,7 @@ import {Icon} from "@iconify/react";
 import Link from "next/link";
 import {useSearchParams} from "next/navigation";
 import Image from "next/image";
+// @ts-ignore
 import confetti from "canvas-confetti";
 
 import {nexiPaymentService} from "@/lib/services/nexi";

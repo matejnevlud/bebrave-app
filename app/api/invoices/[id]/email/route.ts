@@ -64,10 +64,11 @@ export async function POST(
 // Send invoice reminder
 export async function PATCH(
     request: NextRequest,
-    {params}: { params: { id: string } },
+    {params}: { params: Promise<{ id: string }> },
 ) {
     try {
-        const invoiceId = parseInt(params.id);
+        const {id} = await params;
+        const invoiceId = parseInt(id);
 
         if (isNaN(invoiceId)) {
             return NextResponse.json(
