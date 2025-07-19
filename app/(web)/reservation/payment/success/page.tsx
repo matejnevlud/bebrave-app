@@ -10,60 +10,72 @@ import Image from "next/image";
 // @ts-ignore
 import confetti from "canvas-confetti";
 
-import {nexiPaymentService} from "@/lib/services/nexi";
-import {processPaymentResult, getReservationWithDetails} from "@/db/actions";
+import {getReservationWithDetails} from "@/db/actions";
 
 function PaymentSuccessContent() {
     const searchParams = useSearchParams();
     const reservationId = searchParams.get("reservationId");
     const [isProcessing, setIsProcessing] = useState(true);
     const [isSuccess, setIsSuccess] = useState(false);
-    const [paymentResult, setPaymentResult] = useState<any>(null);
     const [reservationDetails, setReservationDetails] = useState<any>(null);
+    const [retryCount, setRetryCount] = useState(0);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
-        const handlePaymentResult = async () => {
+        const checkReservationStatus = async () => {
             if (!reservationId) {
                 setIsProcessing(false);
-
+                setErrorMessage("Nebyl nalezen identifikátor rezervace.");
                 return;
             }
 
             try {
-                // Parse payment result from URL parameters
-                const result = nexiPaymentService.parsePaymentResult(searchParams);
-
-                setPaymentResult(result);
-
-                // Process the payment result
-                const success = await processPaymentResult(
-                    parseInt(reservationId),
-                    result,
-                );
-
-                setIsSuccess(success);
+                const details = await getReservationWithDetails(parseInt(reservationId));
                 
-                // If successful, fetch reservation details and trigger confetti
-                if (success) {
-                    const details = await getReservationWithDetails(parseInt(reservationId));
-                    setReservationDetails(details);
+                if (!details) {
+                    setErrorMessage("Rezervace nebyla nalezena.");
+                    setIsProcessing(false);
+                    return;
+                }
+
+                setReservationDetails(details);
+
+                // Check payment status
+                if (details.paymentStatus === "completed") {
+                    // Payment was successfully processed by webhook
+                    setIsSuccess(true);
+                    setIsProcessing(false);
                     
                     // Trigger confetti animation
                     confetti({
                         particleCount: 200,
                         startVelocity: 60,
                     });
+                } else if (details.paymentStatus === "pending" && retryCount < 10) {
+                    // Payment is still pending, retry after a few seconds
+                    setTimeout(() => {
+                        setRetryCount(prev => prev + 1);
+                    }, 3000); // Wait 3 seconds before retrying
+                } else if (details.paymentStatus === "failed") {
+                    // Payment failed
+                    setIsSuccess(false);
+                    setIsProcessing(false);
+                    setErrorMessage("Platba se nezdařila.");
+                } else {
+                    // Max retries reached, payment still pending
+                    setIsSuccess(false);
+                    setIsProcessing(false);
+                    setErrorMessage("Platba stále čeká na zpracování. Zkuste obnovit stránku za chvíli.");
                 }
             } catch (error) {
-                console.error("Error processing payment result:", error);
-                setIsSuccess(false);
-            } finally {
+                console.error("Error checking reservation status:", error);
+                setErrorMessage("Došlo k chybě při kontrole stavu rezervace.");
                 setIsProcessing(false);
             }
         };
 
-        handlePaymentResult();
-    }, [reservationId, searchParams]);
+        checkReservationStatus();
+    }, [reservationId, retryCount]);
 
     if (isProcessing) {
         return (
@@ -71,14 +83,35 @@ function PaymentSuccessContent() {
                 <Card className="max-w-md mx-auto">
                     <CardBody className="text-center">
                         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"/>
-                        <p className="mt-2">Zpracovávání platby...</p>
+                        <p className="mt-2">
+                            {retryCount === 0 
+                                ? "Zpracovávání platby..." 
+                                : `Čekání na potvrzení platby... (${retryCount}/10)`
+                            }
+                        </p>
+                        {retryCount > 0 && (
+                            <>
+                                <p className="text-sm text-gray-500 mt-2">
+                                    Platba je zpracovávána, prosím čekejte...
+                                </p>
+                                <button
+                                    className="mt-3 text-blue-600 hover:text-blue-800 text-sm underline"
+                                    onClick={() => {
+                                        setRetryCount(0);
+                                        setIsProcessing(true);
+                                    }}
+                                >
+                                    Zkontrolovat nyní
+                                </button>
+                            </>
+                        )}
                     </CardBody>
                 </Card>
             </div>
         );
     }
 
-    if (!reservationId) {
+    if (!reservationId || errorMessage) {
         return (
             <div className="container mx-auto px-4 py-8">
                 <Card className="max-w-md mx-auto">
@@ -86,13 +119,21 @@ function PaymentSuccessContent() {
                         <h1 className="text-2xl font-bold text-red-600">Chyba</h1>
                     </CardHeader>
                     <CardBody className="text-center">
-                        <p>Nebyl nalezen identifikátor rezervace.</p>
-                        <Link
-                            className="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                            href="/reservation"
-                        >
-                            Zpět na rezervaci
-                        </Link>
+                        <p>{errorMessage || "Nebyl nalezen identifikátor rezervace."}</p>
+                        <div className="flex gap-4 justify-center mt-4">
+                            <Link
+                                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                                href="/"
+                            >
+                                Domů
+                            </Link>
+                            <Link
+                                className="bg-orange-600 text-white px-4 py-2 rounded hover:bg-orange-700"
+                                href="/reservation"
+                            >
+                                Nová rezervace
+                            </Link>
+                        </div>
                     </CardBody>
                 </Card>
             </div>
@@ -171,11 +212,13 @@ function PaymentSuccessContent() {
                     <p className="text-sm text-gray-500">
                         Můžete zkusit provést rezervaci znovu nebo zvolit jiný způsob platby.
                     </p>
-                    <div className="bg-red-50 p-4 rounded-lg">
-                        <p className="text-sm font-medium text-red-800">
-                            Chyba: {paymentResult?.error || "Neznámá chyba"}
-                        </p>
-                    </div>
+                    {errorMessage && (
+                        <div className="bg-red-50 p-4 rounded-lg">
+                            <p className="text-sm font-medium text-red-800">
+                                {errorMessage}
+                            </p>
+                        </div>
+                    )}
 
                     <div className="flex gap-4 justify-center">
                         <Link
