@@ -13,7 +13,8 @@ export type HorizontalStepProps = {
     className?: string;
 };
 
-export interface HorizontalStepsProps extends React.HTMLAttributes<HTMLButtonElement> {
+export interface HorizontalStepsProps
+    extends React.HTMLAttributes<HTMLButtonElement> {
     /**
      * An array of steps.
      *
@@ -58,7 +59,13 @@ export interface HorizontalStepsProps extends React.HTMLAttributes<HTMLButtonEle
 
 function CheckIcon(props: ComponentProps<"svg">) {
     return (
-        <svg {...props} fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+        <svg
+            {...props}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            viewBox="0 0 24 24"
+        >
             <m.path
                 animate={{pathLength: 1}}
                 d="M5 13l4 4L19 7"
@@ -76,7 +83,10 @@ function CheckIcon(props: ComponentProps<"svg">) {
     );
 }
 
-const HorizontalSteps = React.forwardRef<HTMLButtonElement, HorizontalStepsProps>(
+const HorizontalSteps = React.forwardRef<
+    HTMLButtonElement,
+    HorizontalStepsProps
+>(
     (
         {
             color = "primary",
@@ -153,10 +163,17 @@ const HorizontalSteps = React.forwardRef<HTMLButtonElement, HorizontalStepsProps
                 <ol className={cn("flex flex-row flex-nowrap", colors, className)}>
                     {steps?.map((step, stepIdx) => {
                         let status =
-                            currentStep === stepIdx ? "active" : currentStep < stepIdx ? "inactive" : "complete";
+                            currentStep === stepIdx
+                                ? "active"
+                                : currentStep < stepIdx
+                                    ? "inactive"
+                                    : "complete";
 
                         return (
-                            <li key={stepIdx} className="relative flex w-full max-w-[120px] items-center">
+                            <li
+                                key={stepIdx}
+                                className="relative flex w-full max-w-[120px] items-center"
+                            >
                                 <button
                                     key={stepIdx}
                                     ref={ref}
@@ -192,14 +209,15 @@ const HorizontalSteps = React.forwardRef<HTMLButtonElement, HorizontalStepsProps
                                                             color: "var(--active-color)",
                                                         },
                                                         complete: {
-                                                            backgroundColor: "var(--complete-background-color)",
+                                                            backgroundColor:
+                                                                "var(--complete-background-color)",
                                                             borderColor: "var(--complete-border-color)",
                                                         },
                                                     }}
                                                 >
                                                     <div className="flex items-center justify-center">
                                                         {status === "complete" ? (
-                                                            <CheckIcon className="h-6 w-6 text-[var(--active-fg-color)]" />
+                                                            <CheckIcon className="h-6 w-6 text-[var(--active-fg-color)]"/>
                                                         ) : (
                                                             <span>{stepIdx + 1}</span>
                                                         )}

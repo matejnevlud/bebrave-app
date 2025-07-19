@@ -1,8 +1,19 @@
 "use client";
 
 import React, {useEffect, useMemo, useState} from "react";
-import {Avatar, DatePicker, Form, Modal, ModalContent, NumberInput, ScrollShadow, Select, SelectItem, TimeInput, useDisclosure} from "@heroui/react";
-import{SVGProps} from "react";
+import {
+    Avatar,
+    DatePicker,
+    Form,
+    Modal,
+    ModalContent,
+    NumberInput,
+    Select,
+    SelectItem,
+    TimeInput,
+    useDisclosure,
+} from "@heroui/react";
+import {SVGProps} from "react";
 import {
     Table,
     TableHeader,
@@ -10,18 +21,30 @@ import {
     TableBody,
     TableRow,
     TableCell,
-    User,
-    Chip,
     Tooltip,
     ChipProps,
 } from "@heroui/react";
-import {ClassType, ClassTypeWithRelations, ClassWithRelations, TrainerWithRelations} from "@/db/schema";
-import {createClass, createClassType, deleteClass, getClasses, getClassTypes, getTrainers, updateClass, updateClassType} from "@/db/actions";
-import {getLocalTimeZone, parseDate, parseTime, today} from "@internationalized/date";
+import {getLocalTimeZone, today} from "@internationalized/date";
 import {Button} from "@heroui/button";
 import {ModalBody, ModalHeader} from "@heroui/modal";
 import {I18nProvider} from "@react-aria/i18n";
 import {Input} from "@heroui/input";
+
+import {
+    createClass,
+    createClassType,
+    deleteClass,
+    getClasses,
+    getClassTypes,
+    getTrainers,
+    updateClassType,
+} from "@/db/actions";
+import {
+    ClassType,
+    ClassTypeWithRelations,
+    ClassWithRelations,
+    TrainerWithRelations,
+} from "@/db/schema";
 
 type IconSvgProps = SVGProps<SVGSVGElement> & {
     size?: number;
@@ -229,9 +252,7 @@ type User = (typeof users)[0];
  * ```
  */
 
-
 export default function LekcePage() {
-
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     let now = today(getLocalTimeZone());
@@ -243,7 +264,7 @@ export default function LekcePage() {
     const [isFetchingData, setIsFetchingData] = useState<boolean>(true);
 
     async function fetchData() {
-        const t =  await getTrainers();
+        const t = await getTrainers();
         const ct = await getClassTypes();
         const c = await getClasses();
 
@@ -260,15 +281,17 @@ export default function LekcePage() {
 
     useEffect(() => {
         fetchData();
-    }, [])
+    }, []);
 
-
-    const [selectedClassType, setSelectedClassType] = useState<ClassTypeWithRelations>();
+    const [selectedClassType, setSelectedClassType] =
+        useState<ClassTypeWithRelations>();
     const selectedClassTypeClasses = useMemo(() => {
         if (!selectedClassType) return [];
-        return classes.filter(c => c.classTypeId === selectedClassType.id);
+
+        return classes.filter((c) => c.classTypeId === selectedClassType.id);
     }, [selectedClassType, classes]);
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
+
     function openReservationModal(c: ClassTypeWithRelations) {
         setSelectedClassType(c);
         onOpen();
@@ -279,6 +302,7 @@ export default function LekcePage() {
             e.preventDefault();
             setIsLoading(true);
             let data = Object.fromEntries(new FormData(e.currentTarget));
+
             console.log(data);
 
             const updatedClassType: Partial<ClassType> = {
@@ -286,18 +310,23 @@ export default function LekcePage() {
                 duration: parseInt(data.duration as string, 10),
                 defaultCapacity: parseInt(data.defaultCapacity as string, 10),
                 price: parseInt(data.price as string),
-            }
+            };
 
-            console.log(updatedClassType)
+            console.log(updatedClassType);
 
-            const fetched = await updateClassType(selectedClassType?.id, updatedClassType);
+            const fetched = await updateClassType(
+                selectedClassType?.id,
+                updatedClassType,
+            );
+
             console.log("Updated class type:", fetched);
             // After updating, you might want to update the state to reflect the changes
             //@ts-ignore
-            setClassTypes(prevClassTypes =>
-                prevClassTypes.map(ct => ct.id === selectedClassType?.id ? fetched : ct)
+            setClassTypes((prevClassTypes) =>
+                prevClassTypes.map((ct) =>
+                    ct.id === selectedClassType?.id ? fetched : ct,
+                ),
             );
-
         } catch (error) {
             console.error("Error updating class type:", error);
             // Optionally, you can show an error message to the user
@@ -305,21 +334,20 @@ export default function LekcePage() {
         } finally {
             setIsLoading(false);
         }
-
     }
-
-
 
     async function createNewClassType(e: React.FormEvent<HTMLFormElement>) {
         try {
             e.preventDefault();
             setIsLoading(true);
-            let formData = new FormData(e.currentTarget)
+            let formData = new FormData(e.currentTarget);
             // convert FormData to a regular object beware of multiple same keys eg select
             let data = Object.fromEntries(formData) as any;
-            data['trainers'] = formData.getAll('trainers').map((trainer: any) => parseInt(trainer, 10));
-            console.log(data);
 
+            data["trainers"] = formData
+                .getAll("trainers")
+                .map((trainer: any) => parseInt(trainer, 10));
+            console.log(data);
 
             // First uplaod the file if it exists
 
@@ -327,7 +355,7 @@ export default function LekcePage() {
                 const file = data.file;
 
                 // get filetype
-                const fileType = file.type.split('/')[1]; // e.g. 'png', 'jpg', etc.
+                const fileType = file.type.split("/")[1]; // e.g. 'png', 'jpg', etc.
                 // create random file name
                 const randomFileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}.${fileType}`;
 
@@ -335,25 +363,29 @@ export default function LekcePage() {
                 // Here you would typically call an API to upload the file
                 // For example, using fetch or axios to send the file to your server
                 const fileFormData = new FormData();
-                fileFormData.append('file', file);
+
+                fileFormData.append("file", file);
                 const response = await fetch(`/uploads/${randomFileName}`, {
-                    method: 'POST',
+                    method: "POST",
                     body: fileFormData,
                 });
+
                 if (!response.ok) {
                     console.error("Failed to upload file:", response.statusText);
+
                     return;
                 }
                 const responseData = await response.json();
+
                 console.log("File uploaded to:", responseData);
 
                 console.log("File uploaded to:", filePath);
                 data.image = filePath; // Assuming the server returns the path to the uploaded image
             } else {
                 console.error("No file provided");
+
                 return;
             }
-
 
             const newClassType: Partial<ClassType> = {
                 name: data.name as string,
@@ -362,14 +394,15 @@ export default function LekcePage() {
                 price: parseInt(data.price as string),
                 description: data.description as string,
                 image: data.image as string, // Assuming you have an image URL or path
-            }
+            };
 
             console.log(newClassType);
 
             const fetchedClassType = await createClassType(newClassType);
+
             console.log("New class type created:", fetchedClassType);
             //@ts-ignore
-            setClassTypes(prevClassTypes => [...prevClassTypes, fetchedClassType]);
+            setClassTypes((prevClassTypes) => [...prevClassTypes, fetchedClassType]);
         } catch (error) {
             console.error("Error creating class type:", error);
             // Optionally, you can show an error message to the user
@@ -377,19 +410,19 @@ export default function LekcePage() {
         } finally {
             setIsLoading(false);
         }
-
     }
-
 
     async function createNewClass(e: React.FormEvent<HTMLFormElement>) {
         try {
             e.preventDefault();
             setIsLoading(true);
             let data = Object.fromEntries(new FormData(e.currentTarget));
+
             console.log(data);
 
             if (!selectedClassType) {
                 console.error("No class type selected");
+
                 return;
             }
 
@@ -398,19 +431,21 @@ export default function LekcePage() {
                 date: data.date as string,
                 time: (data.time as string).substring(0, 5), // Ensure time is in HH:MM format
                 trainerId: parseInt(data.trainerId as string, 10),
-                secondTrainerId: data.secondTrainerId ? parseInt(data.secondTrainerId as string, 10) : undefined,
+                secondTrainerId: data.secondTrainerId
+                    ? parseInt(data.secondTrainerId as string, 10)
+                    : undefined,
                 capacity: selectedClassType.defaultCapacity,
                 location: "Gym", // You can change this to a dynamic value if needed
-
             };
 
             console.log(newClass);
             // Here you would typically call an API to create the class
             const fetchedClass = await createClass(newClass);
+
             console.log("New class created:", fetchedClass);
             // After creation, you might want to update the state to include the new class
             //@ts-ignore
-            setClasses(prevClasses => [...prevClasses, fetchedClass]);
+            setClasses((prevClasses) => [...prevClasses, fetchedClass]);
         } catch (error) {
             console.error("Error creating class:", error);
             // Optionally, you can show an error message to the user
@@ -421,10 +456,9 @@ export default function LekcePage() {
     }
 
     async function handleDeleteClass(id: number) {
-
         console.log("Deleting class with id:", id);
         // Here you would typically call an API to delete the class type
-        setClasses(prevClasses => prevClasses.filter(c => c.id !== id));
+        setClasses((prevClasses) => prevClasses.filter((c) => c.id !== id));
         try {
             setIsLoading(true);
             await deleteClass(id);
@@ -436,23 +470,27 @@ export default function LekcePage() {
             setIsLoading(false);
         }
         // After deletion, unset the class from the state
-
-
     }
 
     return (
         <div>
-            <Table aria-label="Example empty table" rowHeight={80} removeWrapper >
+            <Table removeWrapper aria-label="Example empty table" rowHeight={80}>
                 <TableHeader>
                     <TableColumn>NÁZEV LEKCE</TableColumn>
                     <TableColumn>TRVÁNÍ</TableColumn>
                     <TableColumn>CENA</TableColumn>
                     <TableColumn align="end"> </TableColumn>
                 </TableHeader>
-                <TableBody emptyContent={"Žádné classTypes k zobrazení"} items={classTypes}>
+                <TableBody
+                    emptyContent={"Žádné classTypes k zobrazení"}
+                    items={classTypes}
+                >
                     {(item) => (
-                        <TableRow key={item.id} className="h-[4.5rem] hover:bg-default-100 cursor-pointer" onClick={() => openReservationModal(item)}>
-
+                        <TableRow
+                            key={item.id}
+                            className="h-[4.5rem] hover:bg-default-100 cursor-pointer"
+                            onClick={() => openReservationModal(item)}
+                        >
                             <TableCell>
                                 <Avatar
                                     alt={item?.name}
@@ -463,17 +501,16 @@ export default function LekcePage() {
                                 <b>{item.name}</b>
                             </TableCell>
 
-
-                            <TableCell>
-                                ({item.duration} min)
-                            </TableCell>
+                            <TableCell>({item.duration} min)</TableCell>
 
                             <TableCell>
                                 <b>{item.price}</b>
                             </TableCell>
 
                             <TableCell>
-                                <Button color="primary" size="md" isLoading={isLoading}>Detail</Button>
+                                <Button color="primary" isLoading={isLoading} size="md">
+                                    Detail
+                                </Button>
                             </TableCell>
                         </TableRow>
                     )}
@@ -481,61 +518,102 @@ export default function LekcePage() {
             </Table>
 
             <div>
-                <h4 className="text-lg font-semibold mt-4 mb-4">Vytvořit nový typ lekce</h4>
-                <Form className="w-full max-w grid grid-cols-1 md:grid-cols-2 gap-4 pb-20" onSubmit={createNewClassType}>
+                <h4 className="text-lg font-semibold mt-4 mb-4">
+                    Vytvořit nový typ lekce
+                </h4>
+                <Form
+                    className="w-full max-w grid grid-cols-1 md:grid-cols-2 gap-4 pb-20"
+                    onSubmit={createNewClassType}
+                >
                     <Input
                         isRequired
+                        label="Název lekce"
                         labelPlacement="outside"
                         name="name"
-                        label="Název lekce"
                         placeholder="Zadejte název lekce"
                     />
 
                     <Input
                         isRequired
-                        labelPlacement="outside"
-                        name="description"
                         label="Popis lekce"
-                        placeholder="Zadejte popis lekce"
+                        labelPlacement="outside"
                         maxLength={500}
+                        name="description"
+                        placeholder="Zadejte popis lekce"
                     />
 
                     <NumberInput
                         isRequired
-                        labelPlacement="outside"
-                        name="duration"
+                        formatOptions={{
+                            style: "decimal",
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                        }}
                         label="Délka lekce (v minutách)"
+                        labelPlacement="outside"
                         maxValue={180}
                         minValue={1}
-                        formatOptions={{ style: "decimal", minimumFractionDigits: 0, maximumFractionDigits: 0 }}
+                        name="duration"
                     />
-                    <NumberInput isRequired labelPlacement="outside" name="defaultCapacity" label="Výchozí kapacita lekce" maxValue={100} minValue={1}  formatOptions={{ style: "decimal", minimumFractionDigits: 0, maximumFractionDigits: 0 }} />
-                    <NumberInput isRequired labelPlacement="outside" name="price" label="Cena lekce" formatOptions={{ style: "currency", currency: "CZK", minimumFractionDigits: 2, maximumFractionDigits: 2 }} />
+                    <NumberInput
+                        isRequired
+                        formatOptions={{
+                            style: "decimal",
+                            minimumFractionDigits: 0,
+                            maximumFractionDigits: 0,
+                        }}
+                        label="Výchozí kapacita lekce"
+                        labelPlacement="outside"
+                        maxValue={100}
+                        minValue={1}
+                        name="defaultCapacity"
+                    />
+                    <NumberInput
+                        isRequired
+                        formatOptions={{
+                            style: "currency",
+                            currency: "CZK",
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                        }}
+                        label="Cena lekce"
+                        labelPlacement="outside"
+                        name="price"
+                    />
 
                     <Input
                         isRequired
-                        name="file"
-                        type="file"
+                        accept="image/*"
                         label="Obrázek lekce"
                         labelPlacement="outside"
-                        accept="image/*"
+                        name="file"
                         placeholder="Vyberte obrázek lekce"
+                        type="file"
                     />
 
-
-                    <Button className="" color="success" type="submit" isLoading={isLoading}>
+                    <Button
+                        className=""
+                        color="success"
+                        isLoading={isLoading}
+                        type="submit"
+                    >
                         Vytvořit typ lekce
                     </Button>
-
                 </Form>
             </div>
 
-
-            <Modal isOpen={isOpen} onOpenChange={onOpenChange} scrollBehavior="inside" size="5xl">
+            <Modal
+                isOpen={isOpen}
+                scrollBehavior="inside"
+                size="5xl"
+                onOpenChange={onOpenChange}
+            >
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1">Detail {selectedClassType?.name}</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">
+                                Detail {selectedClassType?.name}
+                            </ModalHeader>
                             <ModalBody>
                                 <Form
                                     className="w-full max-w grid grid-cols-1 md:grid-cols-2 gap-4"
@@ -543,65 +621,123 @@ export default function LekcePage() {
                                 >
                                     <Input
                                         isRequired
-                                        name="name"
+                                        defaultValue={selectedClassType?.name}
                                         label="Název lekce"
                                         labelPlacement="outside"
-                                        defaultValue={selectedClassType?.name}
+                                        name="name"
                                         placeholder="Zadejte název lekce"
                                     />
 
                                     <NumberInput
                                         isRequired
-                                        name="duration"
+                                        defaultValue={selectedClassType?.duration}
+                                        formatOptions={{
+                                            style: "decimal",
+                                            minimumFractionDigits: 0,
+                                            maximumFractionDigits: 0,
+                                        }}
                                         label="Délka lekce (v minutách)"
                                         labelPlacement="outside"
-                                        defaultValue={selectedClassType?.duration}
                                         maxValue={180}
                                         minValue={1}
-                                        formatOptions={{ style: "decimal", minimumFractionDigits: 0, maximumFractionDigits: 0 }}
+                                        name="duration"
                                     />
-                                    <NumberInput isRequired name="defaultCapacity" label="Výchozí kapacita lekce" labelPlacement="outside" defaultValue={selectedClassType?.defaultCapacity} maxValue={100} minValue={1}  formatOptions={{ style: "decimal", minimumFractionDigits: 0, maximumFractionDigits: 0 }} />
-                                    <NumberInput isRequired name="price" label="Cena lekce" labelPlacement="outside" defaultValue={selectedClassType?.price} formatOptions={{ style: "currency", currency: "CZK", minimumFractionDigits: 2, maximumFractionDigits: 2 }} />
-
+                                    <NumberInput
+                                        isRequired
+                                        defaultValue={selectedClassType?.defaultCapacity}
+                                        formatOptions={{
+                                            style: "decimal",
+                                            minimumFractionDigits: 0,
+                                            maximumFractionDigits: 0,
+                                        }}
+                                        label="Výchozí kapacita lekce"
+                                        labelPlacement="outside"
+                                        maxValue={100}
+                                        minValue={1}
+                                        name="defaultCapacity"
+                                    />
+                                    <NumberInput
+                                        isRequired
+                                        defaultValue={selectedClassType?.price}
+                                        formatOptions={{
+                                            style: "currency",
+                                            currency: "CZK",
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2,
+                                        }}
+                                        label="Cena lekce"
+                                        labelPlacement="outside"
+                                        name="price"
+                                    />
 
                                     <div className="">
-                                        <Button className="col-span-full" color="primary" type="submit" isLoading={isLoading}>
+                                        <Button
+                                            className="col-span-full"
+                                            color="primary"
+                                            isLoading={isLoading}
+                                            type="submit"
+                                        >
                                             Uložit detail
                                         </Button>
                                     </div>
-
                                 </Form>
 
-                                <h4 className="text-lg font-semibold mt-8 mb-0">Vypsané termíny lekcí</h4>
+                                <h4 className="text-lg font-semibold mt-8 mb-0">
+                                    Vypsané termíny lekcí
+                                </h4>
 
-                                <Table aria-label="Example empty table" rowHeight={80} removeWrapper className="mt-2">
+                                <Table
+                                    removeWrapper
+                                    aria-label="Example empty table"
+                                    className="mt-2"
+                                    rowHeight={80}
+                                >
                                     <TableHeader>
                                         <TableColumn>Datum lekce</TableColumn>
                                         <TableColumn>Hlavní trenér</TableColumn>
                                         <TableColumn>Druhý trenér</TableColumn>
                                         <TableColumn> </TableColumn>
                                     </TableHeader>
-                                    <TableBody emptyContent={"Žádné termíny k zobrazení"} items={selectedClassTypeClasses || []}>
+                                    <TableBody
+                                        emptyContent={"Žádné termíny k zobrazení"}
+                                        items={selectedClassTypeClasses || []}
+                                    >
                                         {(item) => (
-                                            <TableRow key={item.id} className="hover:bg-default-100 cursor-pointer">
+                                            <TableRow
+                                                key={item.id}
+                                                className="hover:bg-default-100 cursor-pointer"
+                                            >
                                                 <TableCell className="flex-col flex gap-2">
-                                                    <span className="font-medium text-medium">{new Date(item?.date ?? 0).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(item?.date ?? 0).toLocaleDateString()} {item.time}</span>
+                          <span className="font-medium text-medium">
+                            {new Date(item?.date ?? 0).toLocaleDateString(
+                                "cs-CZ",
+                                {weekday: "long"},
+                            )}{" "}
+                              {new Date(item?.date ?? 0).toLocaleDateString()}{" "}
+                              {item.time}
+                          </span>
                                                 </TableCell>
 
                                                 <TableCell>
-                                                    <span className="text-medium">{item.trainer?.name}</span>
+                          <span className="text-medium">
+                            {item.trainer?.name}
+                          </span>
                                                 </TableCell>
-
 
                                                 <TableCell>
-                                                    <span className="text-medium">{item.secondTrainer?.name}</span>
+                          <span className="text-medium">
+                            {item.secondTrainer?.name}
+                          </span>
                                                 </TableCell>
 
-                                                <TableCell onClick={() => handleDeleteClass(item.id)} className="text-right">
-                                                    <Tooltip color="danger" content="Smazat lekci" >
-                                                      <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                                                        <DeleteIcon />
-                                                      </span>
+                                                <TableCell
+                                                    className="text-right"
+                                                    onClick={() => handleDeleteClass(item.id)}
+                                                >
+                                                    <Tooltip color="danger" content="Smazat lekci">
+                            <span className="text-lg text-danger cursor-pointer active:opacity-50">
+                              <DeleteIcon/>
+                            </span>
                                                     </Tooltip>
                                                 </TableCell>
                                             </TableRow>
@@ -609,43 +745,76 @@ export default function LekcePage() {
                                     </TableBody>
                                 </Table>
 
+                                <h4 className="text-lg font-semibold mt-8 mb-0">
+                                    Přidat termín lekce
+                                </h4>
 
-                                <h4 className="text-lg font-semibold mt-8 mb-0">Přidat termín lekce</h4>
-
-                                <Form className="w-full gap-4 mt-2  mb-6 flex md:flex-row flex-col" onSubmit={createNewClass}>
+                                <Form
+                                    className="w-full gap-4 mt-2  mb-6 flex md:flex-row flex-col"
+                                    onSubmit={createNewClass}
+                                >
                                     <I18nProvider locale="cs-CZ">
-                                        <DatePicker isRequired name="date" label="Datum" labelPlacement="outside" defaultValue={undefined}  minValue={now} hourCycle={24} fullWidth={false} />
+                                        <DatePicker
+                                            isRequired
+                                            defaultValue={undefined}
+                                            fullWidth={false}
+                                            hourCycle={24}
+                                            label="Datum"
+                                            labelPlacement="outside"
+                                            minValue={now}
+                                            name="date"
+                                        />
                                     </I18nProvider>
 
-                                    <TimeInput isRequired name="time" label="Čas" labelPlacement="outside"  hourCycle={24} granularity={"minute"} fullWidth={false} />
-
-                                    <Select
-                                        name="trainerId"
-                                        label="Hlavní trenér"
-                                        placeholder="Vyberte ze seznamu"
-                                        items={trainers}
+                                    <TimeInput
                                         isRequired
-                                        labelPlacement="outside"
                                         fullWidth={false}
+                                        granularity={"minute"}
+                                        hourCycle={24}
+                                        label="Čas"
+                                        labelPlacement="outside"
+                                        name="time"
+                                    />
+
+                                    <Select
+                                        isRequired
+                                        fullWidth={false}
+                                        items={trainers}
+                                        label="Hlavní trenér"
+                                        labelPlacement="outside"
+                                        name="trainerId"
+                                        placeholder="Vyberte ze seznamu"
                                     >
-                                        {(trainerKV) => <SelectItem key={trainerKV.id}>{trainerKV.name}</SelectItem>}
+                                        {(trainerKV) => (
+                                            <SelectItem key={trainerKV.id}>
+                                                {trainerKV.name}
+                                            </SelectItem>
+                                        )}
                                     </Select>
 
                                     <Select
-                                        name="secondTrainerId"
-                                        label="Druhý trenér"
-                                        placeholder="Vyberte ze seznamu"
-                                        items={trainers}
-                                        isRequired={false}
-                                        labelPlacement="outside"
                                         fullWidth={false}
+                                        isRequired={false}
+                                        items={trainers}
+                                        label="Druhý trenér"
+                                        labelPlacement="outside"
+                                        name="secondTrainerId"
+                                        placeholder="Vyberte ze seznamu"
                                     >
-                                        {(trainerKV) => <SelectItem key={trainerKV.id}>{trainerKV.name}</SelectItem>}
+                                        {(trainerKV) => (
+                                            <SelectItem key={trainerKV.id}>
+                                                {trainerKV.name}
+                                            </SelectItem>
+                                        )}
                                     </Select>
 
-
-                                    <Button color="primary" type="submit" className="self-end w-80" isLoading={isLoading}>
-                                        Přidat  termín
+                                    <Button
+                                        className="self-end w-80"
+                                        color="primary"
+                                        isLoading={isLoading}
+                                        type="submit"
+                                    >
+                                        Přidat termín
                                     </Button>
                                 </Form>
                             </ModalBody>

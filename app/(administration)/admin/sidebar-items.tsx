@@ -1,8 +1,9 @@
 import {Chip} from "@heroui/react";
 import {Icon} from "@iconify/react";
 
-import {type SidebarItem, SidebarItemType} from "@/components/admin/sidebar";
 import TeamAvatar from "./team-avatar";
+
+import {type SidebarItem, SidebarItemType} from "@/components/admin/sidebar";
 
 /**
  * Please check the https://heroui.com/docs/guide/routing to have a seamless router integration
@@ -20,68 +21,80 @@ export const items: SidebarItem[] = [
         href: "/admin/lekce",
         icon: "solar:checklist-minimalistic-outline",
         title: "Lekce",
-    }
-    /*{
-        key: "projects",
-        href: "#",
-        icon: "solar:widget-2-outline",
-        title: "Projects",
     },
     {
-        key: "tasks",
-        href: "#",
-        icon: "solar:checklist-minimalistic-outline",
-        title: "Tasks",
-        endContent: (
-            <Icon className="text-default-400" icon="solar:add-circle-line-duotone" width={24} />
-        ),
-    },
-    {
-        key: "team",
-        href: "#",
+        key: "treneri",
+        href: "/admin/treneri",
         icon: "solar:users-group-two-rounded-outline",
-        title: "Team",
+        title: "Trenéři",
     },
     {
-        key: "tracker",
-        href: "#",
-        icon: "solar:sort-by-time-linear",
-        title: "Tracker",
-        endContent: (
-            <Chip size="sm" variant="flat">
-                New
-            </Chip>
-        ),
+        key: "invoices",
+        href: "/admin/invoices",
+        icon: "solar:file-text-linear",
+        title: "Faktury",
     },
-    {
-        key: "analytics",
-        href: "#",
-        icon: "solar:chart-outline",
-        title: "Analytics",
-    },
-    {
-        key: "perks",
-        href: "#",
-        icon: "solar:gift-linear",
-        title: "Perks",
-        endContent: (
-            <Chip size="sm" variant="flat">
-                3
-            </Chip>
-        ),
-    },
-    {
-        key: "expenses",
-        href: "#",
-        icon: "solar:bill-list-outline",
-        title: "Expenses",
-    },
-    {
-        key: "settings",
-        href: "#",
-        icon: "solar:settings-outline",
-        title: "Settings",
-    },*/
+    /*{
+          key: "projects",
+          href: "#",
+          icon: "solar:widget-2-outline",
+          title: "Projects",
+      },
+      {
+          key: "tasks",
+          href: "#",
+          icon: "solar:checklist-minimalistic-outline",
+          title: "Tasks",
+          endContent: (
+              <Icon className="text-default-400" icon="solar:add-circle-line-duotone" width={24} />
+          ),
+      },
+      {
+          key: "team",
+          href: "#",
+          icon: "solar:users-group-two-rounded-outline",
+          title: "Team",
+      },
+      {
+          key: "tracker",
+          href: "#",
+          icon: "solar:sort-by-time-linear",
+          title: "Tracker",
+          endContent: (
+              <Chip size="sm" variant="flat">
+                  New
+              </Chip>
+          ),
+      },
+      {
+          key: "analytics",
+          href: "#",
+          icon: "solar:chart-outline",
+          title: "Analytics",
+      },
+      {
+          key: "perks",
+          href: "#",
+          icon: "solar:gift-linear",
+          title: "Perks",
+          endContent: (
+              <Chip size="sm" variant="flat">
+                  3
+              </Chip>
+          ),
+      },
+      {
+          key: "expenses",
+          href: "#",
+          icon: "solar:bill-list-outline",
+          title: "Expenses",
+      },
+      {
+          key: "settings",
+          href: "#",
+          icon: "solar:settings-outline",
+          title: "Settings",
+      },*/
 ];
 
 export const sectionItems: SidebarItem[] = [
@@ -101,7 +114,11 @@ export const sectionItems: SidebarItem[] = [
                 icon: "solar:widget-2-outline",
                 title: "Projects",
                 endContent: (
-                    <Icon className="text-default-400" icon="solar:add-circle-line-duotone" width={24} />
+                    <Icon
+                        className="text-default-400"
+                        icon="solar:add-circle-line-duotone"
+                        width={24}
+                    />
                 ),
             },
             {
@@ -110,7 +127,11 @@ export const sectionItems: SidebarItem[] = [
                 icon: "solar:checklist-minimalistic-outline",
                 title: "Tasks",
                 endContent: (
-                    <Icon className="text-default-400" icon="solar:add-circle-line-duotone" width={24} />
+                    <Icon
+                        className="text-default-400"
+                        icon="solar:add-circle-line-duotone"
+                        width={24}
+                    />
                 ),
             },
             {
@@ -202,19 +223,19 @@ export const sectionItemsWithTeams: SidebarItem[] = [
                 key: "heroui",
                 href: "#",
                 title: "HeroUI",
-                startContent: <TeamAvatar name="Hero UI" />,
+                startContent: <TeamAvatar name="Hero UI"/>,
             },
             {
                 key: "tailwind-variants",
                 href: "#",
                 title: "Tailwind Variants",
-                startContent: <TeamAvatar name="Tailwind Variants" />,
+                startContent: <TeamAvatar name="Tailwind Variants"/>,
             },
             {
                 key: "heroui-pro",
                 href: "#",
                 title: "HeroUI Pro",
-                startContent: <TeamAvatar name="HeroUI Pro" />,
+                startContent: <TeamAvatar name="HeroUI Pro"/>,
             },
         ],
     },
@@ -269,7 +290,11 @@ export const brandItems: SidebarItem[] = [
                 icon: "solar:sort-by-time-linear",
                 title: "Tracker",
                 endContent: (
-                    <Chip className="bg-primary-foreground font-medium text-primary" size="sm" variant="flat">
+                    <Chip
+                        className="bg-primary-foreground font-medium text-primary"
+                        size="sm"
+                        variant="flat"
+                    >
                         New
                     </Chip>
                 ),
@@ -372,19 +397,19 @@ export const sectionLongList: SidebarItem[] = [
                 key: "heroui",
                 href: "#",
                 title: "HeroUI",
-                startContent: <TeamAvatar name="Hero UI" />,
+                startContent: <TeamAvatar name="Hero UI"/>,
             },
             {
                 key: "tailwind-variants",
                 href: "#",
                 title: "Tailwind Variants",
-                startContent: <TeamAvatar name="Tailwind Variants" />,
+                startContent: <TeamAvatar name="Tailwind Variants"/>,
             },
             {
                 key: "heroui-pro",
                 href: "#",
                 title: "HeroUI Pro",
-                startContent: <TeamAvatar name="HeroUI Pro" />,
+                startContent: <TeamAvatar name="HeroUI Pro"/>,
             },
         ],
     },
@@ -403,7 +428,11 @@ export const sectionNestedItems: SidebarItem[] = [
         icon: "solar:widget-2-outline",
         title: "Projects",
         endContent: (
-            <Icon className="text-default-400" icon="solar:add-circle-line-duotone" width={24} />
+            <Icon
+                className="text-default-400"
+                icon="solar:add-circle-line-duotone"
+                width={24}
+            />
         ),
     },
     {
@@ -412,7 +441,11 @@ export const sectionNestedItems: SidebarItem[] = [
         icon: "solar:checklist-minimalistic-outline",
         title: "Tasks",
         endContent: (
-            <Icon className="text-default-400" icon="solar:add-circle-line-duotone" width={24} />
+            <Icon
+                className="text-default-400"
+                icon="solar:add-circle-line-duotone"
+                width={24}
+            />
         ),
     },
     {

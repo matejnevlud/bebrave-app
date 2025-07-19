@@ -35,16 +35,14 @@ export default function RootLayout({
         <body
             className={clsx(
                 "min-h-screen text-foreground bg-background font-sans antialiased",
-                fontRunalto.variable, fontFilson.variable
+                fontRunalto.variable,
+                fontFilson.variable,
             )}
         >
-
         <Providers themeProps={{attribute: "class", defaultTheme: "light"}}>
             <div className="relative flex flex-col min-h-screen ">
                 <Navbar/>
-                <main className="w-full">
-                    {children}
-                </main>
+                <main className="w-full">{children}</main>
                 <footer className="w-full flex items-center justify-center py-8 ">
                     <Link
                         isExternal
@@ -53,7 +51,12 @@ export default function RootLayout({
                         title="NEVLUD Industries"
                     >
                         <span className="text pe-1">Made by</span>
-                        <img src="/loga/nevlud.png" alt="nevlud.com logo" height={2} width={120}/>
+                        <img
+                            alt="nevlud.com logo"
+                            height={2}
+                            src="/loga/nevlud.png"
+                            width={120}
+                        />
                     </Link>
                 </footer>
             </div>

@@ -1,23 +1,36 @@
 "use client";
 
 import type {RadioGroupProps} from "@heroui/react";
+import type {SVGProps} from "react";
 
 import React from "react";
 import {RadioGroup} from "@heroui/react";
 import {cn} from "@heroui/react";
-import PaymentMethodItem from "./PaymentMethodItem";
-
-import type {SVGProps} from "react";
 import {Icon} from "@iconify/react";
+
+import PaymentMethodItem from "./PaymentMethodItem";
 
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
     size?: number;
 };
 
-export const MasterCardIcon: React.FC<IconSvgProps> = ({width = 24, height = 24, ...props}) => {
+export const MasterCardIcon: React.FC<IconSvgProps> = ({
+                                                           width = 24,
+                                                           height = 24,
+                                                           ...props
+                                                       }) => {
     return (
-        <svg fill="none" height={height} viewBox="0 0 512 512" width={width} {...props}>
-            <path d="M325.228 131.82H186.781V380.612H325.228V131.82Z" fill="#FF5F00"/>
+        <svg
+            fill="none"
+            height={height}
+            viewBox="0 0 512 512"
+            width={width}
+            {...props}
+        >
+            <path
+                d="M325.228 131.82H186.781V380.612H325.228V131.82Z"
+                fill="#FF5F00"
+            />
             <path
                 d="M195.571 256.225C195.549 232.264 200.978 208.613 211.448 187.061C221.919 165.509 237.155 146.622 256.003 131.829C232.662 113.482 204.629 102.072 175.11 98.9037C145.591 95.7353 115.776 100.936 89.0725 113.912C62.3692 126.887 39.8553 147.114 24.1041 172.28C8.35298 197.446 0 226.536 0 256.225C0 285.914 8.35298 315.004 24.1041 340.17C39.8553 365.336 62.3692 385.562 89.0725 398.538C115.776 411.513 145.591 416.714 175.11 413.546C204.629 410.378 232.662 398.968 256.003 380.621C237.155 365.828 221.919 346.941 211.449 325.389C200.979 303.837 195.549 280.185 195.571 256.225Z"
                 fill="#EB001B"
@@ -34,9 +47,19 @@ export const MasterCardIcon: React.FC<IconSvgProps> = ({width = 24, height = 24,
     );
 };
 
-export const VisaIcon: React.FC<IconSvgProps> = ({width = 24, height = 24, ...props}) => {
+export const VisaIcon: React.FC<IconSvgProps> = ({
+                                                     width = 24,
+                                                     height = 24,
+                                                     ...props
+                                                 }) => {
     return (
-        <svg fill="none" height={height} viewBox="0 0 512 512" width={width} {...props}>
+        <svg
+            fill="none"
+            height={height}
+            viewBox="0 0 512 512"
+            width={width}
+            {...props}
+        >
             <path
                 d="M253.509 175.921L219.303 335.84H177.929L212.138 175.921H253.509ZM427.568 279.182L449.343 219.13L461.874 279.182H427.568ZM473.744 335.84H512L478.578 175.921H443.29C435.337 175.921 428.632 180.532 425.665 187.643L363.587 335.84H407.037L415.662 311.957H468.734L473.744 335.84ZM365.742 283.632C365.921 241.426 307.397 239.088 307.789 220.23C307.915 214.5 313.382 208.397 325.331 206.836C331.255 206.073 347.603 205.454 366.134 213.993L373.381 180.068C363.429 176.467 350.62 173 334.683 173C293.783 173 265.012 194.725 264.782 225.859C264.519 248.883 285.334 261.72 300.984 269.388C317.119 277.226 322.525 282.251 322.446 289.254C322.335 299.983 309.58 304.734 297.704 304.914C276.892 305.238 264.828 299.289 255.214 294.807L247.704 329.866C257.387 334.297 275.227 338.153 293.7 338.351C337.183 338.351 365.612 316.881 365.742 283.632ZM194.391 175.921L127.357 335.84H83.6302L50.64 208.213C48.6401 200.365 46.8957 197.48 40.8134 194.164C30.8645 188.761 14.4413 183.708 0 180.564L0.978353 175.921H71.3758C80.3427 175.921 88.4104 181.888 90.4642 192.218L107.891 284.765L150.927 175.921H194.391Z"
                 fill="#1434CB"
@@ -45,9 +68,19 @@ export const VisaIcon: React.FC<IconSvgProps> = ({width = 24, height = 24, ...pr
     );
 };
 
-export const PayPalIcon: React.FC<IconSvgProps> = ({width = 24, height = 24, ...props}) => {
+export const PayPalIcon: React.FC<IconSvgProps> = ({
+                                                       width = 24,
+                                                       height = 24,
+                                                       ...props
+                                                   }) => {
     return (
-        <svg fill="none" height={height} viewBox="0 0 512 512" width={width} {...props}>
+        <svg
+            fill="none"
+            height={height}
+            viewBox="0 0 512 512"
+            width={width}
+            {...props}
+        >
             <path
                 d="M345.495 188.005H305.665C302.946 188.005 300.628 189.985 300.203 192.675L284.097 294.794C283.776 296.809 285.337 298.626 287.369 298.626H307.808C309.706 298.626 311.331 297.24 311.628 295.353L316.199 266.407C316.618 263.711 318.942 261.731 321.661 261.731H334.262C360.501 261.731 375.635 249.037 379.595 223.881C381.382 212.876 379.664 204.228 374.511 198.172C368.857 191.522 358.824 188.005 345.495 188.005ZM350.089 225.302C347.917 239.592 336.999 239.592 326.436 239.592H320.433L324.654 212.905C324.905 211.292 326.29 210.104 327.927 210.104H330.681C337.867 210.104 344.656 210.104 348.162 214.203C350.252 216.649 350.887 220.282 350.089 225.302Z"
                 fill="#179BD7"
@@ -76,63 +109,76 @@ export const PayPalIcon: React.FC<IconSvgProps> = ({width = 24, height = 24, ...
     );
 };
 
-
 type PaymentMethodGroupProps = {
     allowQr?: boolean;
     allowOsobne?: boolean;
+    value?: string;
+    onChange?: (value: string) => void;
 } & RadioGroupProps;
 
-const PaymentMethodRadioGroup = React.forwardRef<HTMLDivElement, PaymentMethodGroupProps>(
-    ({className, classNames, ...props}, ref) => {
-        return (
-            <RadioGroup
-                {...props}
-                ref={ref}
-                classNames={{
-                    base: cn("mt-0 w-full", classNames?.base, className),
-                    wrapper: cn("grid md:grid-cols-2", classNames?.wrapper),
-                }}
-                value={props.allowQr ? "qr" : props.allowOsobne ? "osobne" : null}
+const PaymentMethodRadioGroup = React.forwardRef<
+    HTMLDivElement,
+    PaymentMethodGroupProps
+>(({className, classNames, value, onChange, ...props}, ref) => {
+    return (
+        <RadioGroup
+            {...props}
+            ref={ref}
+            classNames={{
+                base: cn("mt-0 w-full", classNames?.base, className),
+                wrapper: cn("grid md:grid-cols-2", classNames?.wrapper),
+            }}
+            name="paymentMethod"
+            orientation="horizontal"
+            value={value || "credit_card"}
+            onValueChange={onChange}
+        >
+            <PaymentMethodItem
+                className="bg-content2 dark:bg-content1"
+                description="Bezpečná platba kreditní kartou"
+                icon={<Icon height={30} icon="mdi:credit-card" width={30}/>}
+                isDisabled={false}
+                label="Platební karta"
+                name="paymentMethod"
+                value="credit_card"
+            />
+            <PaymentMethodItem
+                className="bg-content2 dark:bg-content1"
+                description={
+                    props.allowQr ? "Bankovní převod přes QR kód" : "Připravujeme"
+                }
+                icon={<Icon height={30} icon="mdi:qrcode" width={30}/>}
+                isDisabled={!props.allowQr}
+                label="QR platba"
+                name="paymentMethod"
+                value="qr"
+            />
+            <PaymentMethodItem
+                isDisabled
+                className="bg-content2 dark:bg-content1"
+                description="Připravujeme"
+                icon={<Icon height={30} icon="akar-icons:coin" width={30}/>}
+                label="Zákaznický kredit"
+                name="paymentMethod"
+                value="kredit"
+            />
 
-                orientation="horizontal"
-            >
-                <PaymentMethodItem
-                    isDisabled
-                    className="bg-content2 dark:bg-content1"
-                    description="Připravujeme"
-                    icon={<Icon icon="mdi:credit-card" height={30} width={30}/>}
-                    label="Platební karta"
-                    value="card"
-                />
-                <PaymentMethodItem
-                    isDisabled={!props.allowQr}
-                    className="bg-content2 dark:bg-content1"
-                    description={props.allowQr ? "Bankovní převod přes QR kód" : "Připravujeme"}
-                    icon={<Icon icon="mdi:qrcode" height={30} width={30}/>}
-                    label="QR platba"
-                    value="qr"
-                />
-                <PaymentMethodItem
-                    isDisabled
-                    className="bg-content2 dark:bg-content1"
-                    description="Připravujeme"
-                    icon={<Icon icon="akar-icons:coin" height={30} width={30}/>}
-                    label="Zákaznický kredit"
-                    value="kredit"
-                />
-
-                <PaymentMethodItem
-                    isDisabled={!props.allowOsobne}
-                    className="bg-content2 dark:bg-content1"
-                    description={props.allowOsobne ? "Platba hotově nebo kartou na místě" : "Nepovoleno"}
-                    icon={<Icon icon="mdi:cash-multiple" height={30} width={30}/>}
-                    label="Na místě"
-                    value="osobne"
-                />
-            </RadioGroup>
-        );
-    },
-);
+            <PaymentMethodItem
+                className="bg-content2 dark:bg-content1"
+                description={
+                    props.allowOsobne
+                        ? "Platba hotově nebo kartou na místě"
+                        : "Nepovoleno"
+                }
+                icon={<Icon height={30} icon="mdi:cash-multiple" width={30}/>}
+                isDisabled={!props.allowOsobne}
+                label="Na místě"
+                name="paymentMethod"
+                value="osobne"
+            />
+        </RadioGroup>
+    );
+});
 
 PaymentMethodRadioGroup.displayName = "PaymentMethodRadioGroup";
 

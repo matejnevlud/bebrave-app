@@ -12,11 +12,10 @@ export const siteConfig = {
             label: "Lekce",
             href: "#lekce",
         },
-       {
+        {
             label: "Instruktoři",
             href: "#instruktori",
-        }
-
+        },
     ],
     navMenuItems: [
         {

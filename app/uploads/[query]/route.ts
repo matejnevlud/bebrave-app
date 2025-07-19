@@ -1,37 +1,42 @@
-import {__DEV__} from "@heroui/shared-utils";
 import path from "path";
 
+import {__DEV__} from "@heroui/shared-utils";
 
-export async function GET(request: Request, { params }: { params: Promise<{ query: string }> }) {
-
+export async function GET(
+    request: Request,
+    {params}: { params: Promise<{ query: string }> },
+) {
     const p = await params;
     const fileQuery = p.query;
-
 
     // try to load the file from the filesystem under /uploads/[query]
     // if it exists, return the file content
     // if it does not exist, return a 404 error
-    const fs = require('fs');
-    const path = require('path');
-    const fullPath = __DEV__ ? path.join(process.cwd(), `/public/${fileQuery}`) : `/uploads/${fileQuery}`;
+    const fs = require("fs");
+    const path = require("path");
+    const fullPath = __DEV__
+        ? path.join(process.cwd(), `/public/${fileQuery}`)
+        : `/uploads/${fileQuery}`;
+
     if (!fs.existsSync(fullPath)) {
         return new Response(
             JSON.stringify({
                 error: "File not found",
-                filePath: fullPath
+                filePath: fullPath,
             }),
             {
                 status: 404,
                 headers: {
                     "Content-Type": "application/json",
                 },
-            }
+            },
         );
     }
     // If the file exists, read its content and return it as an image response
     const fileContent = fs.readFileSync(fullPath);
     const fileExtension = path.extname(fullPath).toLowerCase();
     let contentType = "application/octet-stream"; // Default content type
+
     if (fileExtension === ".jpg" || fileExtension === ".jpeg") {
         contentType = "image/jpeg";
     } else if (fileExtension === ".png") {
@@ -40,10 +45,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ quer
         contentType = "image/gif";
     } else if (fileExtension === ".webp") {
         contentType = "image/webp";
-    }
-    else if (fileExtension === ".svg") {
+    } else if (fileExtension === ".svg") {
         contentType = "image/svg+xml";
     }
+
     return new Response(fileContent, {
         status: 200,
         headers: {
@@ -53,40 +58,47 @@ export async function GET(request: Request, { params }: { params: Promise<{ quer
     });
 }
 
-
 // Note: This code assumes that the file paths are safe and do not allow directory traversal attacks.
 // now create POST method to upload files to the /uploads/[query] directory
-export async function POST(request: Request, { params }: { params: Promise<{ query: string }> }) {
+export async function POST(
+    request: Request,
+    {params}: { params: Promise<{ query: string }> },
+) {
     const p = await params;
     const fileQuery = p.query;
 
     // Parse the incoming request as form data
     const formData = await request.formData();
-    const file = formData.get('file') as File;
+    const file = formData.get("file") as File;
 
     if (!file) {
-        return new Response(
-            JSON.stringify({ error: "No file provided" }),
-            { status: 400, headers: { "Content-Type": "application/json" } }
-        );
+        return new Response(JSON.stringify({error: "No file provided"}), {
+            status: 400,
+            headers: {"Content-Type": "application/json"},
+        });
     }
 
     // Define the upload path
-    const uploadPath = __DEV__ ? path.join(process.cwd(), `/public/_uploads/${fileQuery}`) : `/uploads/${fileQuery}`;
+    const uploadPath = __DEV__
+        ? path.join(process.cwd(), `/public/_uploads/${fileQuery}`)
+        : `/uploads/${fileQuery}`;
 
     // Ensure the directory exists
-    const fs = require('fs');
-    fs.mkdirSync(path.dirname(uploadPath), { recursive: true });
+    const fs = require("fs");
+
+    fs.mkdirSync(path.dirname(uploadPath), {recursive: true});
 
     // Write the file to the filesystem
     const buffer = await file.arrayBuffer();
+
     fs.writeFileSync(uploadPath, Buffer.from(buffer));
 
-
-
     return new Response(
-        JSON.stringify({ message: "File uploaded successfully", filePath: uploadPath }),
-        { status: 200, headers: { "Content-Type": "application/json" } }
+        JSON.stringify({
+            message: "File uploaded successfully",
+            filePath: uploadPath,
+        }),
+        {status: 200, headers: {"Content-Type": "application/json"}},
     );
 }
 

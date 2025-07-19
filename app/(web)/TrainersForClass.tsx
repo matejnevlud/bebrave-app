@@ -1,30 +1,35 @@
 "use client";
-import {Card, CardHeader, CardBody, Image, Avatar, Chip} from "@heroui/react";
-import {CardFooter} from "@heroui/card";
-import {Button} from "@heroui/button";
-import {getTrainers} from "@/db/actions";
+import {Avatar} from "@heroui/react";
 import React, {useEffect, useState} from "react";
+
+import {getTrainers} from "@/db/actions";
 import {TrainerWithRelations} from "@/db/schema";
 
-export default function TrainersForClass(props: { classTypeName: string, right?: boolean }) {
-
+export default function TrainersForClass(props: {
+    classTypeName: string;
+    right?: boolean;
+}) {
     const [trainers, setTrainers] = useState<TrainerWithRelations[]>([]);
+
     useEffect(() => {
         (async () => {
             const data = await getTrainers();
             // Filter trainers by class type name
-            const filteredTrainers = data.filter(trainer =>
-                trainer.trainerClassTypes.some(tct => tct.classType.name === props.classTypeName)
+            const filteredTrainers = data.filter((trainer) =>
+                trainer.trainerClassTypes.some(
+                    (tct) => tct.classType.name === props.classTypeName,
+                ),
             );
+
             setTrainers(filteredTrainers);
         })();
     }, []);
 
-
     return (
-        <div className="flex items-center gap-8 flex-wrap mt-4 h-10" style={{justifyContent: props.right ? 'flex-end' : 'flex-start'}}>
-
-
+        <div
+            className="flex items-center gap-8 flex-wrap mt-4 h-10"
+            style={{justifyContent: props.right ? "flex-end" : "flex-start"}}
+        >
             {trainers.map((trainer) => (
                 <div>
                     <Avatar
@@ -33,12 +38,9 @@ export default function TrainersForClass(props: { classTypeName: string, right?:
                         size="md"
                         src={trainer.profilePicture as any}
                     />
-                    <span className="text-medium font-medium" >{trainer.name}</span>
+                    <span className="text-medium font-medium">{trainer.name}</span>
                 </div>
             ))}
-
-
-
         </div>
     );
 }

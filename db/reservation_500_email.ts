@@ -49,7 +49,7 @@ export const reservation500Email = `
               </tr>
               <tr>
                 <td style="padding:8px 0;"><strong>Platba:</strong></td>
-                <td style="padding:8px 0;">Předem na účet QR kódem</td>
+                <td style="padding:8px 0;">{{payment_method}}</td>
               </tr>
             </table>
           </td>
@@ -78,6 +78,8 @@ export const reservation500Email = `
             </ol>
           </td>
         </tr>
+        <!-- Invoice section -->
+        {{invoice_info}}
         <!-- Footer section -->
         <tr>
           <td style="padding:0 40px 24px 40px;">

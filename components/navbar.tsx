@@ -14,18 +14,11 @@ import {Input} from "@heroui/input";
 import {link as linkStyles} from "@heroui/theme";
 import NextLink from "next/link";
 import clsx from "clsx";
-import Image from 'next/image'
+import Image from "next/image";
+import {CalendarDays} from "lucide-react";
+
 import {siteConfig} from "@/config/site";
-import {ThemeSwitch} from "@/components/theme-switch";
-import {
-    TwitterIcon,
-    GithubIcon,
-    DiscordIcon,
-    HeartFilledIcon,
-    SearchIcon,
-    Logo,
-} from "@/components/icons";
-import {Calendar, CalendarDays} from "lucide-react";
+import {SearchIcon} from "@/components/icons";
 
 export const Navbar = () => {
     const searchInput = (
@@ -55,7 +48,13 @@ export const Navbar = () => {
                 <NavbarBrand as="li" className="gap-3 max-w-fit">
                     <NextLink className="flex justify-start items-center gap-5" href="/">
                         {/*<Image src="/loga/bebrave_black.png" width={150} height={41}  alt={"logo"} className="pb-2"/>*/}
-                        <Image src="/loga/b_black.png" width={24} height={24}  alt={"logo"} className=" "/>
+                        <Image
+                            alt={"logo"}
+                            className=" "
+                            height={24}
+                            src="/loga/b_black.png"
+                            width={24}
+                        />
                     </NextLink>
                 </NavbarBrand>
             </NavbarContent>
@@ -84,15 +83,18 @@ export const Navbar = () => {
                 </ul>
             </NavbarContent>
 
-            <NavbarContent className="hidden sm:flex basis-1/5 sm:basis-full" justify="end" >
+            <NavbarContent
+                className="hidden sm:flex basis-1/5 sm:basis-full"
+                justify="end"
+            >
                 <NavbarItem className="hidden sm:flex">
                     <Button
                         as={Link}
                         className="text-sm font-normal text-default-600 bg-default-100"
-                        href={"/reservation"}
-                        startContent={<CalendarDays className={"pb-0.5"} size={24}  />}
-                        variant="flat"
                         color="success"
+                        href={"/reservation"}
+                        startContent={<CalendarDays className={"pb-0.5"} size={24}/>}
+                        variant="flat"
                     >
                         Rezervovat
                     </Button>

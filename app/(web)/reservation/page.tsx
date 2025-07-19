@@ -1,32 +1,42 @@
-"use client"
+"use client";
 
-import {title} from "@/components/primitives";
-
-import {Tab, Image, Card, CardBody, Calendar, Divider, SelectItem, Select, SelectedItems, Avatar, Table, TableHeader, TableColumn, TableBody, TableRow, TableCell, AutocompleteItem, Form, Modal, ModalContent, Chip} from "@heroui/react";
+import {
+    Image,
+    Card,
+    CardBody,
+    Calendar,
+    SelectItem,
+    Select,
+    SelectedItems,
+    Avatar,
+    Form,
+    Chip,
+} from "@heroui/react";
 import React, {Fragment, useEffect, useState} from "react";
-import {today, getLocalTimeZone, isWeekend, CalendarDate, ZonedDateTime, CalendarDateTime, getDayOfWeek} from "@internationalized/date";
+import {today, getLocalTimeZone, CalendarDate} from "@internationalized/date";
 import {I18nProvider, useLocale} from "@react-aria/i18n";
-import {Divide, SeparatorVertical} from "lucide-react";
-import {db} from "@/db";
-import {Class, ClassType, ClassWithRelations, Trainer, trainersTable, TrainerWithRelations} from "@/db/schema";
-import {createReservation, getClasses, getClassTypes, getTrainers} from "@/db/actions";
-import HorizontalSteps from "@/components/blocks/HorizontalSteps";
 import {Button} from "@heroui/button";
-import {Autocomplete} from "@heroui/autocomplete";
 import {Input} from "@heroui/input";
-import {CardHeader} from "@heroui/card";
-import {Badge} from "@heroui/badge";
-import {ModalBody, ModalFooter, ModalHeader} from "@heroui/modal";
-import {Resend} from "resend";
 // @ts-ignore
-import confetti from 'canvas-confetti';
-import PaymentMethodRadioGroup from "@/components/blocks/PaymentMethodRadio";
+import confetti from "canvas-confetti";
 import {Link} from "@heroui/link";
-import { Icon } from "@iconify/react";
+import {Icon} from "@iconify/react";
 
-
-
-
+import PaymentMethodRadioGroup from "@/components/blocks/PaymentMethodRadio";
+import {
+    ClassType,
+    ClassWithRelations,
+    Trainer,
+    TrainerWithRelations,
+} from "@/db/schema";
+import HorizontalSteps from "@/components/blocks/HorizontalSteps";
+import {
+    createReservation,
+    getClasses,
+    getClassTypes,
+    getTrainers,
+} from "@/db/actions";
+import {FormStorage, ReservationFormData} from "@/lib/utils/form-storage";
 
 const users = [
     {
@@ -89,7 +99,6 @@ const users = [
         email: "brian.kim@example.com",
         status: "active",
     },
-
 ];
 
 type User = {
@@ -103,13 +112,7 @@ type User = {
     email: string;
 };
 
-
-
-
-
 export default function ReservationPage() {
-
-
     const [selected, setSelected] = useState("videos");
 
     const [trainers, setTrainers] = useState<TrainerWithRelations[]>([]);
@@ -120,7 +123,7 @@ export default function ReservationPage() {
     const [isFetchingData, setIsFetchingData] = useState<boolean>(true);
 
     async function fetchData() {
-        const t =  await getTrainers();
+        const t = await getTrainers();
         const ct = await getClassTypes();
         const c = await getClasses();
 
@@ -137,8 +140,16 @@ export default function ReservationPage() {
 
     useEffect(() => {
         fetchData();
-    }, [])
+    }, []);
 
+    // Load form data from localStorage on component mount
+    useEffect(() => {
+        const savedData = FormStorage.loadFormData();
+
+        if (savedData) {
+            setFormData(savedData);
+        }
+    }, []);
 
     let now = today(getLocalTimeZone());
 
@@ -150,18 +161,32 @@ export default function ReservationPage() {
 
     let {locale} = useLocale();
 
-
-
-
-
     // FORM DATA
-    const [selectedClassType, setSelectedClassType] = useState<ClassType | null>(null);
+    const [selectedClassType, setSelectedClassType] = useState<ClassType | null>(
+        null,
+    );
     const [selectedTrainer, setSelectedTrainer] = useState<Trainer | null>(null);
     const [selectedDate, setSelectedDate] = useState<CalendarDate | null>(null);
-    const [selectedClass, setSelectedClass] = useState<ClassWithRelations | null>(null);
+    const [selectedClass, setSelectedClass] = useState<ClassWithRelations | null>(
+        null,
+    );
 
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [isFormSubmitted, setIsFormSubmitted] = useState<boolean>(false);
+
+    // Form data state
+    const [formData, setFormData] = useState<ReservationFormData>({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        paymentMethod: "credit_card",
+        // Invoice address fields
+        address: "",
+        city: "",
+        postalCode: "",
+        country: "Česká republika",
+    });
 
     function determineStep() {
         var step = 0;
@@ -178,8 +203,10 @@ export default function ReservationPage() {
         return step; // Example: returning step 1 as the current step
     }
 
-    function handleClassTypeChange (event: React.ChangeEvent<HTMLSelectElement>) {
-        const classType = classTypes.find((ct) => ct.id.toString() == event.target.value) || null;
+    function handleClassTypeChange(event: React.ChangeEvent<HTMLSelectElement>) {
+        const classType =
+            classTypes.find((ct) => ct.id.toString() == event.target.value) || null;
+
         setSelectedClassType(classType);
 
         if (classType) {
@@ -189,48 +216,56 @@ export default function ReservationPage() {
     }
 
     function handleTrainerChange(event: React.ChangeEvent<HTMLSelectElement>) {
-        const trainer = trainers.find((t) => t.id.toString() == event.target.value) || null;
+        const trainer =
+            trainers.find((t) => t.id.toString() == event.target.value) || null;
+
         setSelectedTrainer(trainer);
         setSelectedDate(null);
     }
 
     const availableClassesBasedOnSelection = React.useMemo(() => {
-        let availableClasses: ClassWithRelations[] = classes
+        let availableClasses: ClassWithRelations[] = classes;
 
-        if(selectedClassType)
-            availableClasses = classes.filter(c => c.classTypeId == selectedClassType.id);
+        if (selectedClassType)
+            availableClasses = classes.filter(
+                (c) => c.classTypeId == selectedClassType.id,
+            );
 
         if (selectedTrainer)
-            availableClasses = availableClasses.filter(c => c.trainerId == selectedTrainer.id);
-
+            availableClasses = availableClasses.filter(
+                (c) => c.trainerId == selectedTrainer.id,
+            );
 
         return availableClasses;
     }, [selectedClassType, selectedTrainer, classes, trainers]);
 
-
-
     const availableClassesForDate = React.useMemo(() => {
         if (!selectedDate) return [];
 
-        return availableClassesBasedOnSelection.filter(c => {
+        return availableClassesBasedOnSelection.filter((c) => {
             return c.date === selectedDate.toString();
         });
     }, [selectedDate, availableClassesBasedOnSelection]);
 
     const classesToRender = React.useMemo(() => {
-        let classesToRender = selectedDate ? availableClassesForDate : availableClassesBasedOnSelection;
+        let classesToRender = selectedDate
+            ? availableClassesForDate
+            : availableClassesBasedOnSelection;
 
         // Order by date and time
         classesToRender.sort((a, b) => {
             const dateA = new Date(a.date);
             const dateB = new Date(b.date);
+
             return dateA.getTime() - dateB.getTime() || a.time.localeCompare(b.time);
         });
 
         // Group classes by date
         let groupedClasses: Record<string, ClassWithRelations[]> = {};
+
         classesToRender.forEach((c) => {
             const dateKey = c.date.toString();
+
             if (!groupedClasses[dateKey]) {
                 groupedClasses[dateKey] = [];
             }
@@ -243,47 +278,94 @@ export default function ReservationPage() {
             groupedClasses[dateKey].sort((a, b) => {
                 const timeA = a.time.split(":").map(Number);
                 const timeB = b.time.split(":").map(Number);
+
                 return timeA[0] - timeB[0] || timeA[1] - timeB[1];
             });
         });
 
-
         return groupedClasses;
     }, [selectedDate, availableClassesBasedOnSelection, availableClassesForDate]);
 
-    let isDateUnavailable = (date: any) => !availableClassesBasedOnSelection.some((c) => date.toString() === c.date.toString());
+    let isDateUnavailable = (date: any) =>
+        !availableClassesBasedOnSelection.some(
+            (c) => date.toString() === c.date.toString(),
+        );
 
     function hasClassFreeSpot(c: ClassWithRelations) {
         // Check if the class has any reservations
         if (!c.reservations || c.reservations.length === 0) {
             return true; // No reservations means free spot
         }
+
         return c.reservations.length < c.capacity;
     }
 
     // allow QR only on class id 2
     const [allowQr, setAllowQr] = useState<boolean>(false);
+
     useEffect(() => {
         setAllowQr(selectedClass?.classTypeId === 21); // Assuming classType.id 2 is the one that allows QR payment
     }, [selectedClass]);
+
+    // Handle form field changes and save to localStorage
+    const handleFormFieldChange = (
+        field: keyof ReservationFormData,
+        value: string,
+    ) => {
+        const newFormData = {...formData, [field]: value};
+
+        setFormData(newFormData);
+        FormStorage.saveFormData(newFormData);
+    };
+
+    // Clear form data
+    const handleClearForm = () => {
+        if (confirm("Opravdu chcete vymazat všechny uložené údaje?")) {
+            const emptyFormData: ReservationFormData = {
+                firstName: "",
+                lastName: "",
+                email: "",
+                phone: "",
+                paymentMethod: "credit_card",
+                address: "",
+                city: "",
+                postalCode: "",
+                country: "Česká republika",
+            };
+
+            setFormData(emptyFormData);
+            FormStorage.clearFormData();
+        }
+    };
 
     async function handleReservationSubmit(event: any) {
         event.preventDefault();
 
         const form = event.currentTarget;
-        console.log(form)
+
+        console.log(form);
 
         setIsSubmitting(true);
 
         try {
             // wait for 2 seconds to simulate a network request
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise((resolve) => setTimeout(resolve, 1000));
 
             let userData = Object.fromEntries(new FormData(form));
 
-            const response = await createReservation(selectedClass as ClassWithRelations, undefined, userData)
+            console.log("userData", userData);
 
-            if (response) {
+            const response = await createReservation(
+                selectedClass as ClassWithRelations,
+                undefined,
+                userData,
+            );
+
+            if (typeof response === "string") {
+                // Credit card payment - redirect to Nexi payment page
+                window.location.href = response;
+            } else if (response === true) {
+                // Other payment methods - show success
                 setIsFormSubmitted(true);
                 confetti({
                     particleCount: 200,
@@ -294,15 +376,16 @@ export default function ReservationPage() {
             }
         } catch (error) {
             console.error("Error submitting reservation form:", error);
-            alert("Došlo k chybě při odesílání rezervace. Zkuste to prosím znovu později.");
+            alert(
+                "Došlo k chybě při odesílání rezervace. Zkuste to prosím znovu později.",
+            );
         } finally {
-            setIsSubmitting(false)
+            setIsSubmitting(false);
         }
     }
 
     return (
         <div className="mx-auto flex flex-col items-center justify-center gap-4 pt-4 max-w-7xl">
-
             <h1 className="text-4xl font-sans font-bold">Rezervační systém</h1>
 
             <HorizontalSteps
@@ -326,25 +409,24 @@ export default function ReservationPage() {
                 ]}
             />
 
-
-
-
             {/* Calendar chooser */}
-            <section className={"w-full px-2 max-w-3xl " + (determineStep() >= 4 ? "hidden" : "")}>
+            <section
+                className={
+                    "w-full px-2 max-w-3xl " + (determineStep() >= 4 ? "hidden" : "")
+                }
+            >
                 <div className="w-full max-w-3xl flex flex-col sm:flex-row gap-4 my-4 items-center justify-center">
                     <Select
                         aria-label="Select Class Type"
-                        isLoading={isFetchingData}
-                        isDisabled={isFetchingData}
-                        onChange={handleClassTypeChange}
-                        selectedKeys={selectedClassType ? [selectedClassType.id.toString()] : []}
                         classNames={{
                             base: " fl",
                             trigger: "h-12",
                         }}
+                        isDisabled={isFetchingData}
+                        isLoading={isFetchingData}
                         items={classTypes}
-                        placeholder="Vybrat Typ lekce"
                         maxListboxHeight={400}
+                        placeholder="Vybrat Typ lekce"
                         renderValue={(items: SelectedItems<ClassType>) => {
                             return items.map((item) => (
                                 <div key={item.key} className="flex items-center gap-2">
@@ -360,11 +442,20 @@ export default function ReservationPage() {
                                 </div>
                             ));
                         }}
+                        selectedKeys={
+                            selectedClassType ? [selectedClassType.id.toString()] : []
+                        }
+                        onChange={handleClassTypeChange}
                     >
                         {(user) => (
                             <SelectItem key={user.id} textValue={user.name}>
                                 <div className="flex gap-2 items-center">
-                                    <Avatar alt={user.name} className="flex-shrink-0" size="sm" src={user.image as any} />
+                                    <Avatar
+                                        alt={user.name}
+                                        className="flex-shrink-0"
+                                        size="sm"
+                                        src={user.image as any}
+                                    />
                                     <div className="flex flex-col">
                                         <span className="text-small">{user.name}</span>
                                     </div>
@@ -375,18 +466,27 @@ export default function ReservationPage() {
 
                     <Select
                         aria-label="Select Trainer"
-                        isLoading={isFetchingData}
-                        isDisabled={isFetchingData}
-                        selectedKeys={selectedTrainer ? [selectedTrainer.id.toString()] : []}
-                        disabledKeys={selectedClassType ? trainers.filter(t => !t.trainerClassTypes?.some(tct => tct.classTypeId === selectedClassType?.id)).map(t => t.id.toString()) : []}
-                        onChange={handleTrainerChange}
                         classNames={{
                             base: "fl",
                             trigger: "h-12",
                         }}
+                        disabledKeys={
+                            selectedClassType
+                                ? trainers
+                                    .filter(
+                                        (t) =>
+                                            !t.trainerClassTypes?.some(
+                                                (tct) => tct.classTypeId === selectedClassType?.id,
+                                            ),
+                                    )
+                                    .map((t) => t.id.toString())
+                                : []
+                        }
+                        isDisabled={isFetchingData}
+                        isLoading={isFetchingData}
                         items={trainers}
-                        placeholder="Vybrat trenéra"
                         maxListboxHeight={400}
+                        placeholder="Vybrat trenéra"
                         renderValue={(items: SelectedItems<TrainerWithRelations>) => {
                             return items.map((item) => (
                                 <div key={item.key} className="flex items-center gap-2">
@@ -398,65 +498,97 @@ export default function ReservationPage() {
                                     />
                                     <div className="flex flex-col">
                                         <span>{item.data?.name}</span>
-                                        <span className="text-default-500 text-tiny">{item.data?.trainerClassTypes?.map(tcp => tcp.classType?.name).join(', ')}</span>
+                                        <span className="text-default-500 text-tiny">
+                      {item.data?.trainerClassTypes
+                          ?.map((tcp) => tcp.classType?.name)
+                          .join(", ")}
+                    </span>
                                     </div>
                                 </div>
                             ));
                         }}
+                        selectedKeys={
+                            selectedTrainer ? [selectedTrainer.id.toString()] : []
+                        }
+                        onChange={handleTrainerChange}
                     >
                         {(user) => (
                             <SelectItem key={user.id} textValue={user.name}>
                                 <div className="flex gap-2 items-center">
-                                    <Avatar alt={user.name} className="flex-shrink-0" size="sm" src={user.profilePicture as any} />
+                                    <Avatar
+                                        alt={user.name}
+                                        className="flex-shrink-0"
+                                        size="sm"
+                                        src={user.profilePicture as any}
+                                    />
                                     <div className="flex flex-col">
                                         <span className="text-small">{user.name}</span>
-                                        <span className="text-tiny text-default-400">{user?.trainerClassTypes?.map(tcp => tcp.classType?.name).join(', ')}</span>
+                                        <span className="text-tiny text-default-400">
+                      {user?.trainerClassTypes
+                          ?.map((tcp) => tcp.classType?.name)
+                          .join(", ")}
+                    </span>
                                     </div>
                                 </div>
                             </SelectItem>
                         )}
                     </Select>
-
                 </div>
 
                 <I18nProvider locale="cs-CZ">
                     <Calendar
-                        aria-label="Date"
-                        className={isFetchingData ? "opacity-50" : ""}
-                        minValue={today(getLocalTimeZone()) as any}
-                        isDateUnavailable={isDateUnavailable}
-                        visibleMonths={3}
                         hideDisabledDates
-                        calendarWidth={'16rem'}
-                        weekdayStyle="short"
+                        aria-label="Date"
+                        calendarWidth={"16rem"}
+                        className={isFetchingData ? "opacity-50" : ""}
+                        isDateUnavailable={isDateUnavailable}
+                        minValue={today(getLocalTimeZone()) as any}
                         pageBehavior={"single"}
-                        onChange={setSelectedDate as any}
                         value={selectedDate as any}
+                        visibleMonths={3}
+                        weekdayStyle="short"
+                        onChange={setSelectedDate as any}
                     />
                 </I18nProvider>
 
                 <div className="w-full max-w-3xl pt-6">
                     {Object.entries(classesToRender).map(([date, classes]) => (
                         <Fragment>
-                            <h2 className="text-xl font-bold text-center py-3">{new Date(date).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(date).toLocaleDateString('cs-CZ')}</h2>
+                            <h2 className="text-xl font-bold text-center py-3">
+                                {new Date(date).toLocaleDateString("cs-CZ", {
+                                    weekday: "long",
+                                })}{" "}
+                                {new Date(date).toLocaleDateString("cs-CZ")}
+                            </h2>
                             {classes.map((c: ClassWithRelations) => (
                                 <div className="flex my-6 gap-3 sm:gap-6 items-start sm:items-center flex-col sm:flex-row">
                                     <div className=" ml-4 sm:ml-0 lg:absolute lg:ml-[-5rem] items-center flex flex-row sm:flex-col gap-2 justify-center lg:w-14">
                                         <b>{c.time}</b>
-                                        <span className="text-tiny">{c.classType.duration} min</span>
+                                        <span className="text-tiny">
+                      {c.classType.duration} min
+                    </span>
                                     </div>
-                                    <Card key={c.id} isDisabled={!hasClassFreeSpot(c)} isPressable={hasClassFreeSpot(c)} className="hover:shadow-lg transition-shadow duration-200 flex-1"  onPress={() => setSelectedClass(c)}>
-
+                                    <Card
+                                        key={c.id}
+                                        className="hover:shadow-lg transition-shadow duration-200 flex-1"
+                                        isDisabled={!hasClassFreeSpot(c)}
+                                        isPressable={hasClassFreeSpot(c)}
+                                        onPress={() => setSelectedClass(c)}
+                                    >
                                         <CardBody className="flex flex-row sm:flex-row items-start sm:items-center gap-3 p-0 h-36">
                                             <Image
-                                                src={c.classType.image as any}
                                                 alt={c.classType.name}
                                                 className="w-28 sm:w-36 h-36 rounded-none object-cover"
+                                                src={c.classType.image as any}
                                             />
                                             <div className="flex-1 h-full flex flex-col justify-between py-2 pe-2">
                                                 <div>
-                                                    <h3 className="text-md font-semibold">{c.classType.name}</h3>
-                                                    <p className="text-small line-clamp-3 text-justify text-justify">{c.classType.description}</p>
+                                                    <h3 className="text-md font-semibold">
+                                                        {c.classType.name}
+                                                    </h3>
+                                                    <p className="text-small line-clamp-3 text-justify text-justify">
+                                                        {c.classType.description}
+                                                    </p>
                                                 </div>
                                                 <div className="flex items-center">
                                                     <Avatar
@@ -465,8 +597,10 @@ export default function ReservationPage() {
                                                         size="sm"
                                                         src={c.trainer?.profilePicture as any}
                                                     />
-                                                    <span className="text-small sm:text-medium" >{c.trainer?.name}</span>
-                                                    { c.secondTrainer && (
+                                                    <span className="text-small sm:text-medium">
+                            {c.trainer?.name}
+                          </span>
+                                                    {c.secondTrainer && (
                                                         <div className="inline-block ml-4">
                                                             <Avatar
                                                                 alt={c.secondTrainer?.name}
@@ -474,18 +608,48 @@ export default function ReservationPage() {
                                                                 size="sm"
                                                                 src={c.secondTrainer?.profilePicture as any}
                                                             />
-                                                            <span className="text-small sm:text-medium" >{c.secondTrainer?.name}</span>
+                                                            <span className="text-small sm:text-medium">
+                                {c.secondTrainer?.name}
+                              </span>
                                                         </div>
                                                     )}
-                                                    <div className="flex-1"></div>
-                                                    {!hasClassFreeSpot(c) && <Chip size="md" color="danger" className={"sm:hidden"}>Vyprodáno</Chip>}
-                                                    {hasClassFreeSpot(c) && <span className="float-right mt-1.5 sm:mt-1 mr-4 text-small sm:text-medium" >{c?.classType?.price} Kč</span>}
+                                                    <div className="flex-1"/>
+                                                    {!hasClassFreeSpot(c) && (
+                                                        <Chip
+                                                            className={"sm:hidden"}
+                                                            color="danger"
+                                                            size="md"
+                                                        >
+                                                            Vyprodáno
+                                                        </Chip>
+                                                    )}
+                                                    {hasClassFreeSpot(c) && (
+                                                        <span className="float-right mt-1.5 sm:mt-1 mr-4 text-small sm:text-medium">
+                              {c?.classType?.price} Kč
+                            </span>
+                                                    )}
                                                 </div>
-
                                             </div>
                                             <div className="hidden sm:block me-6">
-                                                {hasClassFreeSpot(c) && <Button color="primary" variant="solid" size="md" onClick={() => setSelectedClass(c)}>Rezervovat</Button>}
-                                                {!hasClassFreeSpot(c) && <Button isDisabled color="danger" className={"hidden sm:inline-flex"}>Vyprodáno</Button>}
+                                                {hasClassFreeSpot(c) && (
+                                                    <Button
+                                                        color="primary"
+                                                        size="md"
+                                                        variant="solid"
+                                                        onClick={() => setSelectedClass(c)}
+                                                    >
+                                                        Rezervovat
+                                                    </Button>
+                                                )}
+                                                {!hasClassFreeSpot(c) && (
+                                                    <Button
+                                                        isDisabled
+                                                        className={"hidden sm:inline-flex"}
+                                                        color="danger"
+                                                    >
+                                                        Vyprodáno
+                                                    </Button>
+                                                )}
                                             </div>
                                         </CardBody>
                                     </Card>
@@ -493,40 +657,60 @@ export default function ReservationPage() {
                             ))}
                         </Fragment>
                     ))}
-
-
                 </div>
             </section>
 
             {/* Reservation form */}
-            <section className={"w-full px-2 max-w-3xl " + (determineStep() === 4 ? "shown" : "hidden")}>
-
-
+            <section
+                className={
+                    "w-full px-2 max-w-3xl " +
+                    (determineStep() === 4 ? "shown" : "hidden")
+                }
+            >
                 <div>
-                    <Link isBlock onPress={() => setSelectedClass(null)} color={"foreground"} className="absolute mt-6 hover:cursor-pointer !text-xl text-center font-bold">
-                        <Icon icon={"weui:back-filled"} className="inline-block me-2" />
-
+                    <Link
+                        isBlock
+                        className="absolute mt-6 hover:cursor-pointer !text-xl text-center font-bold"
+                        color={"foreground"}
+                        onPress={() => setSelectedClass(null)}
+                    >
+                        <Icon className="inline-block me-2" icon={"weui:back-filled"}/>
                     </Link>
-                    <h2 className="text-xl text-center font-bold pt-6">{new Date(selectedClass?.date ?? 0 ).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(selectedClass?.date ?? 0).toLocaleDateString('cs-CZ')} v {selectedClass?.time}</h2>
+                    <h2 className="text-xl text-center font-bold pt-6">
+                        {new Date(selectedClass?.date ?? 0).toLocaleDateString("cs-CZ", {
+                            weekday: "long",
+                        })}{" "}
+                        {new Date(selectedClass?.date ?? 0).toLocaleDateString("cs-CZ")} v{" "}
+                        {selectedClass?.time}
+                    </h2>
                 </div>
-
 
                 <div className=" flex my-6 gap-3 sm:gap-6 items-start sm:items-center flex-col sm:flex-row">
                     <div className=" ml-4 sm:ml-0 lg:absolute lg:ml-[-5rem] items-center flex flex-row sm:flex-col gap-2 justify-center lg:w-14">
                         <b>{selectedClass?.time}</b>
-                        <span className="text-tiny">{selectedClass?.classType.duration} min</span>
+                        <span className="text-tiny">
+              {selectedClass?.classType.duration} min
+            </span>
                     </div>
-                    <Card key={selectedClass?.id} className="hover:shadow-lg transition-shadow duration-200 flex-1" isPressable >
+                    <Card
+                        key={selectedClass?.id}
+                        isPressable
+                        className="hover:shadow-lg transition-shadow duration-200 flex-1"
+                    >
                         <CardBody className="flex flex-row sm:flex-row  gap-3 p-0 min-h-36 ">
                             <Image
-                                src={selectedClass?.classType.image as any}
                                 alt={selectedClass?.classType.name}
                                 className=" w-28 sm:w-36 rounded-none object-cover h-full"
+                                src={selectedClass?.classType.image as any}
                             />
                             <div className="flex-1 self-center h-full flex flex-col justify-between py-2 pe-2">
                                 <div>
-                                    <h3 className="text-md font-semibold">{selectedClass?.classType.name}</h3>
-                                    <p className="text-small  text-justify pe-3">{selectedClass?.classType.description}</p>
+                                    <h3 className="text-md font-semibold">
+                                        {selectedClass?.classType.name}
+                                    </h3>
+                                    <p className="text-small  text-justify pe-3">
+                                        {selectedClass?.classType.description}
+                                    </p>
                                 </div>
                                 <div>
                                     <Avatar
@@ -535,85 +719,159 @@ export default function ReservationPage() {
                                         size="sm"
                                         src={selectedClass?.trainer?.profilePicture as any}
                                     />
-                                    <span className="text-small sm:text-medium" >{selectedClass?.trainer?.name}</span>
+                                    <span className="text-small sm:text-medium">
+                    {selectedClass?.trainer?.name}
+                  </span>
 
-                                    { selectedClass?.secondTrainer && (
+                                    {selectedClass?.secondTrainer && (
                                         <div className="inline-block ml-4">
                                             <Avatar
                                                 alt={selectedClass?.secondTrainer?.name}
                                                 className="inline-flex me-2 hover:scale-125 transition-transform duration-200"
                                                 size="sm"
-                                                src={selectedClass?.secondTrainer?.profilePicture as any}
+                                                src={
+                                                    selectedClass?.secondTrainer?.profilePicture as any
+                                                }
                                             />
-                                            <span className="text-small sm:text-medium" >{selectedClass?.secondTrainer?.name}</span>
+                                            <span className="text-small sm:text-medium">
+                        {selectedClass?.secondTrainer?.name}
+                      </span>
                                         </div>
                                     )}
-                                    <span className="float-right mt-1.5 sm:mt-1 mr-4 text-small sm:text-medium" >{selectedClass?.classType?.price} Kč</span>
+                                    <span className="float-right mt-1.5 sm:mt-1 mr-4 text-small sm:text-medium">
+                    {selectedClass?.classType?.price} Kč
+                  </span>
                                 </div>
-
                             </div>
                         </CardBody>
                     </Card>
                 </div>
 
-
-
                 <Card className="p-2 mt-8">
                     <CardBody>
-                        <Form validationBehavior="native" onSubmit={(e) => handleReservationSubmit(e)}>
-
-                            <span className="relative text-foreground-500">Osobní údaje</span>
+                        <Form
+                            validationBehavior="native"
+                            onSubmit={(e) => handleReservationSubmit(e)}
+                        >
+                            <div className="flex items-center justify-between mb-4">
+                <span className="relative text-foreground-500">
+                  Osobní údaje
+                </span>
+                            </div>
                             <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
-
                                 <Input
                                     isRequired
-                                    name="firstName"
+                                    autoComplete="firstName"
                                     label="Jméno"
                                     labelPlacement="outside"
+                                    name="firstName"
                                     placeholder="Zadejte jméno"
-                                    autoComplete="firstName"
+                                    value={formData.firstName}
+                                    onChange={(e) =>
+                                        handleFormFieldChange("firstName", e.target.value)
+                                    }
                                 />
                                 <Input
                                     isRequired
-                                    name="lastName"
+                                    autoComplete="lastName"
                                     label="Příjmení"
                                     labelPlacement="outside"
+                                    name="lastName"
                                     placeholder="Zadejte příjmení"
-                                    autoComplete="lastName"
+                                    value={formData.lastName}
+                                    onChange={(e) =>
+                                        handleFormFieldChange("lastName", e.target.value)
+                                    }
                                 />
                                 <Input
                                     isRequired
-                                    name="email"
+                                    autoComplete="email"
                                     label="Email"
                                     labelPlacement="outside"
+                                    name="email"
                                     placeholder="Zadejte email"
                                     type="email"
-                                    autoComplete="email"
+                                    value={formData.email}
+                                    onChange={(e) =>
+                                        handleFormFieldChange("email", e.target.value)
+                                    }
                                 />
                                 {/* Phone Number */}
                                 <Input
                                     isRequired
-                                    name="phone"
+                                    autoComplete="tel"
                                     label="Telefonní číslo"
                                     labelPlacement="outside"
+                                    name="phone"
                                     placeholder="Zadejte telefonní číslo"
                                     type="tel"
-                                    autoComplete="tel"
+                                    value={formData.phone}
+                                    onChange={(e) =>
+                                        handleFormFieldChange("phone", e.target.value)
+                                    }
                                 />
                             </div>
 
+                            <span className="relative text-foreground-500 pt-6">
+                Platební metoda
+              </span>
+                            <PaymentMethodRadioGroup
+                                allowOsobne={!allowQr}
+                                allowQr={allowQr}
+                                value={formData.paymentMethod}
+                                onChange={(value) =>
+                                    handleFormFieldChange("paymentMethod", value)
+                                }
+                            />
 
-                            <span className="relative text-foreground-500 pt-6">Platební metoda</span>
-                            <PaymentMethodRadioGroup allowQr={allowQr} allowOsobne={!allowQr}/>
-
-
-
-
-
+                            <span className="relative text-foreground-500 pt-6">
+                Fakturační adresa
+              </span>
+                            <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
+                                <Input
+                                    label="Ulice a číslo popisné"
+                                    labelPlacement="outside"
+                                    name="address"
+                                    placeholder="Hlavní 123"
+                                    value={formData.address}
+                                    onChange={(e) =>
+                                        handleFormFieldChange("address", e.target.value)
+                                    }
+                                />
+                                <Input
+                                    label="Město"
+                                    labelPlacement="outside"
+                                    name="city"
+                                    placeholder="Praha"
+                                    value={formData.city}
+                                    onChange={(e) =>
+                                        handleFormFieldChange("city", e.target.value)
+                                    }
+                                />
+                                <Input
+                                    label="PSČ"
+                                    labelPlacement="outside"
+                                    name="postalCode"
+                                    placeholder="11000"
+                                    value={formData.postalCode}
+                                    onChange={(e) =>
+                                        handleFormFieldChange("postalCode", e.target.value)
+                                    }
+                                />
+                                <Input
+                                    label="Země"
+                                    labelPlacement="outside"
+                                    name="country"
+                                    placeholder="Česká republika"
+                                    value={formData.country}
+                                    onChange={(e) =>
+                                        handleFormFieldChange("country", e.target.value)
+                                    }
+                                />
+                            </div>
 
                             <div className="pt-6 flex w-full justify-end gap-2">
-
-                                <Button color="primary" type="submit" isLoading={isSubmitting}>
+                                <Button color="primary" isLoading={isSubmitting} type="submit">
                                     Odeslat rezervaci
                                 </Button>
                             </div>
@@ -623,22 +881,38 @@ export default function ReservationPage() {
             </section>
 
             {/* Thank You page */}
-            <section className={"w-full px-2 max-w-3xl " + (determineStep() === 5 ? "shown" : "hidden")}>
+            <section
+                className={
+                    "w-full px-2 max-w-3xl " +
+                    (determineStep() === 5 ? "shown" : "hidden")
+                }
+            >
                 <div className="flex flex-col items-center justify-center gap-4 pt-20">
                     <Image
-                        src={selectedClass?.trainer.profilePicture ?? "/photos/trainers/martina.jpg"}
                         alt="Děkujeme za vaši rezervaci!"
                         className="w-72 h-72 rounded-full object-cover"
+                        src={
+                            selectedClass?.trainer.profilePicture ??
+                            "/photos/trainers/martina.jpg"
+                        }
                     />
 
-                    <h1 className="text-4xl text-center font-bold pt-4 pb-2">Děkujeme za vaši rezervaci!</h1>
+                    <h1 className="text-4xl text-center font-bold pt-4 pb-2">
+                        Děkujeme za vaši rezervaci!
+                    </h1>
                     <p className="text-lg text-center">
-                        Vaše rezervace na lekci <b>{selectedClass?.classType.name}</b>  dne <b>{new Date(selectedClass?.date ?? -1).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(selectedClass?.date ?? -1).toLocaleDateString('cs-CZ')} v {selectedClass?.time}</b> byla úspěšně odeslána. Těšíme se na vás, tým BeBrave.
+                        Vaše rezervace na lekci <b>{selectedClass?.classType.name}</b> dne{" "}
+                        <b>
+                            {new Date(selectedClass?.date ?? -1).toLocaleDateString("cs-CZ", {
+                                weekday: "long",
+                            })}{" "}
+                            {new Date(selectedClass?.date ?? -1).toLocaleDateString("cs-CZ")}{" "}
+                            v {selectedClass?.time}
+                        </b>{" "}
+                        byla úspěšně odeslána. Těšíme se na vás, tým BeBrave.
                     </p>
                 </div>
-
             </section>
-
         </div>
     );
 }

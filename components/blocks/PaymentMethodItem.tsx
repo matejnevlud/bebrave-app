@@ -13,7 +13,10 @@ export type PaymentMethodItemProps = RadioProps & {
     isRecommended?: boolean;
 };
 
-const PaymentMethodItem = React.forwardRef<HTMLInputElement, PaymentMethodItemProps>(
+const PaymentMethodItem = React.forwardRef<
+    HTMLInputElement,
+    PaymentMethodItemProps
+>(
     (
         {
             label,
@@ -55,12 +58,18 @@ const PaymentMethodItem = React.forwardRef<HTMLInputElement, PaymentMethodItemPr
                             </Chip>
                         )}
                         {isRecommended && (
-                            <Chip className="h-6 p-0 text-tiny" color="success" variant="flat">
+                            <Chip
+                                className="h-6 p-0 text-tiny"
+                                color="success"
+                                variant="flat"
+                            >
                                 Recommended
                             </Chip>
                         )}
                     </div>
-                    <p className="text-tiny text-default-400">{description || children}</p>
+                    <p className="text-tiny text-default-400">
+                        {description || children}
+                    </p>
                 </div>
             </div>
         </Radio>

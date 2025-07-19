@@ -1,14 +1,20 @@
 import {forwardRef} from "react";
-import {useButton, Ripple, Spinner, ButtonProps as BaseButtonProps} from "@heroui/react";
+import {
+    useButton,
+    Ripple,
+    Spinner,
+    ButtonProps as BaseButtonProps,
+} from "@heroui/react";
 
-export interface ButtonProps extends BaseButtonProps {}
+export interface ButtonProps extends BaseButtonProps {
+}
 
 const CTAButton = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
     const {
         domRef,
         children,
         spinnerSize,
-        spinner = <Spinner color="current" size={spinnerSize} />,
+        spinner = <Spinner color="current" size={spinnerSize}/>,
         spinnerPlacement,
         startContent,
         endContent,
@@ -30,7 +36,7 @@ const CTAButton = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
             {children}
             {isLoading && spinnerPlacement === "end" && spinner}
             {endContent}
-            {!disableRipple && <Ripple ripples={ripples} onClear={onClear} />}
+            {!disableRipple && <Ripple ripples={ripples} onClear={onClear}/>}
         </button>
     );
 });

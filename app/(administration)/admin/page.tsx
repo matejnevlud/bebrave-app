@@ -1,10 +1,20 @@
 "use client";
 
 import React, {useEffect, useMemo, useState} from "react";
-import {Avatar, DatePicker, Form, Modal, ModalContent, NumberInput, ScrollShadow, Select, SelectItem, Spinner, TimeInput, useDisclosure} from "@heroui/react";
-import {items} from "./sidebar-items";
-import Sidebar from "@/components/admin/sidebar";
-import{SVGProps} from "react";
+import {
+    Avatar,
+    DatePicker,
+    Form,
+    Modal,
+    ModalContent,
+    NumberInput,
+    Select,
+    SelectItem,
+    Spinner,
+    TimeInput,
+    useDisclosure,
+} from "@heroui/react";
+import {SVGProps} from "react";
 import {
     Table,
     TableHeader,
@@ -17,15 +27,28 @@ import {
     Tooltip,
     ChipProps,
 } from "@heroui/react";
-import {Class, ClassType, ClassWithRelations, TrainerWithRelations} from "@/db/schema";
-import {getClasses, getClassTypes, getTrainers, updateClass} from "@/db/actions";
-import {getLocalTimeZone, parseDate, parseTime, Time, today} from "@internationalized/date";
+import {
+    getLocalTimeZone,
+    parseDate,
+    parseTime,
+    today,
+} from "@internationalized/date";
 import {Button} from "@heroui/button";
-import {CameraIcon} from "lucide-react";
-import {Icon} from "@iconify/react";
-import {ModalBody, ModalFooter, ModalHeader} from "@heroui/modal";
-import {Input} from "@heroui/input";
+import {ModalBody, ModalHeader} from "@heroui/modal";
 import {I18nProvider} from "@react-aria/i18n";
+
+import {
+    getClasses,
+    getClassTypes,
+    getTrainers,
+    updateClass,
+} from "@/db/actions";
+import {
+    Class,
+    ClassType,
+    ClassWithRelations,
+    TrainerWithRelations,
+} from "@/db/schema";
 
 type IconSvgProps = SVGProps<SVGSVGElement> & {
     size?: number;
@@ -233,9 +256,7 @@ type User = (typeof users)[0];
  * ```
  */
 
-
 export default function AdminPage() {
-
     let now = today(getLocalTimeZone());
     const [trainers, setTrainers] = useState<TrainerWithRelations[]>([]);
     const trainersKeyValueArray = useMemo(() => {
@@ -258,7 +279,7 @@ export default function AdminPage() {
     const [isFetchingData, setIsFetchingData] = useState<boolean>(true);
 
     async function fetchData() {
-        const t =  await getTrainers();
+        const t = await getTrainers();
         const ct = await getClassTypes();
         const c = await getClasses();
 
@@ -275,46 +296,57 @@ export default function AdminPage() {
 
     useEffect(() => {
         fetchData();
-    }, [])
-
+    }, []);
 
     const lastClassInEachDay = useMemo(() => {
         if (classes.length === 0) return [];
 
-        const groupedByDate = classes.reduce((acc, c) => {
-            const date = new Date(c.date).toLocaleDateString('cs-CZ');
-            if (!acc[date]) {
-                acc[date] = [];
-            }
-            acc[date].push(c);
-            return acc;
-        }, {} as Record<string, ClassWithRelations[]>);
+        const groupedByDate = classes.reduce(
+            (acc, c) => {
+                const date = new Date(c.date).toLocaleDateString("cs-CZ");
 
-        const lastClasses = Object.entries(groupedByDate).map(([date, classList]) => {
-            const lastClass = classList
-                .sort((a, b) => new Date(a.date + 'T' + a.time).getTime() - new Date(b.date + 'T' + b.time).getTime())
-                .pop();
-            //return { ...lastClass, date };
-            return lastClass?.id ?? -1;
-        });
+                if (!acc[date]) {
+                    acc[date] = [];
+                }
+                acc[date].push(c);
+
+                return acc;
+            },
+            {} as Record<string, ClassWithRelations[]>,
+        );
+
+        const lastClasses = Object.entries(groupedByDate).map(
+            ([date, classList]) => {
+                const lastClass = classList
+                    .sort(
+                        (a, b) =>
+                            new Date(a.date + "T" + a.time).getTime() -
+                            new Date(b.date + "T" + b.time).getTime(),
+                    )
+                    .pop();
+
+                //return { ...lastClass, date };
+                return lastClass?.id ?? -1;
+            },
+        );
 
         console.log("Last classes in each day:", lastClasses);
 
         return lastClasses;
     }, [classes]);
 
-
     const [selectedClass, setSelectedClass] = useState<ClassWithRelations>();
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
+
     function openReservationModal(c: ClassWithRelations) {
         setSelectedClass(c);
         onOpen();
     }
 
-
     async function saveClassChanges(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         let data = Object.fromEntries(new FormData(e.currentTarget));
+
         console.log(data);
 
         // create class like object partial
@@ -325,30 +357,25 @@ export default function AdminPage() {
             capacity: Number(data.capacity),
             classTypeId: Number(data.classTypeId),
             trainerId: Number(data.trainerId),
-            secondTrainerId: data.secondTrainerId ? Number(data.secondTrainerId) : null,
+            secondTrainerId: data.secondTrainerId
+                ? Number(data.secondTrainerId)
+                : null,
         };
 
         console.log("Updated class data:", updatedClass);
 
-
-
         const fetchedClass = await updateClass(selectedClass?.id, updatedClass);
+
         console.log("Updated class:", fetchedClass);
         setSelectedClass(fetchedClass as ClassWithRelations);
 
         //@ts-ignore
         setClasses((prevClasses) => {
-            return prevClasses.map((c) => (c.id === fetchedClass?.id ? fetchedClass : c));
+            return prevClasses.map((c) =>
+                c.id === fetchedClass?.id ? fetchedClass : c,
+            );
         });
-
-
-
-
-
     }
-
-
-
 
     const renderCell = React.useCallback((user: User, columnKey: React.Key) => {
         const cellValue = user[columnKey as keyof User];
@@ -368,12 +395,19 @@ export default function AdminPage() {
                 return (
                     <div className="flex flex-col">
                         <p className="text-bold text-sm capitalize">{cellValue}</p>
-                        <p className="text-bold text-sm capitalize text-default-400">{user.team}</p>
+                        <p className="text-bold text-sm capitalize text-default-400">
+                            {user.team}
+                        </p>
                     </div>
                 );
             case "status":
                 return (
-                    <Chip className="capitalize" color={statusColorMap[user.status]} size="sm" variant="flat">
+                    <Chip
+                        className="capitalize"
+                        color={statusColorMap[user.status]}
+                        size="sm"
+                        variant="flat"
+                    >
                         {cellValue}
                     </Chip>
                 );
@@ -382,17 +416,17 @@ export default function AdminPage() {
                     <div className="relative flex items-center gap-2">
                         <Tooltip content="Details">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <EyeIcon />
+                <EyeIcon/>
               </span>
                         </Tooltip>
                         <Tooltip content="Edit user">
               <span className="text-lg text-default-400 cursor-pointer active:opacity-50">
-                <EditIcon />
+                <EditIcon/>
               </span>
                         </Tooltip>
                         <Tooltip color="danger" content="Delete user">
               <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                <DeleteIcon />
+                <DeleteIcon/>
               </span>
                         </Tooltip>
                     </div>
@@ -405,27 +439,36 @@ export default function AdminPage() {
     return (
         <div>
             <Table
+                removeWrapper
                 aria-label="Example table with custom cells"
                 className="hidden"
-                removeWrapper
             >
                 <TableHeader columns={columns}>
                     {(column) => (
-                        <TableColumn key={column.uid} align={column.uid === "actions" ? "center" : "start"}>
+                        <TableColumn
+                            key={column.uid}
+                            align={column.uid === "actions" ? "center" : "start"}
+                        >
                             {column.name}
                         </TableColumn>
                     )}
                 </TableHeader>
                 <TableBody items={users}>
                     {(item) => (
-                        <TableRow key={item.id} onClick={() => console.log(item.id)} className="hover:bg-default-100 cursor-pointer">
-                            {(columnKey) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
+                        <TableRow
+                            key={item.id}
+                            className="hover:bg-default-100 cursor-pointer"
+                            onClick={() => console.log(item.id)}
+                        >
+                            {(columnKey) => (
+                                <TableCell>{renderCell(item, columnKey)}</TableCell>
+                            )}
                         </TableRow>
                     )}
                 </TableBody>
             </Table>
 
-            <Table aria-label="Example empty table" rowHeight={80} removeWrapper>
+            <Table removeWrapper aria-label="Example empty table" rowHeight={80}>
                 <TableHeader>
                     <TableColumn>ČAS</TableColumn>
                     <TableColumn>NÁZEV LEKCE</TableColumn>
@@ -433,16 +476,38 @@ export default function AdminPage() {
                     <TableColumn>OBSAZENOST</TableColumn>
                     <TableColumn align="end"> </TableColumn>
                 </TableHeader>
-                <TableBody emptyContent={"Žádné lekce k zobrazení"} items={classes} loadingContent={<Spinner label="Načítám..." />} isLoading={isFetchingData}>
+                <TableBody
+                    emptyContent={"Žádné lekce k zobrazení"}
+                    isLoading={isFetchingData}
+                    items={classes}
+                    loadingContent={<Spinner label="Načítám..."/>}
+                >
                     {(item) => (
-                        <TableRow key={item.id} className={"h-[4.5rem] hover:bg-default-100 cursor-pointer" + (lastClassInEachDay.includes(item.id) ? "  border-b-gray-200  border-b-1.5" : "")} onClick={() => openReservationModal(item)}>
+                        <TableRow
+                            key={item.id}
+                            className={
+                                "h-[4.5rem] hover:bg-default-100 cursor-pointer" +
+                                (lastClassInEachDay.includes(item.id)
+                                    ? "  border-b-gray-200  border-b-1.5"
+                                    : "")
+                            }
+                            onClick={() => openReservationModal(item)}
+                        >
                             <TableCell>
-                                <b>{new Date(item.date).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(item.date).toLocaleDateString()}</b>
+                                <b>
+                                    {new Date(item.date).toLocaleDateString("cs-CZ", {
+                                        weekday: "long",
+                                    })}{" "}
+                                    {new Date(item.date).toLocaleDateString()}
+                                </b>
                                 <br/>
-                                <span className="text-tiny">{item.time}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                                <span className="text-tiny">({item.classType.duration} min)</span>
+                                <span className="text-tiny">
+                  {item.time}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </span>
+                                <span className="text-tiny">
+                  ({item.classType.duration} min)
+                </span>
                             </TableCell>
-
 
                             <TableCell>
                                 <Avatar
@@ -475,94 +540,257 @@ export default function AdminPage() {
                             </TableCell>
 
                             <TableCell>
-                                <Button color={item.reservations?.length >= 3 ? "success" : item.reservations?.length > 0 ? "warning" : undefined}  variant={"bordered"} onPress={() => openReservationModal(item)}>
-                                    {item.reservations?.length} / {item.capacity}
-                                </Button>
+                                {(() => {
+                                    // Count only confirmed reservations (exclude cancelled and pending_payment)
+                                    const confirmedReservations =
+                                        item.reservations?.filter(
+                                            (r) => r.status === "confirmed",
+                                        ) || [];
+                                    const confirmedCount = confirmedReservations.length;
+
+                                    return (
+                                        <Button
+                                            color={
+                                                confirmedCount >= 3
+                                                    ? "success"
+                                                    : confirmedCount > 0
+                                                        ? "warning"
+                                                        : undefined
+                                            }
+                                            variant={"bordered"}
+                                            onPress={() => openReservationModal(item)}
+                                        >
+                                            {confirmedCount} / {item.capacity}
+                                        </Button>
+                                    );
+                                })()}
                             </TableCell>
 
                             <TableCell>
-                                <Button color="primary" size="md">Detail</Button>
+                                <Button color="primary" size="md">
+                                    Detail
+                                </Button>
                             </TableCell>
                         </TableRow>
                     )}
                 </TableBody>
             </Table>
 
-            <Modal isOpen={isOpen} onOpenChange={onOpenChange} scrollBehavior="inside" size="5xl">
+            <Modal
+                isOpen={isOpen}
+                scrollBehavior="inside"
+                size="5xl"
+                onOpenChange={onOpenChange}
+            >
                 <ModalContent>
                     {(onClose) => (
                         <>
-                            <ModalHeader className="flex flex-col gap-1">Detail {selectedClass?.classType.name} - {new Date(selectedClass?.date ?? 0).toLocaleDateString('cs-CZ', { weekday: 'long' })} {new Date(selectedClass?.date ?? 0).toLocaleDateString()}</ModalHeader>
+                            <ModalHeader className="flex flex-col gap-1">
+                                Detail {selectedClass?.classType.name} -{" "}
+                                {new Date(selectedClass?.date ?? 0).toLocaleDateString(
+                                    "cs-CZ",
+                                    {weekday: "long"},
+                                )}{" "}
+                                {new Date(selectedClass?.date ?? 0).toLocaleDateString()}
+                            </ModalHeader>
                             <ModalBody>
                                 <Form
                                     className="w-full max-w grid grid-cols-1 md:grid-cols-2 gap-4"
                                     onSubmit={saveClassChanges}
                                 >
                                     <I18nProvider locale="cs-CZ">
-                                        <DatePicker isRequired name="date" label="Datum" labelPlacement="outside" defaultValue={parseDate(selectedClass?.date ?? "") ?? undefined}  hourCycle={24} />
+                                        <DatePicker
+                                            isRequired
+                                            defaultValue={
+                                                parseDate(selectedClass?.date ?? "") ?? undefined
+                                            }
+                                            hourCycle={24}
+                                            label="Datum"
+                                            labelPlacement="outside"
+                                            name="date"
+                                        />
                                     </I18nProvider>
-                                    <TimeInput isRequired name="time" label="Čas" labelPlacement="outside" defaultValue={parseTime(selectedClass?.time ?? "00:00")} hourCycle={24} granularity={"minute"} />
+                                    <TimeInput
+                                        isRequired
+                                        defaultValue={parseTime(selectedClass?.time ?? "00:00")}
+                                        granularity={"minute"}
+                                        hourCycle={24}
+                                        label="Čas"
+                                        labelPlacement="outside"
+                                        name="time"
+                                    />
 
-                                    <NumberInput isRequired name="capacity" label="Kapacita lekce" labelPlacement="outside" defaultValue={selectedClass?.capacity} maxValue={100} minValue={1}  formatOptions={{ style: "decimal", minimumFractionDigits: 0, maximumFractionDigits: 0 }} />
-
+                                    <NumberInput
+                                        isRequired
+                                        defaultValue={selectedClass?.capacity}
+                                        formatOptions={{
+                                            style: "decimal",
+                                            minimumFractionDigits: 0,
+                                            maximumFractionDigits: 0,
+                                        }}
+                                        label="Kapacita lekce"
+                                        labelPlacement="outside"
+                                        maxValue={100}
+                                        minValue={1}
+                                        name="capacity"
+                                    />
 
                                     <Select
-                                        name="classTypeId"
+                                        isRequired
+                                        defaultSelectedKeys={
+                                            selectedClass?.classType?.id
+                                                ? [selectedClass.classType.id.toString()]
+                                                : undefined
+                                        }
+                                        items={classTypesKeyValueArray}
                                         label="Typ lekce"
                                         labelPlacement="outside"
+                                        name="classTypeId"
                                         placeholder="Vyberte ze seznamu"
-                                        items={classTypesKeyValueArray}
-                                        isRequired
-                                        defaultSelectedKeys={selectedClass?.classType?.id ? [selectedClass.classType.id.toString()] : undefined}
                                     >
-                                        {(classTypeKV) => <SelectItem>{classTypeKV.value}</SelectItem>}
+                                        {(classTypeKV) => (
+                                            <SelectItem>{classTypeKV.value}</SelectItem>
+                                        )}
                                     </Select>
 
                                     <Select
-                                        name="trainerId"
+                                        isRequired
+                                        defaultSelectedKeys={
+                                            selectedClass?.trainerId
+                                                ? [selectedClass.trainerId.toString()]
+                                                : undefined
+                                        }
+                                        items={trainersKeyValueArray}
                                         label="Trenér"
                                         labelPlacement="outside"
+                                        name="trainerId"
                                         placeholder="Vyberte ze seznamu"
-                                        items={trainersKeyValueArray}
-                                        isRequired
-                                        defaultSelectedKeys={selectedClass?.trainerId ? [selectedClass.trainerId.toString()] : undefined}
                                     >
                                         {(trainerKV) => <SelectItem>{trainerKV.value}</SelectItem>}
                                     </Select>
 
                                     <Select
-                                        name="secondTrainerId"
+                                        defaultSelectedKeys={
+                                            selectedClass?.secondTrainerId
+                                                ? [selectedClass.secondTrainerId.toString()]
+                                                : undefined
+                                        }
+                                        items={trainersKeyValueArray}
                                         label="Druhý trenér"
                                         labelPlacement="outside"
+                                        name="secondTrainerId"
                                         placeholder="Vyberte ze seznamu"
-                                        items={trainersKeyValueArray}
-                                        defaultSelectedKeys={selectedClass?.secondTrainerId ? [selectedClass.secondTrainerId.toString()] : undefined}
                                     >
                                         {(trainerKV) => <SelectItem>{trainerKV.value}</SelectItem>}
                                     </Select>
 
                                     <div className="col-span-2">
-                                        <Button className="col-span-full" color="success" type="submit">
+                                        <Button
+                                            className="col-span-full"
+                                            color="success"
+                                            type="submit"
+                                        >
                                             Uložit změny
                                         </Button>
                                     </div>
-
                                 </Form>
 
-                                <Table aria-label="Example empty table" rowHeight={80} removeWrapper className="mt-8">
+                                <Table
+                                    removeWrapper
+                                    aria-label="Example empty table"
+                                    className="mt-8"
+                                    rowHeight={80}
+                                >
                                     <TableHeader>
                                         <TableColumn>Klient</TableColumn>
                                         <TableColumn>Datum rezervace</TableColumn>
+                                        <TableColumn>Status</TableColumn>
+                                        <TableColumn>Platba</TableColumn>
                                     </TableHeader>
-                                    <TableBody emptyContent={"Žádné rezervace k zobrazení"} items={selectedClass?.reservations || []}>
+                                    <TableBody
+                                        emptyContent={"Žádné rezervace k zobrazení"}
+                                        items={selectedClass?.reservations || []}
+                                    >
                                         {(item) => (
-                                            <TableRow key={item.id} className="h-[4.5rem] hover:bg-default-100 cursor-pointer">
+                                            <TableRow
+                                                key={item.id}
+                                                className="h-[4.5rem] hover:bg-default-100 cursor-pointer"
+                                            >
                                                 <TableCell className="flex-col flex gap-2">
-                                                    <span className="font-medium text-medium">{item.firstName} {item.lastName}</span>
+                          <span className="font-medium text-medium">
+                            {item.firstName} {item.lastName}
+                          </span>
                                                     <span className="text-small">{item.phone}</span>
                                                 </TableCell>
                                                 <TableCell>
-                                                    <span className="text-medium">{new Date(item.createdAt ?? 0).toLocaleString()}</span>
+                          <span className="text-medium">
+                            {new Date(item.createdAt ?? 0).toLocaleString()}
+                          </span>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Chip
+                                                        color={
+                                                            item.status === "confirmed"
+                                                                ? "success"
+                                                                : item.status === "cancelled"
+                                                                    ? "danger"
+                                                                    : item.status === "pending_payment"
+                                                                        ? "warning"
+                                                                        : "default"
+                                                        }
+                                                        size="sm"
+                                                        variant="flat"
+                                                    >
+                                                        {item.status === "confirmed"
+                                                            ? "Potvrzeno"
+                                                            : item.status === "cancelled"
+                                                                ? "Zrušeno"
+                                                                : item.status === "pending_payment"
+                                                                    ? "Čeká na platbu"
+                                                                    : item.status}
+                                                    </Chip>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <div className="flex flex-col gap-1">
+                                                        <Chip
+                                                            color={
+                                                                item.paymentStatus === "completed"
+                                                                    ? "success"
+                                                                    : item.paymentStatus === "failed"
+                                                                        ? "danger"
+                                                                        : item.paymentStatus === "cancelled"
+                                                                            ? "danger"
+                                                                            : item.paymentStatus === "pending"
+                                                                                ? "warning"
+                                                                                : "default"
+                                                            }
+                                                            size="sm"
+                                                            variant="flat"
+                                                        >
+                                                            {item.paymentStatus === "completed"
+                                                                ? "Uhrazeno"
+                                                                : item.paymentStatus === "failed"
+                                                                    ? "Neúspěšná"
+                                                                    : item.paymentStatus === "cancelled"
+                                                                        ? "Zrušena"
+                                                                        : item.paymentStatus === "pending"
+                                                                            ? "Čeká"
+                                                                            : item.paymentStatus}
+                                                        </Chip>
+                                                        {item.paymentMethod && (
+                                                            <span className="text-tiny text-default-500">
+                                {item.paymentMethod === "credit_card"
+                                    ? "Karta"
+                                    : item.paymentMethod === "qr_payment"
+                                        ? "QR platba"
+                                        : item.paymentMethod === "on_site"
+                                            ? "Na místě"
+                                            : item.paymentMethod === "customer_credit"
+                                                ? "Kredit"
+                                                : item.paymentMethod}
+                              </span>
+                                                        )}
+                                                    </div>
                                                 </TableCell>
                                             </TableRow>
                                         )}
