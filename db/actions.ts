@@ -564,7 +564,7 @@ export async function processPaymentResult(
                 .where(eq(reservationsTable.id, reservationId));
 
             // Generate invoice with full customer data
-            await generateInvoice(reservationId, reservation.class, {
+            const invoice = await generateInvoice(reservationId, reservation.class, {
                 firstName: reservation.firstName,
                 lastName: reservation.lastName,
                 email: reservation.email,
@@ -576,6 +576,19 @@ export async function processPaymentResult(
                 postalCode: "11000",
                 country: "Česká republika",
             });
+
+            // Mark invoice as paid for successful card payments
+            // (other payment methods like on-site/QR require manual confirmation by admin)
+            if (invoice && reservation.paymentMethod === "credit_card") {
+                await db
+                    .update(invoicesTable)
+                    .set({
+                        status: "paid",
+                    })
+                    .where(eq(invoicesTable.id, invoice.id));
+                
+                console.log(`Invoice ${invoice.invoiceNumber} marked as paid for reservation ${reservationId}`);
+            }
 
             // Send confirmation email with full customer data
             await sendConfirmationEmail(

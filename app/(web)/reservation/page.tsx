@@ -829,6 +829,7 @@ export default function ReservationPage() {
               </span>
                             <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
                                 <Input
+                                    isRequired
                                     label="Ulice a číslo popisné"
                                     labelPlacement="outside"
                                     name="address"
@@ -839,6 +840,7 @@ export default function ReservationPage() {
                                     }
                                 />
                                 <Input
+                                    isRequired
                                     label="Město"
                                     labelPlacement="outside"
                                     name="city"
@@ -849,6 +851,7 @@ export default function ReservationPage() {
                                     }
                                 />
                                 <Input
+                                    isRequired
                                     label="PSČ"
                                     labelPlacement="outside"
                                     name="postalCode"
@@ -859,6 +862,7 @@ export default function ReservationPage() {
                                     }
                                 />
                                 <Input
+                                    isRequired
                                     label="Země"
                                     labelPlacement="outside"
                                     name="country"
