@@ -90,13 +90,16 @@ export class NexiPaymentService {
                     cardHolderName: data.customerInfo.name,
                     cardHolderEmail: data.customerInfo.email,
                     mobilePhone: data.customerInfo.phone,
-                    mobilePhoneCountryCode: 420,
+                    mobilePhoneCountryCode: "+420",
                     billingAddress: {
                         name: data.customerInfo.name,
                         street: data.customerInfo.address || "Customer Address",
                         city: data.customerInfo.city || "Prague",
                         postCode: data.customerInfo.postalCode || "11000",
-                        //country: data.customerInfo.country || 'CZE'
+                        country: 'CZE',
+                        additionalInfo: "",
+                        province: "00",
+
                     },
                 },
             },

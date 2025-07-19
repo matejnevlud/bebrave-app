@@ -497,8 +497,11 @@ export async function createReservation(
                 })
                 .returning();
 
-            // Generate invoice for all payment methods
-            await generateInvoice(reservation[0].id, classWithRelations, userData);
+            // Generate invoice only for credit card payments 
+            // On-site and QR payments don't generate invoices
+            if (paymentMethod === "credit_card") {
+                await generateInvoice(reservation[0].id, classWithRelations, userData);
+            }
 
             // Send confirmation email
             await sendConfirmationEmail(
@@ -563,46 +566,63 @@ export async function processPaymentResult(
                 })
                 .where(eq(reservationsTable.id, reservationId));
 
-            // Generate invoice with full customer data
-            const invoice = await generateInvoice(reservationId, reservation.class, {
+            // Get customer data from Dotypos for accurate billing address
+            let customerData = {
                 firstName: reservation.firstName,
                 lastName: reservation.lastName,
                 email: reservation.email,
                 phone: reservation.phone,
-                // Note: For credit card payments, we should ideally store address data in reservations table
-                // For now, we'll use default values since the address is collected during payment
                 address: "Adresa zákazníka",
-                city: "Praha",
+                city: "Praha", 
                 postalCode: "11000",
                 country: "Česká republika",
-            });
+            };
 
-            // Mark invoice as paid for successful card payments
-            // (other payment methods like on-site/QR require manual confirmation by admin)
-            if (invoice && reservation.paymentMethod === "credit_card") {
-                await db
-                    .update(invoicesTable)
-                    .set({
-                        status: "paid",
-                    })
-                    .where(eq(invoicesTable.id, invoice.id));
-                
-                console.log(`Invoice ${invoice.invoiceNumber} marked as paid for reservation ${reservationId}`);
+            if (reservation.email) {
+                try {
+                    const dotyposCustomer = await dotyposGetCustomerByEmail(reservation.email);
+                    if (dotyposCustomer) {
+                        customerData = {
+                            firstName: dotyposCustomer.firstName || reservation.firstName,
+                            lastName: dotyposCustomer.lastName || reservation.lastName,
+                            email: reservation.email,
+                            phone: dotyposCustomer.phone || reservation.phone,
+                            address: dotyposCustomer.addressLine1 || "Adresa zákazníka",
+                            city: dotyposCustomer.city || "Praha",
+                            postalCode: dotyposCustomer.zip || "11000",
+                            country: dotyposCustomer.country || "Česká republika",
+                        };
+                        console.log("Using Dotypos customer data for invoice:", customerData);
+                    } else {
+                        console.log("Customer not found in Dotypos, using fallback data for invoice");
+                    }
+                } catch (error) {
+                    console.error("Error fetching customer from Dotypos, using fallback data:", error);
+                }
             }
 
-            // Send confirmation email with full customer data
+            // Generate invoice only for credit card payments
+            let invoice = null;
+            if (reservation.paymentMethod === "credit_card") {
+                invoice = await generateInvoice(reservationId, reservation.class, customerData);
+                
+                // Mark invoice as paid for successful card payments
+                if (invoice) {
+                    await db
+                        .update(invoicesTable)
+                        .set({
+                            status: "paid",
+                        })
+                        .where(eq(invoicesTable.id, invoice.id));
+                    
+                    console.log(`Invoice ${invoice.invoiceNumber} marked as paid for reservation ${reservationId}`);
+                }
+            }
+
+            // Send confirmation email with customer data from Dotypos
             await sendConfirmationEmail(
                 reservation.class,
-                {
-                    firstName: reservation.firstName,
-                    lastName: reservation.lastName,
-                    email: reservation.email,
-                    phone: reservation.phone,
-                    address: "Adresa zákazníka",
-                    city: "Praha",
-                    postalCode: "11000",
-                    country: "Česká republika",
-                },
+                customerData,
                 "credit_card",
                 reservationId,
             );
@@ -1108,6 +1128,37 @@ async function getNewAccessToken(): Promise<string | null> {
     ACCESS_TOKEN = response.data?.accessToken;
 
     return ACCESS_TOKEN;
+}
+
+async function dotyposGetCustomerByEmail(email: string): Promise<any | null> {
+    ACCESS_TOKEN = await getNewAccessToken();
+    if (!ACCESS_TOKEN) {
+        throw new Error("No access token available");
+    }
+    
+    try {
+        const response = await axios({
+            method: "GET",
+            url: `https://api.dotykacka.cz/v2/clouds/${CLOUD_ID}/customers`,
+            params: {
+                filter: `email|like|${email}`,
+            },
+            headers: {
+                "Content-Type": "application/json; charset=UTF-8",
+                Accept: "application/json; charset=UTF-8",
+                Authorization: `Bearer ${ACCESS_TOKEN}`,
+            },
+        });
+        
+        if (response.data?.totalItemsCount > 0) {
+            return response.data.data[0];
+        }
+        
+        return null;
+    } catch (error) {
+        console.error("Error fetching customer from Dotypos:", error);
+        return null;
+    }
 }
 
 async function dotyposCreateCustomer(userData: any): Promise<string | null> {

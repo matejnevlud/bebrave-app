@@ -7,6 +7,7 @@ import {Logo} from "@/components/icons";
 import Lectors from "@/app/(web)/Lectors";
 import HlsPlayer from "@/components/HLSPlayer";
 import TrainersForClass from "@/app/(web)/TrainersForClass";
+import HLSPlayerControls from "@/components/HLSPlayerControls";
 
 export default function Home() {
     return (
@@ -73,27 +74,22 @@ export default function Home() {
 
                 <div className="flex flex-col md:flex-row gap-8 mb-20 overflow-visible">
                     <div className="flex-[2]  block overflow-visible">
-                        <HeroImage
-                            isBlurred
-                            alt="HeroUI Album Cover"
-                            className="rounded-md hover:scale-[1.02] transition-transform duration-300"
-                            src="https://imagedelivery.net/eo8aTqb-9sQsvXZHFngPsQ/a8fd5b98-0384-462c-807e-a2ee774ca000/public"
+                        <HLSPlayerControls
+                            src={
+                                "https://customer-llaf4k9ibc46xjbf.cloudflarestream.com/04ef6b6b7aeb177554462a852c7866ff/manifest/video.m3u8"
+                            }
                         />
                     </div>
                     <div className="leading-7 flex-1 content-start">
                         <h1 className="font-sans font-bold text-2xl sm:text-4xl">
                             Kdo jsme
                         </h1>
+
                         <p className=" mt-4">
-                            BeBrave Studio je místo, kde se pohyb stává vášní. Zaměřujeme se
-                            na energické skupinové lekce pod vedením zkušených trenérů. Ať už
-                            jsi úplný začátečník nebo zkušený sportovec, u nás najdeš svůj
-                            rytmus.
+                            Jsme místem, kde nejde jen o to „odcvičit si to své” – ale hlavně se cítit dobře ve vlastním těle, najít si lekce, které tě budou bavit, a obklopit se lidmi, se kterými sdílíš stejnou energii. V našem studiu najdeš pestrou nabídku skupinových lekcí, které sednou každému – stačí si jen najít tu svou.
                         </p>
-                        <p className=" mt-4">
-                            Naše studio je otevřené všem, kteří chtějí zlepšit svou kondici,
-                            získat nové dovednosti a užít si pohyb v přátelské atmosféře.
-                            Přijďte se k nám přidat a objevte radost z pohybu!
+                        <p className="font-bold mt-4">
+                            Studio BeBrave není jen další fitness prostor – tvoříme zážitky, komunitu a opravdovou radost z pohybu.
                         </p>
                     </div>
                 </div>

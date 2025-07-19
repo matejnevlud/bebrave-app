@@ -5,7 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="878e36bd-1ad8-483a-aae1-c8c02b1128eb" name="Changes" comment="init base">
-      <change beforePath="$PROJECT_DIR$/app/(web)/reservation/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/reservation/page.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/components/HLSPlayerControls.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(web)/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/actions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/nexi.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/nexi.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,7 +52,7 @@
     "js.debugger.nextJs.config.created.client": "true",
     "js.debugger.nextJs.config.created.server": "true",
     "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "/Users/matejnevlud/github/bebrave-app/app/(web)",
+    "last_opened_file_path": "/Users/matejnevlud/github/bebrave-app/components",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -61,11 +65,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/components" />
       <recent name="$PROJECT_DIR$/app/(web)" />
       <recent name="$PROJECT_DIR$/public" />
       <recent name="$PROJECT_DIR$/db" />
       <recent name="$PROJECT_DIR$/app/(administration)/admin/calendar" />
-      <recent name="$PROJECT_DIR$/app/(administration)/admin" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/public" />
@@ -131,7 +135,7 @@
       <workItem from="1751911537552" duration="7052000" />
       <workItem from="1751993283928" duration="60000" />
       <workItem from="1752402684254" duration="1219000" />
-      <workItem from="1752761189519" duration="33179000" />
+      <workItem from="1752761189519" duration="38704000" />
     </task>
     <task id="LOCAL-00001" summary="init base">
       <option name="closed" value="true" />
