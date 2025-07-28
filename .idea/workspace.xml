@@ -7,6 +7,7 @@
     <list default="true" id="878e36bd-1ad8-483a-aae1-c8c02b1128eb" name="Changes" comment="init base">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/components/navbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/navbar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/site.ts" beforeDir="false" afterPath="$PROJECT_DIR$/config/site.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,7 +50,7 @@
     &quot;js.debugger.nextJs.config.created.client&quot;: &quot;true&quot;,
     &quot;js.debugger.nextJs.config.created.server&quot;: &quot;true&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/Users/matejnevlud/github/bebrave-app/components&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/matejnevlud/github/bebrave-app&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -133,7 +134,10 @@
       <workItem from="1751993283928" duration="60000" />
       <workItem from="1752402684254" duration="1219000" />
       <workItem from="1752761189519" duration="39356000" />
-      <workItem from="1753273416046" duration="346000" />
+      <workItem from="1753273416046" duration="1379000" />
+      <workItem from="1753380578724" duration="6000" />
+      <workItem from="1753422203492" duration="10000" />
+      <workItem from="1753691283231" duration="900000" />
     </task>
     <task id="LOCAL-00001" summary="init base">
       <option name="closed" value="true" />

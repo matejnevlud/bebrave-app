@@ -1,3 +1,4 @@
+"use client";
 import {
     Navbar as HeroUINavbar,
     NavbarContent,
@@ -19,8 +20,11 @@ import {CalendarDays} from "lucide-react";
 
 import {siteConfig} from "@/config/site";
 import {SearchIcon} from "@/components/icons";
+import React, { useReducer } from "react";
 
 export const Navbar = () => {
+    const [isMenuOpen, setIsMenuOpen] = useReducer((current) => !current, false);
+
     const searchInput = (
         <Input
             aria-label="Search"
@@ -43,7 +47,7 @@ export const Navbar = () => {
     );
 
     return (
-        <HeroUINavbar maxWidth="xl" position="sticky">
+        <HeroUINavbar maxWidth="xl" position="sticky" isMenuOpen={isMenuOpen} onMenuOpenChange={setIsMenuOpen}>
             <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
                 <NavbarBrand as="li" className="gap-3 max-w-fit">
                     <NextLink className="flex justify-start items-center gap-5" href="/">
@@ -106,19 +110,13 @@ export const Navbar = () => {
             </NavbarContent>
 
             <NavbarMenu>
-                {searchInput}
                 <div className="mx-4 mt-2 flex flex-col gap-2">
                     {siteConfig.navMenuItems.map((item, index) => (
                         <NavbarMenuItem key={`${item}-${index}`}>
                             <Link
-                                color={
-                                    index === 2
-                                        ? "primary"
-                                        : index === siteConfig.navMenuItems.length - 1
-                                            ? "danger"
-                                            : "foreground"
-                                }
+                                color={index === siteConfig.navMenuItems.length - 1 ? "success" : "foreground"}
                                 href={item.href}
+                                onPress={() => setIsMenuOpen()}
                                 size="lg"
                             >
                                 {item.label}

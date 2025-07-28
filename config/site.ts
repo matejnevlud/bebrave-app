@@ -19,20 +19,20 @@ export const siteConfig = {
     ],
     navMenuItems: [
         {
+            label: "O Nás",
+            href: "#onas",
+        },
+        {
             label: "Lekce",
-            href: "/",
+            href: "#lekce",
         },
         {
             label: "Instruktoři",
-            href: "/",
+            href: "#instruktori",
         },
         {
-            label: "Blog",
-            href: "/",
-        },
-        {
-            label: "O Nás",
-            href: "/",
+            label: "Rezervace",
+            href: "/reservation",
         },
     ],
     links: {
