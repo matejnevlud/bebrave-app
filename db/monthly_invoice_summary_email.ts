@@ -11,7 +11,7 @@ export const monthlyInvoiceSummaryEmail = `
   <tr>
     <td align="center">
       <!-- Card -->
-      <table role="presentation" width="700" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;font-family:Arial,Helvetica,sans-serif;">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;font-family:Arial,Helvetica,sans-serif;">
         <!-- Header -->
         <tr>
           <td style="padding:32px 40px 24px 40px;text-align: center;">
@@ -24,100 +24,35 @@ export const monthlyInvoiceSummaryEmail = `
           </td>
         </tr>
         
-        <!-- Summary section -->
+        <!-- Content -->
         <tr>
           <td style="padding:0 40px 24px 40px;">
-            <h2 style="font-size:18px;margin:0 0 16px 0;color:#000;">Celkový přehled</h2>
-            <table role="presentation" width="100%" cellpadding="8" cellspacing="0" style="border:1px solid #e0e0e0;border-radius:4px;">
-              <tr style="background:#f8f8f8;">
-                <td style="font-weight:bold;border-bottom:1px solid #e0e0e0;">Celkový počet faktur:</td>
-                <td style="text-align:right;border-bottom:1px solid #e0e0e0;">{{total_invoices}}</td>
-              </tr>
-              <tr>
-                <td style="font-weight:bold;border-bottom:1px solid #e0e0e0;">Celková částka bez DPH:</td>
-                <td style="text-align:right;border-bottom:1px solid #e0e0e0;">{{total_amount_without_vat}} Kč</td>
-              </tr>
-              <tr style="background:#f8f8f8;">
-                <td style="font-weight:bold;border-bottom:1px solid #e0e0e0;">Celková částka DPH:</td>
-                <td style="text-align:right;border-bottom:1px solid #e0e0e0;">{{total_vat_amount}} Kč</td>
-              </tr>
-              <tr>
-                <td style="font-weight:bold;font-size:16px;">Celková částka s DPH:</td>
-                <td style="text-align:right;font-weight:bold;font-size:16px;">{{total_amount_with_vat}} Kč</td>
-              </tr>
-            </table>
-          </td>
-        </tr>
+            <p style="margin:0 0 16px 0;font-size:14px;">Dobrý den,</p>
+            <p style="margin:0 0 16px 0;font-size:14px;">zasílame Vám měsíční přehled faktur za {{month_year}}.</p>
+            
+            <!-- Quick Summary -->
+            <div style="background:#f0f9ff;border:1px solid #3b82f6;border-radius:6px;padding:16px 20px;margin:20px 0;">
+              <p style="margin:0 0 8px 0;font-size:14px;color:#1f2937;"><strong>📊 Shrnutí za {{month_year}}:</strong></p>
+              <ul style="margin:0;padding-left:20px;font-size:13px;color:#374151;">
+                <li>Celkem faktur: <strong>{{total_invoices}}</strong></li>
+                <li>Celková částka: <strong>{{total_amount_with_vat}} Kč</strong> (včetně DPH)</li>
+                <li>Změna oproti předchozímu měsíci: <strong style="{{percentage_change_color}}">{{percentage_change}}</strong></li>
+              </ul>
+            </div>
 
-        <!-- Breakdown by class type -->
-        <tr>
-          <td style="padding:0 40px 24px 40px;">
-            <h2 style="font-size:18px;margin:0 0 16px 0;color:#000;">Přehled podle typu lekcí</h2>
-            <table role="presentation" width="100%" cellpadding="8" cellspacing="0" style="border:1px solid #e0e0e0;border-radius:4px;">
-              <tr style="background:#f0f0f0;">
-                <th style="text-align:left;border-bottom:2px solid #e0e0e0;font-weight:bold;">Typ lekce</th>
-                <th style="text-align:center;border-bottom:2px solid #e0e0e0;font-weight:bold;">Počet</th>
-                <th style="text-align:right;border-bottom:2px solid #e0e0e0;font-weight:bold;">Částka bez DPH</th>
-                <th style="text-align:right;border-bottom:2px solid #e0e0e0;font-weight:bold;">DPH</th>
-                <th style="text-align:right;border-bottom:2px solid #e0e0e0;font-weight:bold;">Celkem s DPH</th>
-              </tr>
-              {{class_type_breakdown}}
-            </table>
-          </td>
-        </tr>
+            <!-- PDF Attachment Notice -->
+            <div style="background:#f0fdf4;border:1px solid #22c55e;border-radius:6px;padding:16px 20px;margin:20px 0;">
+              <p style="margin:0 0 8px 0;font-size:14px;color:#1f2937;"><strong>📎 Příloha:</strong></p>
+              <p style="margin:0;font-size:13px;color:#374151;">Detailní přehled najdete v příloze tohoto e-mailu ve formátu PDF. Obsahuje:</p>
+              <ul style="margin:8px 0 0 0;padding-left:20px;font-size:13px;color:#374151;">
+                <li>Přehled podle typu lekcí</li>
+                <li>Přehled podle způsobu platby</li>
+                <li>Analýza DPH</li>
+                <li>Porovnání s předchozím měsícem</li>
+              </ul>
+            </div>
 
-        <!-- Breakdown by payment method -->
-        <tr>
-          <td style="padding:0 40px 24px 40px;">
-            <h2 style="font-size:18px;margin:0 0 16px 0;color:#000;">Přehled podle způsobu platby</h2>
-            <table role="presentation" width="100%" cellpadding="8" cellspacing="0" style="border:1px solid #e0e0e0;border-radius:4px;">
-              <tr style="background:#f0f0f0;">
-                <th style="text-align:left;border-bottom:2px solid #e0e0e0;font-weight:bold;">Způsob platby</th>
-                <th style="text-align:center;border-bottom:2px solid #e0e0e0;font-weight:bold;">Počet</th>
-                <th style="text-align:right;border-bottom:2px solid #e0e0e0;font-weight:bold;">Částka bez DPH</th>
-                <th style="text-align:right;border-bottom:2px solid #e0e0e0;font-weight:bold;">DPH</th>
-                <th style="text-align:right;border-bottom:2px solid #e0e0e0;font-weight:bold;">Celkem s DPH</th>
-              </tr>
-              {{payment_method_breakdown}}
-            </table>
-          </td>
-        </tr>
-
-        <!-- VAT breakdown -->
-        <tr>
-          <td style="padding:0 40px 24px 40px;">
-            <h2 style="font-size:18px;margin:0 0 16px 0;color:#000;">Přehled DPH</h2>
-            <table role="presentation" width="100%" cellpadding="8" cellspacing="0" style="border:1px solid #e0e0e0;border-radius:4px;">
-              <tr style="background:#f0f0f0;">
-                <th style="text-align:left;border-bottom:2px solid #e0e0e0;font-weight:bold;">Sazba DPH</th>
-                <th style="text-align:center;border-bottom:2px solid #e0e0e0;font-weight:bold;">Počet faktur</th>
-                <th style="text-align:right;border-bottom:2px solid #e0e0e0;font-weight:bold;">Základ daně</th>
-                <th style="text-align:right;border-bottom:2px solid #e0e0e0;font-weight:bold;">DPH</th>
-                <th style="text-align:right;border-bottom:2px solid #e0e0e0;font-weight:bold;">Celkem</th>
-              </tr>
-              {{vat_breakdown}}
-            </table>
-          </td>
-        </tr>
-
-        <!-- Monthly comparison -->
-        <tr>
-          <td style="padding:0 40px 24px 40px;">
-            <h2 style="font-size:18px;margin:0 0 16px 0;color:#000;">Porovnání s předchozím měsícem</h2>
-            <table role="presentation" width="100%" cellpadding="8" cellspacing="0" style="border:1px solid #e0e0e0;border-radius:4px;">
-              <tr style="background:#f8f8f8;">
-                <td style="font-weight:bold;border-bottom:1px solid #e0e0e0;">Změna počtu faktur:</td>
-                <td style="text-align:right;border-bottom:1px solid #e0e0e0;{{invoice_change_color}}">{{invoice_count_change}}</td>
-              </tr>
-              <tr>
-                <td style="font-weight:bold;border-bottom:1px solid #e0e0e0;">Změna celkové částky:</td>
-                <td style="text-align:right;border-bottom:1px solid #e0e0e0;{{revenue_change_color}}">{{revenue_change}}</td>
-              </tr>
-              <tr style="background:#f8f8f8;">
-                <td style="font-weight:bold;">Změna v procentech:</td>
-                <td style="text-align:right;{{percentage_change_color}}">{{percentage_change}}</td>
-              </tr>
-            </table>
+            <p style="margin:16px 0 0 0;font-size:14px;">V případě jakýchkoli dotazů nás neváhejte kontaktovat.</p>
           </td>
         </tr>
 
@@ -125,10 +60,13 @@ export const monthlyInvoiceSummaryEmail = `
         <tr>
           <td style="padding:0 40px 32px 40px;">
             <p style="font-size:14px;margin:16px 0 0 0;color:#666;text-align:center;">
-              Tento přehled byl automaticky vygenerován dne {{generation_date}}.
+              Vygenerováno automaticky dne {{generation_date}}.
             </p>
-            <p style="font-size:14px;margin:8px 0 0 0;color:#666;text-align:center;">
+            <p style="font-size:14px;margin:8px 0 0 0;color:#000;text-align:center;">
               <strong>Tým BeBrave Studio</strong>
+            </p>
+            <p style="font-size:12px;margin:8px 0 0 0;color:#666;text-align:center;">
+              📧 info@bebravestudio.cz | 📞 +420 731 906 623
             </p>
           </td>
         </tr>

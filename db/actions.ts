@@ -22,6 +22,7 @@ import {
 import {reservationEmail} from "@/db/reservation_email";
 import {reservation500Email} from "@/db/reservation_500_email";
 import {monthlyInvoiceSummaryEmail} from "@/db/monthly_invoice_summary_email";
+import {PDFMonthlySummaryService} from "@/lib/services/pdf-monthly-summary";
 import {nexiPaymentService} from "@/lib/services/nexi";
 import {PDFInvoiceService} from "@/lib/services/pdf-invoice";
 import {generateSecureInvoicePdfUrl} from "@/lib/invoice-security";
@@ -1499,9 +1500,12 @@ export async function generateMonthlyInvoiceSummary(
 // Send monthly invoice summary email
 export async function sendMonthlyInvoiceSummaryEmail(
     targetMonth?: Date,
-    recipientEmail: string = 'bgaluskova@intaste.cz'
+    recipientEmail?: string
 ): Promise<boolean> {
     try {
+        // Determine recipient email based on environment
+        let finalRecipientEmail = recipientEmail;
+
         const summaryData = await generateMonthlyInvoiceSummary(targetMonth);
         
         if (!summaryData) {
@@ -1509,7 +1513,12 @@ export async function sendMonthlyInvoiceSummaryEmail(
             return false;
         }
 
-        // Format currency values
+        // Generate PDF attachment
+        console.log('Generating PDF attachment...');
+        const pdfBuffer = await PDFMonthlySummaryService.generatePDF(summaryData);
+        const pdfFileName = PDFMonthlySummaryService.generatePDFFileName(summaryData.month, summaryData.year);
+
+        // Format values for simple email template
         const formatCurrency = (amountInCents: number): string => {
             return (amountInCents / 100).toLocaleString('cs-CZ', {
                 minimumFractionDigits: 2,
@@ -1517,87 +1526,39 @@ export async function sendMonthlyInvoiceSummaryEmail(
             });
         };
 
-        // Format percentage
         const formatPercentage = (value: number): string => {
             const sign = value > 0 ? '+' : '';
             return `${sign}${value.toFixed(1)}%`;
         };
 
-        // Format change values
-        const formatChange = (value: number): string => {
-            const sign = value > 0 ? '+' : '';
-            return `${sign}${formatCurrency(Math.abs(value))} Kč`;
-        };
-
-        // Build class type breakdown table rows
-        const classTypeRows = summaryData.classTypeBreakdown.map(item => `
-            <tr style="border-bottom:1px solid #e0e0e0;">
-                <td style="padding:8px 0;">${item.name}</td>
-                <td style="text-align:center;padding:8px 0;">${item.count}</td>
-                <td style="text-align:right;padding:8px 0;">${formatCurrency(item.amountWithoutVat)} Kč</td>
-                <td style="text-align:right;padding:8px 0;">${formatCurrency(item.vatAmount)} Kč</td>
-                <td style="text-align:right;padding:8px 0;">${formatCurrency(item.totalAmount)} Kč</td>
-            </tr>
-        `).join('');
-
-        // Build payment method breakdown table rows
-        const paymentMethodRows = summaryData.paymentMethodBreakdown.map(item => `
-            <tr style="border-bottom:1px solid #e0e0e0;">
-                <td style="padding:8px 0;">${item.methodLabel}</td>
-                <td style="text-align:center;padding:8px 0;">${item.count}</td>
-                <td style="text-align:right;padding:8px 0;">${formatCurrency(item.amountWithoutVat)} Kč</td>
-                <td style="text-align:right;padding:8px 0;">${formatCurrency(item.vatAmount)} Kč</td>
-                <td style="text-align:right;padding:8px 0;">${formatCurrency(item.totalAmount)} Kč</td>
-            </tr>
-        `).join('');
-
-        // Build VAT breakdown table rows
-        const vatRows = summaryData.vatBreakdown.map(item => `
-            <tr style="border-bottom:1px solid #e0e0e0;">
-                <td style="padding:8px 0;">${item.rate}%</td>
-                <td style="text-align:center;padding:8px 0;">${item.count}</td>
-                <td style="text-align:right;padding:8px 0;">${formatCurrency(item.baseAmount)} Kč</td>
-                <td style="text-align:right;padding:8px 0;">${formatCurrency(item.vatAmount)} Kč</td>
-                <td style="text-align:right;padding:8px 0;">${formatCurrency(item.totalAmount)} Kč</td>
-            </tr>
-        `).join('');
-
-        // Determine colors for comparison
-        const invoiceChangeColor = summaryData.previousMonthComparison.invoiceCountChange > 0 ? 'color:#16a34a;' : 
-                                  summaryData.previousMonthComparison.invoiceCountChange < 0 ? 'color:#dc2626;' : '';
-        const revenueChangeColor = summaryData.previousMonthComparison.revenueChange > 0 ? 'color:#16a34a;' : 
-                                  summaryData.previousMonthComparison.revenueChange < 0 ? 'color:#dc2626;' : '';
+        // Determine color for percentage change
         const percentageChangeColor = summaryData.previousMonthComparison.percentageChange > 0 ? 'color:#16a34a;' : 
                                      summaryData.previousMonthComparison.percentageChange < 0 ? 'color:#dc2626;' : '';
 
-        // Replace placeholders in email template
+        // Replace placeholders in simple email template
         let emailHtml = monthlyInvoiceSummaryEmail
             .replace(/{{month_year}}/g, `${summaryData.month} ${summaryData.year}`)
             .replace(/{{total_invoices}}/g, summaryData.totalInvoices.toString())
-            .replace(/{{total_amount_without_vat}}/g, formatCurrency(summaryData.totalAmountWithoutVat))
-            .replace(/{{total_vat_amount}}/g, formatCurrency(summaryData.totalVatAmount))
             .replace(/{{total_amount_with_vat}}/g, formatCurrency(summaryData.totalAmountWithVat))
-            .replace(/{{class_type_breakdown}}/g, classTypeRows)
-            .replace(/{{payment_method_breakdown}}/g, paymentMethodRows)
-            .replace(/{{vat_breakdown}}/g, vatRows)
-            .replace(/{{invoice_count_change}}/g, summaryData.previousMonthComparison.invoiceCountChange >= 0 ? 
-                `+${summaryData.previousMonthComparison.invoiceCountChange}` : 
-                summaryData.previousMonthComparison.invoiceCountChange.toString())
-            .replace(/{{revenue_change}}/g, formatChange(summaryData.previousMonthComparison.revenueChange))
             .replace(/{{percentage_change}}/g, formatPercentage(summaryData.previousMonthComparison.percentageChange))
-            .replace(/{{generation_date}}/g, new Date().toLocaleDateString('cs-CZ'))
-            .replace(/{{invoice_change_color}}/g, invoiceChangeColor)
-            .replace(/{{revenue_change_color}}/g, revenueChangeColor)
-            .replace(/{{percentage_change_color}}/g, percentageChangeColor);
+            .replace(/{{percentage_change_color}}/g, percentageChangeColor)
+            .replace(/{{generation_date}}/g, new Date().toLocaleDateString('cs-CZ'));
 
-        // Send email using Resend
+        // Send email using Resend with PDF attachment
         const resend = new Resend("re_fPhhnprW_2SD7UaFhoM9ZdPo7bhWeMqxc");
 
         const result = await resend.emails.send({
             from: "BeBrave Studio <info@bebravestudio.cz>",
-            to: [recipientEmail],
+            to: [finalRecipientEmail],
             subject: `Měsíční přehled faktur - ${summaryData.month} ${summaryData.year}`,
             html: emailHtml,
+            attachments: [
+                {
+                    filename: pdfFileName,
+                    content: pdfBuffer,
+                    contentType: 'application/pdf',
+                }
+            ],
         });
 
         console.log('Monthly invoice summary email sent successfully:', result);

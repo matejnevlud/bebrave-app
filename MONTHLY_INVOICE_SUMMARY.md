@@ -24,16 +24,17 @@ This system automatically generates and sends a comprehensive monthly invoice su
 
 ### Railway Cron Service
 
-#### Standalone Script (`/scripts/monthly-invoice-summary.js`)
-- Node.js script that runs independently as a cron job
+#### Standalone Script (`/scripts/monthly-invoice-summary.ts`)
+- TypeScript script using tsx that runs independently as a cron job
+- Makes HTTPS requests to bebravestudio.cz API for email generation
 - Automatically calculates and sends summary for previous month
 - Handles errors and logging for Railway environment
 - Runs via npm command: `npm run cron:monthly-invoice-summary`
 
-#### Railway Configuration (`/railway.toml`)
-- Defines two services: main web app and cron job
-- Cron schedule: `"0 9 1 * *"` (9:00 AM on 1st day of each month)
-- Separate service deployment for better resource management
+#### Manual Cron Setup
+- The script can be run manually or scheduled externally
+- Command: `npm run cron:monthly-invoice-summary`
+- Targets: `https://bebravestudio.cz/api/monthly-invoice-summary`
 
 ### API Routes (Optional - for manual testing)
 
@@ -41,46 +42,68 @@ This system automatically generates and sends a comprehensive monthly invoice su
 - **POST**: Send monthly summary email with custom parameters
 - **GET**: Generate summary data without sending email (testing)
 
-## Railway.com Deployment
+## Manual Execution
 
-### 1. Automatic Cron Setup
+### 1. Local Testing
 
-The system is configured to run automatically on Railway.com using the `railway.toml` configuration:
-
-```toml
-[services.monthly-invoice-summary-cron]
-source = "."
-cron = "0 9 1 * *"  # 9:00 AM on the 1st day of every month
-build.cmd = "npm install"
-start.cmd = "npm run cron:monthly-invoice-summary"
-```
-
-**Alternative Setup**: You can also create the cron service through Railway's dashboard:
-1. Go to your Railway project
-2. Click "New Service" 
-3. Select "Cron Job"
-4. Set command: `npm run cron:monthly-invoice-summary`
-5. Set schedule: `0 9 1 * *`
-
-### 2. Manual Testing
-
-#### Local Testing:
+Run the cron script manually:
 ```bash
 npm run cron:monthly-invoice-summary
 ```
 
-#### API Testing (if needed):
+### 2. API Testing (Optional)
+
+You can also test the API endpoints directly:
+
 ```bash
 # Test data generation without sending
-GET /api/monthly-invoice-summary?targetMonth=2024-01-01
+GET https://bebravestudio.cz/api/monthly-invoice-summary?targetMonth=2024-01-01
 
 # Send test email
-POST /api/monthly-invoice-summary
+POST https://bebravestudio.cz/api/monthly-invoice-summary
 Content-Type: application/json
 {
   "targetMonth": "2024-01-01",
-  "recipientEmail": "test@example.com"
+  "recipientEmail": "test@example.com"  
 }
+```
+
+### 3. External Scheduling
+
+Since the railway.toml configuration is removed, you can schedule the script using external services:
+
+#### Option A: GitHub Actions
+Create `.github/workflows/monthly-invoice-summary.yml`:
+
+```yaml
+name: Monthly Invoice Summary
+on:
+  schedule:
+    - cron: '0 9 1 * *'  # 9:00 AM on 1st day of each month
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  send-summary:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - run: npm install
+      - run: npm run cron:monthly-invoice-summary
+```
+
+#### Option B: External Cron Services
+Use services like cron-job.org, EasyCron, or similar to call:
+```bash
+npm run cron:monthly-invoice-summary
+```
+
+#### Option C: Manual Execution
+Run the command manually on the 1st of each month:
+```bash
+npm run cron:monthly-invoice-summary
 ```
 
 
@@ -115,7 +138,7 @@ DATABASE_URL=postgresql://...
 # Email service (Resend API key is already in the code)
 # No additional email env vars needed
 
-# Any other existing environment variables your app needs
+# TypeScript execution environment
 NODE_ENV=production
 ```
 

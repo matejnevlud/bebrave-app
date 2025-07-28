@@ -7,7 +7,7 @@
         "build": "next build",
         "start": "next start",
         "lint": "eslint --fix",
-        "cron:monthly-invoice-summary": "node scripts/monthly-invoice-summary.js"
+        "cron:monthly-invoice-summary": "npx tsx scripts/monthly-invoice-summary.ts"
     },
     "dependencies": {
         "@heroui/button": "2.2.19",
@@ -77,6 +77,7 @@
         "prettier": "3.5.3",
         "tailwind-variants": "0.3.0",
         "tailwindcss": "3.4.16",
+        "tsx": "^4.19.1",
         "typescript": "5.6.3"
     }
 }
