@@ -1549,7 +1549,7 @@ export async function sendMonthlyInvoiceSummaryEmail(
 
         const result = await resend.emails.send({
             from: "BeBrave Studio <info@bebravestudio.cz>",
-            to: [finalRecipientEmail],
+            to: [finalRecipientEmail || 'nevlud3@gmail.com'],
             subject: `Měsíční přehled faktur - ${summaryData.month} ${summaryData.year}`,
             html: emailHtml,
             attachments: [

@@ -11,8 +11,7 @@
 
 import https from 'https';
 
-// Set NODE_ENV to production for proper database connections
-process.env.NODE_ENV = process.env.NODE_ENV || 'production';
+// Set NODE_ENV to production for proper database connection
 
 console.log('🚀 Starting Monthly Invoice Summary Cron Job');
 console.log(`📅 Execution time: ${new Date().toISOString()}`);

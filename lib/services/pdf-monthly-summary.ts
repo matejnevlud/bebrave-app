@@ -348,6 +348,9 @@ export class PDFMonthlySummaryService {
                 console.error('⚠️ Failed to save debug files:', debugError);
             }
 
+            // Return the PDF buffer as a base64 string
+            // @ts-ignore
+            return pdfBuffer.toString('base64');
         } finally {
             await browser.close();
         }

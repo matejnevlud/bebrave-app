@@ -5,14 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="878e36bd-1ad8-483a-aae1-c8c02b1128eb" name="Changes" comment="init base">
-      <change afterPath="$PROJECT_DIR$/debug/monthly_summary_červenec_2025_2025-07-28T16-19-40-425Z.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug/monthly_summary_červenec_2025_2025-07-28T16-19-40-425Z.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug/monthly_summary_červenec_2025_2025-07-28T16-24-09-573Z.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug/monthly_summary_červenec_2025_2025-07-28T16-24-09-573Z.pdf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug/monthly_summary_červenec_2025_2025-07-28T16-26-30-794Z.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/debug/monthly_summary_červenec_2025_2025-07-28T16-26-30-794Z.pdf" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bun.lock" beforeDir="false" afterPath="$PROJECT_DIR$/bun.lock" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/actions.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/services/pdf-monthly-summary.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/pdf-monthly-summary.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/scripts/monthly-invoice-summary.ts" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/monthly-invoice-summary.ts" afterDir="false" />
@@ -145,7 +138,7 @@
       <workItem from="1753273416046" duration="1379000" />
       <workItem from="1753380578724" duration="6000" />
       <workItem from="1753422203492" duration="10000" />
-      <workItem from="1753691283231" duration="11825000" />
+      <workItem from="1753691283231" duration="12264000" />
     </task>
     <task id="LOCAL-00001" summary="init base">
       <option name="closed" value="true" />
