@@ -1515,7 +1515,7 @@ export async function sendMonthlyInvoiceSummaryEmail(
 
         // Generate PDF attachment
         console.log('Generating PDF attachment...');
-        const pdfBuffer = await PDFMonthlySummaryService.generatePDF(summaryData);
+        const pdfBufferBase64 = await PDFMonthlySummaryService.generatePDF(summaryData);
         const pdfFileName = PDFMonthlySummaryService.generatePDFFileName(summaryData.month, summaryData.year);
 
         // Format values for simple email template
@@ -1555,8 +1555,7 @@ export async function sendMonthlyInvoiceSummaryEmail(
             attachments: [
                 {
                     filename: pdfFileName,
-                    content: pdfBuffer,
-                    contentType: 'application/pdf',
+                    content: pdfBufferBase64
                 }
             ],
         });

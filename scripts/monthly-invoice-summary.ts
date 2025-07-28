@@ -35,7 +35,8 @@ async function runMonthlySummary() {
         
         // Make POST request to the API endpoint
         const postData = JSON.stringify({
-            targetMonth: targetMonth
+            targetMonth: targetMonth,
+            recipientEmail: process.env.MONTHLY_SUM_EMAIL || 'nevlud3@gmail.com'
         });
         
         const options = {

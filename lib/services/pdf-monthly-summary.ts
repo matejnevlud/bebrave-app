@@ -117,7 +117,7 @@ export class PDFMonthlySummaryService {
                     font-family: Arial, sans-serif; 
                     font-size: 12px; 
                     line-height: 1.4; 
-                    margin: 20px;
+                    margin: 10px;
                     color: #000;
                 }
                 .header { 
@@ -195,30 +195,7 @@ export class PDFMonthlySummaryService {
                     <div>IČO: ${COMPANY_INFO.ico} | DIČ: ${COMPANY_INFO.dic}</div>
                     <div>${COMPANY_INFO.email} | ${COMPANY_INFO.phone}</div>
                 </div>
-                <div class="summary-title">Měsíční przehled faktur - ${data.month} ${data.year}</div>
-            </div>
-
-            <!-- Overall Summary -->
-            <div class="section">
-                <div class="section-title">Celkový přehled</div>
-                <table class="summary-table">
-                    <tr>
-                        <td style="font-weight: bold;">Celkový počet faktur:</td>
-                        <td style="text-align: right;">${data.totalInvoices}</td>
-                    </tr>
-                    <tr>
-                        <td style="font-weight: bold;">Celková částka bez DPH:</td>
-                        <td style="text-align: right;">${this.formatCurrency(data.totalAmountWithoutVat)} Kč</td>
-                    </tr>
-                    <tr>
-                        <td style="font-weight: bold;">Celková částka DPH:</td>
-                        <td style="text-align: right;">${this.formatCurrency(data.totalVatAmount)} Kč</td>
-                    </tr>
-                    <tr class="total-row">
-                        <td style="font-weight: bold; font-size: 14px;">Celková částka s DPH:</td>
-                        <td style="text-align: right; font-weight: bold; font-size: 14px;">${this.formatCurrency(data.totalAmountWithVat)} Kč</td>
-                    </tr>
-                </table>
+                <div class="summary-title">Měsíční přehled faktur - ${data.month} ${data.year}</div>
             </div>
 
             <!-- Class Type Breakdown -->
@@ -311,7 +288,7 @@ export class PDFMonthlySummaryService {
         `;
     }
 
-    static async generatePDF(data: MonthlySummaryData): Promise<Buffer> {
+    static async generatePDF(data: MonthlySummaryData): Promise<string> {
         const browser = await puppeteer.launch({
             headless: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox']
@@ -363,12 +340,14 @@ export class PDFMonthlySummaryService {
                 // Verify the PDF starts with correct PDF header
                 const pdfHeader = pdfBuffer.slice(0, 4).toString();
                 console.log(`📋 PDF header: ${pdfHeader} (should be %PDF)`);
+
+
+                return fs.readFileSync(debugFilePath).toString('base64');
                 
             } catch (debugError) {
                 console.error('⚠️ Failed to save debug files:', debugError);
             }
 
-            return pdfBuffer;
         } finally {
             await browser.close();
         }
