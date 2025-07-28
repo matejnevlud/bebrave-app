@@ -6,7 +6,8 @@
         "dev": "next dev --turbopack",
         "build": "next build",
         "start": "next start",
-        "lint": "eslint --fix"
+        "lint": "eslint --fix",
+        "cron:monthly-invoice-summary": "node scripts/monthly-invoice-summary.js"
     },
     "dependencies": {
         "@heroui/button": "2.2.19",

@@ -1,6 +1,6 @@
 "use server";
 
-import {desc, eq, max, sql} from "drizzle-orm";
+import {desc, eq, max, sql, and, gte, lt} from "drizzle-orm";
 import {Resend} from "resend";
 import axios from "axios";
 
@@ -21,6 +21,7 @@ import {
 } from "@/db/schema";
 import {reservationEmail} from "@/db/reservation_email";
 import {reservation500Email} from "@/db/reservation_500_email";
+import {monthlyInvoiceSummaryEmail} from "@/db/monthly_invoice_summary_email";
 import {nexiPaymentService} from "@/lib/services/nexi";
 import {PDFInvoiceService} from "@/lib/services/pdf-invoice";
 import {generateSecureInvoicePdfUrl} from "@/lib/invoice-security";
@@ -1270,4 +1271,339 @@ async function dotyposCreateCustomer(userData: any): Promise<string | null> {
     }
 
     return null;
+}
+
+
+interface MonthlyInvoiceSummaryData {
+    month: string;
+    year: number;
+    totalInvoices: number;
+    totalAmountWithoutVat: number;
+    totalVatAmount: number;
+    totalAmountWithVat: number;
+    classTypeBreakdown: Array<{
+        name: string;
+        count: number;
+        amountWithoutVat: number;
+        vatAmount: number;
+        totalAmount: number;
+    }>;
+    paymentMethodBreakdown: Array<{
+        method: string;
+        methodLabel: string;
+        count: number;
+        amountWithoutVat: number;
+        vatAmount: number;
+        totalAmount: number;
+    }>;
+    vatBreakdown: Array<{
+        rate: number;
+        count: number;
+        baseAmount: number;
+        vatAmount: number;
+        totalAmount: number;
+    }>;
+    previousMonthComparison: {
+        invoiceCountChange: number;
+        revenueChange: number;
+        percentageChange: number;
+    };
+}
+
+// Generate and send monthly invoice summary email
+export async function generateMonthlyInvoiceSummary(
+    targetMonth?: Date,
+    recipientEmail?: string
+): Promise<MonthlyInvoiceSummaryData | null> {
+    try {
+        // Use current month - 1 if no target month provided
+        const now = new Date();
+        const summaryDate = targetMonth || new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        
+        const startOfMonth = new Date(summaryDate.getFullYear(), summaryDate.getMonth(), 1);
+        const endOfMonth = new Date(summaryDate.getFullYear(), summaryDate.getMonth() + 1, 1); // First day of next month
+        
+        // Previous month for comparison
+        const startOfPrevMonth = new Date(summaryDate.getFullYear(), summaryDate.getMonth() - 1, 1);
+        const endOfPrevMonth = new Date(summaryDate.getFullYear(), summaryDate.getMonth(), 1); // First day of target month
+
+        console.log(`Generating invoice summary for ${startOfMonth.toLocaleDateString('cs-CZ', { month: 'long', year: 'numeric' })}`);
+        console.log(`Date range: ${startOfMonth.toISOString()} to ${endOfMonth.toISOString()}`)
+
+        // Get all invoices for the target month
+        const invoices = await db.query.invoicesTable.findMany({
+            where: and(
+                gte(invoicesTable.issueDate, startOfMonth),
+                lt(invoicesTable.issueDate, endOfMonth)
+            ),
+            with: {
+                reservation: {
+                    with: {
+                        class: {
+                            with: {
+                                classType: true,
+                                trainer: true,
+                            },
+                        },
+                    },
+                },
+            },
+            orderBy: desc(invoicesTable.issueDate),
+        });
+
+        console.log(`Found ${invoices.length} invoices for the month of ${startOfMonth.toLocaleDateString('cs-CZ', { month: 'long', year: 'numeric' })}`)
+
+        // Get previous month invoices for comparison
+        const prevMonthInvoices = await db.query.invoicesTable.findMany({
+            where: and(
+                gte(invoicesTable.issueDate, startOfPrevMonth),
+                lt(invoicesTable.issueDate, endOfPrevMonth)
+            ),
+        });
+
+        console.log(`Found ${prevMonthInvoices.length} invoices for previous month comparison`)
+
+        // Calculate totals
+        const totalInvoices = invoices.length;
+        const totalAmountWithoutVat = invoices.reduce((sum, inv) => sum + (inv.amount || 0), 0);
+        const totalVatAmount = invoices.reduce((sum, inv) => sum + (inv.vatAmount || 0), 0);
+        const totalAmountWithVat = invoices.reduce((sum, inv) => sum + (inv.totalAmount || 0), 0);
+
+        // Group by class type
+        const classTypeMap = new Map<string, {
+            name: string;
+            count: number;
+            amountWithoutVat: number;
+            vatAmount: number;
+            totalAmount: number;
+        }>();
+
+        invoices.forEach(invoice => {
+            const classTypeName = invoice.reservation?.class?.classType?.name || 'Neznámý typ lekce';
+            
+            if (!classTypeMap.has(classTypeName)) {
+                classTypeMap.set(classTypeName, {
+                    name: classTypeName,
+                    count: 0,
+                    amountWithoutVat: 0,
+                    vatAmount: 0,
+                    totalAmount: 0,
+                });
+            }
+            
+            const entry = classTypeMap.get(classTypeName)!;
+            entry.count++;
+            entry.amountWithoutVat += invoice.amount || 0;
+            entry.vatAmount += invoice.vatAmount || 0;
+            entry.totalAmount += invoice.totalAmount || 0;
+        });
+
+        // Group by payment method
+        const paymentMethodMap = new Map<string, {
+            method: string;
+            methodLabel: string;
+            count: number;
+            amountWithoutVat: number;
+            vatAmount: number;
+            totalAmount: number;
+        }>();
+
+        const paymentMethodLabels: Record<string, string> = {
+            'credit_card': 'Kreditní karta',
+            'on_site': 'Na místě',
+            'qr_payment': 'QR platba',
+            'customer_credit': 'Kredit zákazníka',
+        };
+
+        invoices.forEach(invoice => {
+            const paymentMethod = invoice.paymentMethod || 'on_site';
+            const methodLabel = paymentMethodLabels[paymentMethod] || paymentMethod;
+            
+            if (!paymentMethodMap.has(paymentMethod)) {
+                paymentMethodMap.set(paymentMethod, {
+                    method: paymentMethod,
+                    methodLabel,
+                    count: 0,
+                    amountWithoutVat: 0,
+                    vatAmount: 0,
+                    totalAmount: 0,
+                });
+            }
+            
+            const entry = paymentMethodMap.get(paymentMethod)!;
+            entry.count++;
+            entry.amountWithoutVat += invoice.amount || 0;
+            entry.vatAmount += invoice.vatAmount || 0;
+            entry.totalAmount += invoice.totalAmount || 0;
+        });
+
+        // Group by VAT rate
+        const vatRateMap = new Map<number, {
+            rate: number;
+            count: number;
+            baseAmount: number;
+            vatAmount: number;
+            totalAmount: number;
+        }>();
+
+        invoices.forEach(invoice => {
+            const vatRate = invoice.vatRate || 0;
+            
+            if (!vatRateMap.has(vatRate)) {
+                vatRateMap.set(vatRate, {
+                    rate: vatRate,
+                    count: 0,
+                    baseAmount: 0,
+                    vatAmount: 0,
+                    totalAmount: 0,
+                });
+            }
+            
+            const entry = vatRateMap.get(vatRate)!;
+            entry.count++;
+            entry.baseAmount += invoice.amount || 0;
+            entry.vatAmount += invoice.vatAmount || 0;
+            entry.totalAmount += invoice.totalAmount || 0;
+        });
+
+        // Calculate previous month comparison
+        const prevMonthTotal = prevMonthInvoices.reduce((sum, inv) => sum + (inv.totalAmount || 0), 0);
+        const invoiceCountChange = totalInvoices - prevMonthInvoices.length;
+        const revenueChange = totalAmountWithVat - prevMonthTotal;
+        const percentageChange = prevMonthTotal > 0 ? ((revenueChange / prevMonthTotal) * 100) : 0;
+
+        const summaryData: MonthlyInvoiceSummaryData = {
+            month: startOfMonth.toLocaleDateString('cs-CZ', { month: 'long' }),
+            year: startOfMonth.getFullYear(),
+            totalInvoices,
+            totalAmountWithoutVat,
+            totalVatAmount,
+            totalAmountWithVat,
+            classTypeBreakdown: Array.from(classTypeMap.values()).sort((a, b) => b.totalAmount - a.totalAmount),
+            paymentMethodBreakdown: Array.from(paymentMethodMap.values()).sort((a, b) => b.totalAmount - a.totalAmount),
+            vatBreakdown: Array.from(vatRateMap.values()).sort((a, b) => b.rate - a.rate),
+            previousMonthComparison: {
+                invoiceCountChange,
+                revenueChange,
+                percentageChange,
+            },
+        };
+
+        return summaryData;
+    } catch (error) {
+        console.error('Error generating monthly invoice summary:', error);
+        return null;
+    }
+}
+
+// Send monthly invoice summary email
+export async function sendMonthlyInvoiceSummaryEmail(
+    targetMonth?: Date,
+    recipientEmail: string = 'bgaluskova@intaste.cz'
+): Promise<boolean> {
+    try {
+        const summaryData = await generateMonthlyInvoiceSummary(targetMonth);
+        
+        if (!summaryData) {
+            console.error('Failed to generate monthly invoice summary data');
+            return false;
+        }
+
+        // Format currency values
+        const formatCurrency = (amountInCents: number): string => {
+            return (amountInCents / 100).toLocaleString('cs-CZ', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+            });
+        };
+
+        // Format percentage
+        const formatPercentage = (value: number): string => {
+            const sign = value > 0 ? '+' : '';
+            return `${sign}${value.toFixed(1)}%`;
+        };
+
+        // Format change values
+        const formatChange = (value: number): string => {
+            const sign = value > 0 ? '+' : '';
+            return `${sign}${formatCurrency(Math.abs(value))} Kč`;
+        };
+
+        // Build class type breakdown table rows
+        const classTypeRows = summaryData.classTypeBreakdown.map(item => `
+            <tr style="border-bottom:1px solid #e0e0e0;">
+                <td style="padding:8px 0;">${item.name}</td>
+                <td style="text-align:center;padding:8px 0;">${item.count}</td>
+                <td style="text-align:right;padding:8px 0;">${formatCurrency(item.amountWithoutVat)} Kč</td>
+                <td style="text-align:right;padding:8px 0;">${formatCurrency(item.vatAmount)} Kč</td>
+                <td style="text-align:right;padding:8px 0;">${formatCurrency(item.totalAmount)} Kč</td>
+            </tr>
+        `).join('');
+
+        // Build payment method breakdown table rows
+        const paymentMethodRows = summaryData.paymentMethodBreakdown.map(item => `
+            <tr style="border-bottom:1px solid #e0e0e0;">
+                <td style="padding:8px 0;">${item.methodLabel}</td>
+                <td style="text-align:center;padding:8px 0;">${item.count}</td>
+                <td style="text-align:right;padding:8px 0;">${formatCurrency(item.amountWithoutVat)} Kč</td>
+                <td style="text-align:right;padding:8px 0;">${formatCurrency(item.vatAmount)} Kč</td>
+                <td style="text-align:right;padding:8px 0;">${formatCurrency(item.totalAmount)} Kč</td>
+            </tr>
+        `).join('');
+
+        // Build VAT breakdown table rows
+        const vatRows = summaryData.vatBreakdown.map(item => `
+            <tr style="border-bottom:1px solid #e0e0e0;">
+                <td style="padding:8px 0;">${item.rate}%</td>
+                <td style="text-align:center;padding:8px 0;">${item.count}</td>
+                <td style="text-align:right;padding:8px 0;">${formatCurrency(item.baseAmount)} Kč</td>
+                <td style="text-align:right;padding:8px 0;">${formatCurrency(item.vatAmount)} Kč</td>
+                <td style="text-align:right;padding:8px 0;">${formatCurrency(item.totalAmount)} Kč</td>
+            </tr>
+        `).join('');
+
+        // Determine colors for comparison
+        const invoiceChangeColor = summaryData.previousMonthComparison.invoiceCountChange > 0 ? 'color:#16a34a;' : 
+                                  summaryData.previousMonthComparison.invoiceCountChange < 0 ? 'color:#dc2626;' : '';
+        const revenueChangeColor = summaryData.previousMonthComparison.revenueChange > 0 ? 'color:#16a34a;' : 
+                                  summaryData.previousMonthComparison.revenueChange < 0 ? 'color:#dc2626;' : '';
+        const percentageChangeColor = summaryData.previousMonthComparison.percentageChange > 0 ? 'color:#16a34a;' : 
+                                     summaryData.previousMonthComparison.percentageChange < 0 ? 'color:#dc2626;' : '';
+
+        // Replace placeholders in email template
+        let emailHtml = monthlyInvoiceSummaryEmail
+            .replace(/{{month_year}}/g, `${summaryData.month} ${summaryData.year}`)
+            .replace(/{{total_invoices}}/g, summaryData.totalInvoices.toString())
+            .replace(/{{total_amount_without_vat}}/g, formatCurrency(summaryData.totalAmountWithoutVat))
+            .replace(/{{total_vat_amount}}/g, formatCurrency(summaryData.totalVatAmount))
+            .replace(/{{total_amount_with_vat}}/g, formatCurrency(summaryData.totalAmountWithVat))
+            .replace(/{{class_type_breakdown}}/g, classTypeRows)
+            .replace(/{{payment_method_breakdown}}/g, paymentMethodRows)
+            .replace(/{{vat_breakdown}}/g, vatRows)
+            .replace(/{{invoice_count_change}}/g, summaryData.previousMonthComparison.invoiceCountChange >= 0 ? 
+                `+${summaryData.previousMonthComparison.invoiceCountChange}` : 
+                summaryData.previousMonthComparison.invoiceCountChange.toString())
+            .replace(/{{revenue_change}}/g, formatChange(summaryData.previousMonthComparison.revenueChange))
+            .replace(/{{percentage_change}}/g, formatPercentage(summaryData.previousMonthComparison.percentageChange))
+            .replace(/{{generation_date}}/g, new Date().toLocaleDateString('cs-CZ'))
+            .replace(/{{invoice_change_color}}/g, invoiceChangeColor)
+            .replace(/{{revenue_change_color}}/g, revenueChangeColor)
+            .replace(/{{percentage_change_color}}/g, percentageChangeColor);
+
+        // Send email using Resend
+        const resend = new Resend("re_fPhhnprW_2SD7UaFhoM9ZdPo7bhWeMqxc");
+
+        const result = await resend.emails.send({
+            from: "BeBrave Studio <info@bebravestudio.cz>",
+            to: [recipientEmail],
+            subject: `Měsíční přehled faktur - ${summaryData.month} ${summaryData.year}`,
+            html: emailHtml,
+        });
+
+        console.log('Monthly invoice summary email sent successfully:', result);
+        return true;
+    } catch (error) {
+        console.error('Error sending monthly invoice summary email:', error);
+        return false;
+    }
 }
