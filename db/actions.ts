@@ -883,6 +883,7 @@ async function sendConfirmationEmail(
         const emailData: any = {
             from: "BeBrave Studio <info@bebravestudio.cz>",
             to: [userData?.email],
+            bcc: "bgaluskova@intaste.cz",
             subject: `Rezervace lekce ${classWithRelations.classType.name} - ${new Date(classWithRelations.date).toLocaleDateString("cs-CZ", {year: "numeric", month: "long", day: "numeric"})}`,
             html: htmlString,
         };
@@ -964,6 +965,7 @@ async function sendConfirmationEmail(
         });
 
         const result = await resend.emails.send(emailData);
+
 
         console.log("Email sent successfully:", result);
     } catch (error) {
