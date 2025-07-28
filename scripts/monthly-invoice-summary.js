@@ -1,4 +1,4 @@
-#!/usr/bin/env npx tsx
+#!/usr/bin/env node
 
 /**
  * Monthly Invoice Summary Cron Job
@@ -9,7 +9,7 @@
  * Usage: npm run cron:monthly-invoice-summary
  */
 
-import https from 'https';
+const https = require('https');
 
 // Set NODE_ENV to production for proper database connection
 
@@ -21,13 +21,13 @@ async function runMonthlySummary() {
     try {
         console.log('🔄 Making external API call to bebravestudio.cz...');
         
-        // Calculate previous month
+        // Calculate current month
         const now = new Date();
-        const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-        const targetMonth = lastMonth.toISOString().slice(0, 10); // YYYY-MM-DD format
+        const currentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const targetMonth = currentMonth.toISOString().slice(0, 10); // YYYY-MM-DD format
         
-        console.log(`📊 Generating summary for: ${lastMonth.toISOString().slice(0, 7)}`);
-        console.log(`📅 Target month: ${lastMonth.toLocaleDateString('cs-CZ', { year: 'numeric', month: 'long' })}`);
+        console.log(`📊 Generating summary for: ${currentMonth.toISOString().slice(0, 7)}`);
+        console.log(`📅 Target month: ${currentMonth.toLocaleDateString('cs-CZ', { year: 'numeric', month: 'long' })}`);
         
         const baseUrl = 'https://bebravestudio.cz';
         console.log(`🌐 Making request to: ${baseUrl}/api/monthly-invoice-summary`);
@@ -50,7 +50,7 @@ async function runMonthlySummary() {
             }
         };
         
-        const success = await new Promise<boolean>((resolve) => {
+        const success = await new Promise((resolve) => {
             const req = https.request(options, (res) => {
                 let data = '';
                 
@@ -105,7 +105,7 @@ async function runMonthlySummary() {
         }
     } catch (error) {
         console.error('💥 Error in monthly summary cron job:', error);
-        console.error('Stack trace:', (error as Error).stack);
+        console.error('Stack trace:', error.stack);
         
         // Log additional context for debugging
         console.error('📍 Current working directory:', process.cwd());
