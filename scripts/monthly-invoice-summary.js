@@ -24,7 +24,9 @@ async function runMonthlySummary() {
         // Calculate current month
         const now = new Date();
         const currentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        const targetMonth = currentMonth.toISOString().slice(0, 10); // YYYY-MM-DD format
+        const previousMonth = new Date(currentMonth);
+        previousMonth.setMonth(previousMonth.getMonth() - 1);
+        const targetMonth = previousMonth.toISOString().slice(0, 7); // Format YYYY-MM
         
         console.log(`📊 Generating summary for: ${currentMonth.toISOString().slice(0, 7)}`);
         console.log(`📅 Target month: ${currentMonth.toLocaleDateString('cs-CZ', { year: 'numeric', month: 'long' })}`);
