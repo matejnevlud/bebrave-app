@@ -26,6 +26,7 @@ import {PDFMonthlySummaryService} from "@/lib/services/pdf-monthly-summary";
 import {nexiPaymentService} from "@/lib/services/nexi";
 import {PDFInvoiceService} from "@/lib/services/pdf-invoice";
 import {generateSecureInvoicePdfUrl} from "@/lib/invoice-security";
+import {picnicReservationEmail} from "@/db/picnic_reservation_email";
 
 // Keep inmemory last access token
 const CLOUD_ID = process.env.CLOUD_ID || "373067553";
@@ -784,6 +785,8 @@ async function sendConfirmationEmail(
         let htmlString = reservationEmail;
 
         if (classWithRelations.classTypeId === 21) htmlString = reservation500Email;
+        if (classWithRelations.classTypeId === 24) htmlString = picnicReservationEmail;
+
 
         // Replace placeholders with actual data
         htmlString = htmlString.replace("{{studio_name}}", "BeBrave Studio");

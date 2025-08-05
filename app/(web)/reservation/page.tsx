@@ -302,9 +302,11 @@ export default function ReservationPage() {
 
     // allow QR only on class id 2
     const [allowQr, setAllowQr] = useState<boolean>(false);
+    const [disableOnsite, setDisableOnsite] = useState<boolean>(false);
 
     useEffect(() => {
         setAllowQr(selectedClass?.classTypeId === 21); // Assuming classType.id 2 is the one that allows QR payment
+        setDisableOnsite(selectedClass?.classTypeId == 24); // Disable onsite payment for all classes except classType.id 2
     }, [selectedClass]);
 
     // Handle form field changes and save to localStorage
@@ -816,9 +818,10 @@ export default function ReservationPage() {
                 Platební metoda
               </span>
                             <PaymentMethodRadioGroup
-                                allowOsobne={!allowQr}
+                                allowOsobne={!allowQr && !disableOnsite}
                                 allowQr={allowQr}
-                                value={formData.paymentMethod}
+                                defaultValue={disableOnsite ? "credit_card" : null}
+                                value={disableOnsite ? "credit_card" : formData.paymentMethod}
                                 onChange={(value) =>
                                     handleFormFieldChange("paymentMethod", typeof value === 'string' ? value : value.target.value)
                                 }
