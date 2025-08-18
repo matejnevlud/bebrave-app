@@ -1,7 +1,7 @@
 export default function BlogLayout({
-                                       children,
-                                   }: {
-    children: React.ReactNode;
+  children,
+}: {
+  children: React.ReactNode;
 }) {
-    return <section className="">{children}</section>;
+  return <section className="">{children}</section>;
 }

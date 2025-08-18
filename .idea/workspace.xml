@@ -5,13 +5,75 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="878e36bd-1ad8-483a-aae1-c8c02b1128eb" name="Changes" comment="init base">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(administration)/admin/invoices/PDFViewer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(administration)/admin/invoices/PDFViewer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(administration)/admin/invoices/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(administration)/admin/invoices/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(administration)/admin/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(administration)/admin/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(administration)/admin/lekce/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(administration)/admin/lekce/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(administration)/admin/login/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(administration)/admin/login/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(administration)/admin/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(administration)/admin/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(administration)/admin/sidebar-items.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(administration)/admin/sidebar-items.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(administration)/admin/sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(administration)/admin/sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(administration)/admin/team-avatar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(administration)/admin/team-avatar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(administration)/admin/treneri/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(administration)/admin/treneri/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(administration)/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(administration)/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(web)/Lectors.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/Lectors.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(web)/TrainersForClass.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/TrainersForClass.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(web)/about/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/about/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(web)/about/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/about/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(web)/blog/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/blog/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(web)/blog/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/blog/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(web)/docs/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/docs/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(web)/docs/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/docs/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(web)/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(web)/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(web)/pricing/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/pricing/layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(web)/pricing/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/pricing/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(web)/reservation/layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/reservation/layout.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(web)/reservation/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/reservation/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(web)/reservation/payment/cancel/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/reservation/payment/cancel/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(web)/reservation/payment/success/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/reservation/payment/success/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/debug/email-preview/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/debug/email-preview/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/invoices/[id]/email/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/invoices/[id]/email/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/invoices/[id]/pdf/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/invoices/[id]/pdf/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/monthly-invoice-summary/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/monthly-invoice-summary/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/payment/webhook/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/payment/webhook/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/api/sentry-example-api/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/api/sentry-example-api/route.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/error.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/error.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/layout.tsx" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/global-error.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/global-error.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/providers.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/providers.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/sentry-example-page/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/sentry-example-page/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/uploads/[query]/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/uploads/[query]/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/CTA.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/CTA.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/HLSPlayer.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/HLSPlayer.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/HLSPlayerControls.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/HLSPlayerControls.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/admin/sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/admin/sidebar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/blocks/HorizontalSteps.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/blocks/HorizontalSteps.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/blocks/PaymentMethodItem.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/blocks/PaymentMethodItem.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/blocks/PaymentMethodRadio.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/blocks/PaymentMethodRadio.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/counter.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/counter.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/icons.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/icons.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/navbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/navbar.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/primitives.ts" beforeDir="false" afterPath="$PROJECT_DIR$/components/primitives.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/theme-switch.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/theme-switch.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/fonts.ts" beforeDir="false" afterPath="$PROJECT_DIR$/config/fonts.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/config/site.ts" beforeDir="false" afterPath="$PROJECT_DIR$/config/site.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/actions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/monthly_invoice_summary_email.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/monthly_invoice_summary_email.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/picnic_reservation_email.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/picnic_reservation_email.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/drizzle.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/instrumentation-client.ts" beforeDir="false" afterPath="$PROJECT_DIR$/instrumentation-client.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/instrumentation.ts" beforeDir="false" afterPath="$PROJECT_DIR$/instrumentation.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/invoice-security.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/invoice-security.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/server-auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/server-auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/email-invoice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/email-invoice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/nexi.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/nexi.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/pdf-invoice.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/pdf-invoice.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/services/pdf-monthly-summary.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/services/pdf-monthly-summary.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/utils/form-storage.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/utils/form-storage.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/types/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/types/index.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

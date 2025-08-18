@@ -1,90 +1,90 @@
 import puppeteer from "puppeteer";
 
-import {Invoice} from "@/db/schema";
+import { Invoice } from "@/db/schema";
 
 export interface InvoiceData {
-    invoice: Invoice & {
-        reservation: {
-            class: {
-                classType: { name: string };
-                trainer: { name: string };
-                date: string;
-                time: string;
-            };
-        };
+  invoice: Invoice & {
+    reservation: {
+      class: {
+        classType: { name: string };
+        trainer: { name: string };
+        date: string;
+        time: string;
+      };
     };
-    companyInfo: {
-        name: string;
-        address: string;
-        city: string;
-        postalCode: string;
-        country: string;
-        ico: string;
-        dic: string;
-        email: string;
-        phone: string;
-    };
+  };
+  companyInfo: {
+    name: string;
+    address: string;
+    city: string;
+    postalCode: string;
+    country: string;
+    ico: string;
+    dic: string;
+    email: string;
+    phone: string;
+  };
 }
 
 export class PDFInvoiceService {
-    private static readonly COMPANY_INFO = {
-        name: "BeBrave Studio",
-        address: "Důlní 3394/4",
-        city: "Moravská Ostrava a Přívoz",
-        postalCode: "702 00",
-        country: "Česká republika",
-        ico: "12345678", // Replace with actual IČO
-        dic: "CZ12345678", // Replace with actual DIČ
-        email: "info@bebravestudio.cz",
-        phone: "+420 731 906 623",
+  private static readonly COMPANY_INFO = {
+    name: "BeBrave Studio",
+    address: "Důlní 3394/4",
+    city: "Moravská Ostrava a Přívoz",
+    postalCode: "702 00",
+    country: "Česká republika",
+    ico: "12345678", // Replace with actual IČO
+    dic: "CZ12345678", // Replace with actual DIČ
+    email: "info@bebravestudio.cz",
+    phone: "+420 731 906 623",
+  };
+
+  /**
+   * Generate PDF invoice as buffer
+   */
+  static async generateInvoicePDF(invoiceData: InvoiceData): Promise<Buffer> {
+    const html = this.generateInvoiceHTML(invoiceData);
+
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    });
+
+    try {
+      const page = await browser.newPage();
+
+      await page.setContent(html, { waitUntil: "networkidle0" });
+
+      const pdfBuffer = await page.pdf({
+        format: "A4",
+        margin: { top: "1cm", bottom: "1cm", left: "1cm", right: "1cm" },
+        displayHeaderFooter: false,
+        printBackground: true,
+      });
+
+      return pdfBuffer as any;
+    } finally {
+      await browser.close();
+    }
+  }
+
+  /**
+   * Generate invoice HTML template
+   */
+  private static generateInvoiceHTML(invoiceData: InvoiceData): string {
+    const { invoice, companyInfo } = invoiceData;
+    const reservation = invoice.reservation;
+    const classInfo = reservation.class;
+
+    const formatAmount = (amountInCents: number) => {
+      return `${(amountInCents / 100).toFixed(2)} Kč`;
     };
 
-    /**
-     * Generate PDF invoice as buffer
-     */
-    static async generateInvoicePDF(invoiceData: InvoiceData): Promise<Buffer> {
-        const html = this.generateInvoiceHTML(invoiceData);
+    const formatDate = (date: Date | string) => {
+      return new Date(date).toLocaleDateString("cs-CZ");
+    };
 
-        const browser = await puppeteer.launch({
-            headless: true,
-            args: ["--no-sandbox", "--disable-setuid-sandbox"],
-        });
-
-        try {
-            const page = await browser.newPage();
-
-            await page.setContent(html, {waitUntil: "networkidle0"});
-
-            const pdfBuffer = await page.pdf({
-                format: "A4",
-                margin: {top: "1cm", bottom: "1cm", left: "1cm", right: "1cm"},
-                displayHeaderFooter: false,
-                printBackground: true,
-            });
-
-            return pdfBuffer as any;
-        } finally {
-            await browser.close();
-        }
-    }
-
-    /**
-     * Generate invoice HTML template
-     */
-    private static generateInvoiceHTML(invoiceData: InvoiceData): string {
-        const {invoice, companyInfo} = invoiceData;
-        const reservation = invoice.reservation;
-        const classInfo = reservation.class;
-
-        const formatAmount = (amountInCents: number) => {
-            return `${(amountInCents / 100).toFixed(2)} Kč`;
-        };
-
-        const formatDate = (date: Date | string) => {
-            return new Date(date).toLocaleDateString("cs-CZ");
-        };
-
-        return `
+    return `
 <!DOCTYPE html>
 <html lang="cs">
 <head>
@@ -386,32 +386,32 @@ export class PDFInvoiceService {
 </body>
 </html>
     `;
-    }
+  }
 
-    /**
-     * Generate invoice file name
-     */
-    static generateInvoiceFileName(invoiceNumber: number): string {
-        return `faktura-${invoiceNumber}.pdf`;
-    }
+  /**
+   * Generate invoice file name
+   */
+  static generateInvoiceFileName(invoiceNumber: number): string {
+    return `faktura-${invoiceNumber}.pdf`;
+  }
 
-    /**
-     * Save PDF to file system (optional)
-     */
-    static async saveInvoicePDF(
-        invoiceData: InvoiceData,
-        filePath: string,
-    ): Promise<void> {
-        const pdfBuffer = await this.generateInvoicePDF(invoiceData);
-        const fs = require("fs");
+  /**
+   * Save PDF to file system (optional)
+   */
+  static async saveInvoicePDF(
+    invoiceData: InvoiceData,
+    filePath: string,
+  ): Promise<void> {
+    const pdfBuffer = await this.generateInvoicePDF(invoiceData);
+    const fs = require("fs");
 
-        fs.writeFileSync(filePath, pdfBuffer);
-    }
+    fs.writeFileSync(filePath, pdfBuffer);
+  }
 
-    /**
-     * Get default company info
-     */
-    static getDefaultCompanyInfo() {
-        return this.COMPANY_INFO;
-    }
+  /**
+   * Get default company info
+   */
+  static getDefaultCompanyInfo() {
+    return this.COMPANY_INFO;
+  }
 }

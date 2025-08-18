@@ -1,106 +1,106 @@
-import {Resend} from "resend";
+import { Resend } from "resend";
 
-import {PDFInvoiceService} from "./pdf-invoice";
+import { PDFInvoiceService } from "./pdf-invoice";
 
-import {generateSecureInvoicePdfUrl} from "@/lib/invoice-security";
-import {getInvoice} from "@/db/actions";
+import { generateSecureInvoicePdfUrl } from "@/lib/invoice-security";
+import { getInvoice } from "@/db/actions";
 
 export class EmailInvoiceService {
-    private static readonly resend = new Resend(
-        "re_fPhhnprW_2SD7UaFhoM9ZdPo7bhWeMqxc",
-    );
+  private static readonly resend = new Resend(
+    "re_fPhhnprW_2SD7UaFhoM9ZdPo7bhWeMqxc",
+  );
 
-    /**
-     * Send invoice email with PDF attachment
-     */
-    static async sendInvoiceEmail(
-        invoiceId: number,
-        recipientEmail?: string,
-    ): Promise<boolean> {
-        try {
-            // Get invoice with full details
-            const invoice = await getInvoice(invoiceId);
+  /**
+   * Send invoice email with PDF attachment
+   */
+  static async sendInvoiceEmail(
+    invoiceId: number,
+    recipientEmail?: string,
+  ): Promise<boolean> {
+    try {
+      // Get invoice with full details
+      const invoice = await getInvoice(invoiceId);
 
-            if (!invoice) {
-                console.error("Invoice not found:", invoiceId);
+      if (!invoice) {
+        console.error("Invoice not found:", invoiceId);
 
-                return false;
-            }
+        return false;
+      }
 
-            // Use provided email or customer email
-            const email = recipientEmail || invoice.customerEmail;
+      // Use provided email or customer email
+      const email = recipientEmail || invoice.customerEmail;
 
-            if (!email) {
-                console.error("No email address provided for invoice:", invoiceId);
+      if (!email) {
+        console.error("No email address provided for invoice:", invoiceId);
 
-                return false;
-            }
+        return false;
+      }
 
-            // Use remote PDF URL for email attachment
-            const baseUrl = process.env.VERCEL_URL
-                ? `https://${process.env.VERCEL_URL}`
-                : process.env.NODE_ENV === "development"
-                    ? "http://localhost:3000"
-                    : "https://bebravestudio.cz";
+      // Use remote PDF URL for email attachment
+      const baseUrl = process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : process.env.NODE_ENV === "development"
+          ? "http://localhost:3000"
+          : "https://bebravestudio.cz";
 
-            const pdfUrl = generateSecureInvoicePdfUrl(
-                baseUrl,
-                invoice.id,
-                invoice.customerEmail,
-                invoice.createdAt,
-            );
-            const fileName = PDFInvoiceService.generateInvoiceFileName(
-                invoice.invoiceNumber,
-            );
+      const pdfUrl = generateSecureInvoicePdfUrl(
+        baseUrl,
+        invoice.id,
+        invoice.customerEmail,
+        invoice.createdAt,
+      );
+      const fileName = PDFInvoiceService.generateInvoiceFileName(
+        invoice.invoiceNumber,
+      );
 
-            // Prepare email content
-            const emailSubject = `Faktura ${invoice.invoiceNumber} - BeBrave Studio`;
-            const emailHtml = this.generateInvoiceEmailHTML(invoice);
+      // Prepare email content
+      const emailSubject = `Faktura ${invoice.invoiceNumber} - BeBrave Studio`;
+      const emailHtml = this.generateInvoiceEmailHTML(invoice);
 
-            // Send email with PDF attachment using remote URL
-            const result = await this.resend.emails.send({
-                from: "BeBrave Studio <info@bebravestudio.cz>",
-                to: [email],
-                subject: emailSubject,
-                html: emailHtml,
-                attachments: [
-                    {
-                        path: pdfUrl,
-                        filename: fileName,
-                    },
-                ],
-            });
+      // Send email with PDF attachment using remote URL
+      const result = await this.resend.emails.send({
+        from: "BeBrave Studio <info@bebravestudio.cz>",
+        to: [email],
+        subject: emailSubject,
+        html: emailHtml,
+        attachments: [
+          {
+            path: pdfUrl,
+            filename: fileName,
+          },
+        ],
+      });
 
-            console.log("Invoice email sent successfully:", result);
+      console.log("Invoice email sent successfully:", result);
 
-            return true;
-        } catch (error) {
-            console.error("Error sending invoice email:", error);
+      return true;
+    } catch (error) {
+      console.error("Error sending invoice email:", error);
 
-            return false;
-        }
+      return false;
     }
+  }
 
-    /**
-     * Generate email HTML for invoice
-     */
-    private static generateInvoiceEmailHTML(invoice: any): string {
-        const formatAmount = (amountInCents: number) => {
-            return `${(amountInCents / 100).toFixed(2)} Kč`;
-        };
+  /**
+   * Generate email HTML for invoice
+   */
+  private static generateInvoiceEmailHTML(invoice: any): string {
+    const formatAmount = (amountInCents: number) => {
+      return `${(amountInCents / 100).toFixed(2)} Kč`;
+    };
 
-        const formatDate = (date: Date | string) => {
-            return new Date(date).toLocaleDateString("cs-CZ");
-        };
+    const formatDate = (date: Date | string) => {
+      return new Date(date).toLocaleDateString("cs-CZ");
+    };
 
-        const statusText =
-            invoice.status === "paid"
-                ? "uhrazena"
-                : invoice.status === "issued"
-                    ? "vystavena"
-                    : "zrušena";
+    const statusText =
+      invoice.status === "paid"
+        ? "uhrazena"
+        : invoice.status === "issued"
+          ? "vystavena"
+          : "zrušena";
 
-        return `
+    return `
 <!DOCTYPE html>
 <html lang="cs">
 <head>
@@ -242,54 +242,54 @@ export class EmailInvoiceService {
 </body>
 </html>
     `;
+  }
+
+  /**
+   * Send invoice reminder email
+   */
+  static async sendInvoiceReminder(invoiceId: number): Promise<boolean> {
+    try {
+      const invoice = await getInvoice(invoiceId);
+
+      if (!invoice || invoice.status !== "issued") {
+        console.error("Invoice not found or not in issued status:", invoiceId);
+
+        return false;
+      }
+
+      const reminderSubject = `Připomínka faktury ${invoice.invoiceNumber} - BeBrave Studio`;
+      const reminderHtml = this.generateReminderEmailHTML(invoice);
+
+      const result = await this.resend.emails.send({
+        from: "BeBrave Studio <info@bebravestudio.cz>",
+        to: [invoice.customerEmail],
+        subject: reminderSubject,
+        html: reminderHtml,
+      });
+
+      console.log("Invoice reminder sent successfully:", result);
+
+      return true;
+    } catch (error) {
+      console.error("Error sending invoice reminder:", error);
+
+      return false;
     }
+  }
 
-    /**
-     * Send invoice reminder email
-     */
-    static async sendInvoiceReminder(invoiceId: number): Promise<boolean> {
-        try {
-            const invoice = await getInvoice(invoiceId);
+  /**
+   * Generate reminder email HTML
+   */
+  private static generateReminderEmailHTML(invoice: any): string {
+    const formatAmount = (amountInCents: number) => {
+      return `${(amountInCents / 100).toFixed(2)} Kč`;
+    };
 
-            if (!invoice || invoice.status !== "issued") {
-                console.error("Invoice not found or not in issued status:", invoiceId);
+    const formatDate = (date: Date | string) => {
+      return new Date(date).toLocaleDateString("cs-CZ");
+    };
 
-                return false;
-            }
-
-            const reminderSubject = `Připomínka faktury ${invoice.invoiceNumber} - BeBrave Studio`;
-            const reminderHtml = this.generateReminderEmailHTML(invoice);
-
-            const result = await this.resend.emails.send({
-                from: "BeBrave Studio <info@bebravestudio.cz>",
-                to: [invoice.customerEmail],
-                subject: reminderSubject,
-                html: reminderHtml,
-            });
-
-            console.log("Invoice reminder sent successfully:", result);
-
-            return true;
-        } catch (error) {
-            console.error("Error sending invoice reminder:", error);
-
-            return false;
-        }
-    }
-
-    /**
-     * Generate reminder email HTML
-     */
-    private static generateReminderEmailHTML(invoice: any): string {
-        const formatAmount = (amountInCents: number) => {
-            return `${(amountInCents / 100).toFixed(2)} Kč`;
-        };
-
-        const formatDate = (date: Date | string) => {
-            return new Date(date).toLocaleDateString("cs-CZ");
-        };
-
-        return `
+    return `
 <!DOCTYPE html>
 <html lang="cs">
 <head>
@@ -381,5 +381,5 @@ export class EmailInvoiceService {
 </body>
 </html>
     `;
-    }
+  }
 }
