@@ -31,7 +31,7 @@ export default function TrainersForClass(props: {
             style={{justifyContent: props.right ? "flex-end" : "flex-start"}}
         >
             {trainers.map((trainer) => (
-                <div>
+                <div key={trainer.id}>
                     <Avatar
                         alt={trainer.name}
                         className="inline-flex me-2 hover:scale-125 transition-transform duration-200"

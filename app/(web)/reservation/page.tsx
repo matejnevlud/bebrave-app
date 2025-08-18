@@ -12,7 +12,7 @@ import {
     Form,
     Chip,
 } from "@heroui/react";
-import React, {Fragment, useEffect, useState} from "react";
+import React, {Fragment, Suspense, useEffect, useState} from "react";
 import {today, getLocalTimeZone, CalendarDate} from "@internationalized/date";
 import {I18nProvider, useLocale} from "@react-aria/i18n";
 import {Button} from "@heroui/button";
@@ -37,6 +37,7 @@ import {
     getTrainers,
 } from "@/db/actions";
 import {FormStorage, ReservationFormData} from "@/lib/utils/form-storage";
+import dynamic from "next/dynamic";
 
 const users = [
     {
@@ -112,7 +113,7 @@ type User = {
     email: string;
 };
 
-export default function ReservationPage() {
+ function ReservationPage() {
     const [selected, setSelected] = useState("videos");
 
     const [trainers, setTrainers] = useState<TrainerWithRelations[]>([]);
@@ -121,6 +122,8 @@ export default function ReservationPage() {
     const [classTypes, setClassTypes] = useState<ClassType[]>([]);
 
     const [isFetchingData, setIsFetchingData] = useState<boolean>(true);
+    const [isHydrated, setIsHydrated] = useState(false);
+    const [currentDate, setCurrentDate] = useState<CalendarDate | null>(null);
 
     async function fetchData() {
         const t = await getTrainers();
@@ -140,6 +143,8 @@ export default function ReservationPage() {
 
     useEffect(() => {
         fetchData();
+        setIsHydrated(true);
+        setCurrentDate(today(getLocalTimeZone()));
     }, []);
 
     // Load form data from localStorage on component mount
@@ -151,15 +156,8 @@ export default function ReservationPage() {
         }
     }, []);
 
-    let now = today(getLocalTimeZone());
-
-    let disabledRanges = [
-        [now, now.add({days: 5})],
-        [now.add({days: 14}), now.add({days: 16})],
-        [now.add({days: 23}), now.add({days: 24})],
-    ];
-
-    let {locale} = useLocale();
+    // Moved to useEffect to prevent hydration issues
+    // Disabled ranges will be handled after hydration
 
     // FORM DATA
     const [selectedClassType, setSelectedClassType] = useState<ClassType | null>(
@@ -537,33 +535,35 @@ export default function ReservationPage() {
                     </Select>
                 </div>
 
-                <I18nProvider locale="cs-CZ">
-                    <Calendar
-                        hideDisabledDates
-                        aria-label="Date"
-                        calendarWidth={"16rem"}
-                        className={isFetchingData ? "opacity-50" : ""}
-                        isDateUnavailable={isDateUnavailable}
-                        minValue={today(getLocalTimeZone()) as any}
-                        pageBehavior={"single"}
-                        value={selectedDate as any}
-                        visibleMonths={3}
-                        weekdayStyle="short"
-                        onChange={setSelectedDate as any}
-                    />
-                </I18nProvider>
+                {isHydrated && (
+                    <I18nProvider locale="cs-CZ">
+                        <Calendar
+                            hideDisabledDates
+                            aria-label="Date"
+                            calendarWidth={"16rem"}
+                            className={isFetchingData ? "opacity-50" : ""}
+                            isDateUnavailable={isDateUnavailable}
+                            minValue={currentDate as any}
+                            pageBehavior={"single"}
+                            value={selectedDate as any}
+                            visibleMonths={3}
+                            weekdayStyle="short"
+                            onChange={setSelectedDate as any}
+                        />
+                    </I18nProvider>
+                )}
 
                 <div className="w-full max-w-3xl pt-6">
                     {Object.entries(classesToRender).map(([date, classes]) => (
-                        <Fragment>
+                        <Fragment key={date}>
                             <h2 className="text-xl font-bold text-center py-3">
-                                {new Date(date).toLocaleDateString("cs-CZ", {
+                                {isHydrated ? new Date(date).toLocaleDateString("cs-CZ", {
                                     weekday: "long",
-                                })}{" "}
-                                {new Date(date).toLocaleDateString("cs-CZ")}
+                                }) : ''}{" "}
+                                {isHydrated ? new Date(date).toLocaleDateString("cs-CZ") : ''}
                             </h2>
                             {classes.map((c: ClassWithRelations) => (
-                                <div className="flex my-6 gap-3 sm:gap-6 items-start sm:items-center flex-col sm:flex-row">
+                                <div key={c.id} className="flex my-6 gap-3 sm:gap-6 items-start sm:items-center flex-col sm:flex-row">
                                     <div className=" ml-4 sm:ml-0 lg:absolute lg:ml-[-5rem] items-center flex flex-row sm:flex-col gap-2 justify-center lg:w-14">
                                         <b>{c.time}</b>
                                         <span className="text-tiny">
@@ -638,7 +638,11 @@ export default function ReservationPage() {
                                                         color="primary"
                                                         size="md"
                                                         variant="solid"
-                                                        onClick={() => setSelectedClass(c)}
+                                                        as="span"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setSelectedClass(c);
+                                                        }}
                                                     >
                                                         Rezervovat
                                                     </Button>
@@ -648,6 +652,7 @@ export default function ReservationPage() {
                                                         isDisabled
                                                         className={"hidden sm:inline-flex"}
                                                         color="danger"
+                                                        as="span"
                                                     >
                                                         Vyprodáno
                                                     </Button>
@@ -679,10 +684,10 @@ export default function ReservationPage() {
                         <Icon className="inline-block me-2" icon={"weui:back-filled"}/>
                     </Link>
                     <h2 className="text-xl text-center font-bold pt-6">
-                        {new Date(selectedClass?.date ?? 0).toLocaleDateString("cs-CZ", {
+                        {isHydrated ? new Date(selectedClass?.date ?? 0).toLocaleDateString("cs-CZ", {
                             weekday: "long",
-                        })}{" "}
-                        {new Date(selectedClass?.date ?? 0).toLocaleDateString("cs-CZ")} v{" "}
+                        }) : ''}{" "}
+                        {isHydrated ? new Date(selectedClass?.date ?? 0).toLocaleDateString("cs-CZ") : ''} v{" "}
                         {selectedClass?.time}
                     </h2>
                 </div>
@@ -910,10 +915,10 @@ export default function ReservationPage() {
                     <p className="text-lg text-center">
                         Vaše rezervace na lekci <b>{selectedClass?.classType.name}</b> dne{" "}
                         <b>
-                            {new Date(selectedClass?.date ?? -1).toLocaleDateString("cs-CZ", {
+                            {isHydrated ? new Date(selectedClass?.date ?? -1).toLocaleDateString("cs-CZ", {
                                 weekday: "long",
-                            })}{" "}
-                            {new Date(selectedClass?.date ?? -1).toLocaleDateString("cs-CZ")}{" "}
+                            }) : ''}{" "}
+                            {isHydrated ? new Date(selectedClass?.date ?? -1).toLocaleDateString("cs-CZ") : ''}{" "}
                             v {selectedClass?.time}
                         </b>{" "}
                         byla úspěšně odeslána. Těšíme se na vás, tým BeBrave.
@@ -923,3 +928,9 @@ export default function ReservationPage() {
         </div>
     );
 }
+
+
+const ReservationPageNoSSR = dynamic(() => Promise.resolve(ReservationPage), {
+    ssr: false,
+});
+export default ReservationPageNoSSR;
