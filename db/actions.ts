@@ -290,20 +290,36 @@ export async function updateClass(
 }
 
 export async function deleteClass(classId: number): Promise<boolean> {
-  try {
-    // Delete the class from the database
-    const result = await db
-      .delete(classesTable)
-      .where(eq(classesTable.id, classId));
+   try {
+     // Delete the class from the database
+     const result = await db
+       .delete(classesTable)
+       .where(eq(classesTable.id, classId));
 
-    return true;
-  } catch (error) {
-    console.error("Error deleting class:", error);
-    throw new Error(
-      "Nastala se chyba při mazání lekce. Zkuste to prosím znovu později.",
-    );
-  }
-}
+     return true;
+   } catch (error) {
+     console.error("Error deleting class:", error);
+     throw new Error(
+       "Nastala se chyba při mazání lekce. Zkuste to prosím znovu později.",
+     );
+   }
+ }
+
+ export async function deleteClassType(classTypeId: number): Promise<boolean> {
+   try {
+     // Delete the class type from the database
+     const result = await db
+       .delete(classTypesTable)
+       .where(eq(classTypesTable.id, classTypeId));
+
+     return true;
+   } catch (error) {
+     console.error("Error deleting class type:", error);
+     throw new Error(
+       "Nastala se chyba při mazání typu lekce. Zkuste to prosím znovu později.",
+     );
+   }
+ }
 
 export async function createClassType(
   classTypeData: Partial<ClassType>,
@@ -823,6 +839,16 @@ async function sendConfirmationEmail(
       "{{first_name}}",
       userData?.firstName || "Zákazník",
     );
+
+    // Add custom email message if it exists
+    let customMessageHtml = "";
+    if (classWithRelations.classType.customEmailMessage && classWithRelations.classType.customEmailMessage.trim() !== "") {
+      customMessageHtml = `
+        <div style="background:#f0f9ff;border:1px solid #3b82f6;border-radius:6px;padding:16px 20px;margin:16px 0;">
+          <p style="margin:0 0 16px 0;font-size:14px;color:#1f2937;">${classWithRelations.classType.customEmailMessage}</p>
+        </div>`;
+    }
+    htmlString = htmlString.replace("{{custom_email_message}}", customMessageHtml);
     htmlString = htmlString.replace(
       "{{date}}",
       new Date(classWithRelations?.date ?? -1).toLocaleDateString("cs-CZ", {

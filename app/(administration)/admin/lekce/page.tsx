@@ -34,6 +34,7 @@ import {
   createClass,
   createClassType,
   deleteClass,
+  deleteClassType,
   getClasses,
   getClassTypes,
   getTrainers,
@@ -264,6 +265,23 @@ export default function LekcePage() {
 
   const [isFetchingData, setIsFetchingData] = useState<boolean>(true);
 
+  async function handleDeleteClassType(id: number) {
+    console.log("Deleting class type with id:", id);
+    // Here you would typically call an API to delete the class type
+    setClassTypes((prevClassTypes) => prevClassTypes.filter((ct) => ct.id !== id));
+    try {
+      setIsLoading(true);
+      await deleteClassType(id);
+    } catch (error) {
+      console.error("Error deleting class type:", error);
+      // Optionally, you can show an error message to the user
+      alert("Failed to delete class type. Please try again later.");
+    } finally {
+      setIsLoading(false);
+    }
+    // After deletion, unset the class type from the state
+  }
+
   async function fetchData() {
     const t = await getTrainers();
     const ct = await getClassTypes();
@@ -321,6 +339,7 @@ export default function LekcePage() {
         defaultCapacity: parseInt(data.defaultCapacity as string, 10),
         price: parseInt(data.price as string),
         allowedPaymentMethods: allowedPaymentMethods,
+        customEmailMessage: data.customEmailMessage as string,
       };
 
       console.log(updatedClassType);
@@ -415,6 +434,7 @@ export default function LekcePage() {
         description: data.description as string,
         image: data.image as string, // Assuming you have an image URL or path
         allowedPaymentMethods: allowedPaymentMethods,
+        customEmailMessage: data.customEmailMessage as string,
       };
 
       console.log(newClassType);
@@ -529,9 +549,16 @@ export default function LekcePage() {
               </TableCell>
 
               <TableCell>
-                <Button color="primary" isLoading={isLoading} size="md">
-                  Detail
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button color="primary" isLoading={isLoading} size="md">
+                    Detail
+                  </Button>
+                  <Tooltip color="danger" content="Smazat typ lekce">
+                    <span className="text-lg text-danger cursor-pointer active:opacity-50" onClick={() => handleDeleteClassType(item.id)}>
+                      <DeleteIcon />
+                    </span>
+                  </Tooltip>
+                </div>
               </TableCell>
             </TableRow>
           )}
@@ -562,6 +589,17 @@ export default function LekcePage() {
             name="description"
             placeholder="Zadejte popis lekce"
           />
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Vlastní zpráva v e-mailu</label>
+            <textarea
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
+              maxLength={1000}
+              name="customEmailMessage"
+              placeholder="Zadejte vlastní zprávu, která se zobrazí v potvrzovacím e-mailu"
+              rows={4}
+            />
+          </div>
 
           <NumberInput
             isRequired
@@ -691,6 +729,7 @@ export default function LekcePage() {
                     placeholder="Zadejte název lekce"
                   />
 
+
                   <NumberInput
                     isRequired
                     defaultValue={selectedClassType?.duration}
@@ -733,58 +772,75 @@ export default function LekcePage() {
                     name="price"
                   />
 
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Povolené platební metody</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {(() => {
-                        const paymentConfig = selectedClassType?.allowedPaymentMethods
-                          ? parseAllowedPaymentMethods(selectedClassType.allowedPaymentMethods)
-                          : { allowCreditCard: true, allowQr: true, allowOnsite: true, allowCredit: false };
 
-                        return (
-                          <>
-                            <label className="flex items-center space-x-2">
-                              <input
-                                type="checkbox"
-                                name="allowCreditCard"
-                                defaultChecked={paymentConfig.allowCreditCard}
-                                className="rounded"
-                              />
-                              <span className="text-sm">Platební karta</span>
-                            </label>
-                            <label className="flex items-center space-x-2">
-                              <input
-                                type="checkbox"
-                                name="allowQr"
-                                defaultChecked={paymentConfig.allowQr}
-                                className="rounded"
-                              />
-                              <span className="text-sm">QR platba</span>
-                            </label>
-                            <label className="flex items-center space-x-2">
-                              <input
-                                type="checkbox"
-                                name="allowOnsite"
-                                defaultChecked={paymentConfig.allowOnsite}
-                                className="rounded"
-                              />
-                              <span className="text-sm">Na místě</span>
-                            </label>
-                            <label className="flex items-center space-x-2">
-                              <input
-                                type="checkbox"
-                                name="allowCredit"
-                                defaultChecked={paymentConfig.allowCredit}
-                                className="rounded"
-                              />
-                              <span className="text-sm">Zákaznický kredit</span>
-                            </label>
-                          </>
-                        );
-                      })()}
+
+
+                  <div className="space-y-2 col-span-full flex gap-4">
+
+                    <div className="">
+                      <label className="text-sm font-medium">Povolené platební metody</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {(() => {
+                          const paymentConfig = selectedClassType?.allowedPaymentMethods
+                              ? parseAllowedPaymentMethods(selectedClassType.allowedPaymentMethods)
+                              : { allowCreditCard: true, allowQr: true, allowOnsite: true, allowCredit: false };
+
+                          return (
+                              <>
+                                <label className="flex items-center space-x-2">
+                                  <input
+                                      type="checkbox"
+                                      name="allowCreditCard"
+                                      defaultChecked={paymentConfig.allowCreditCard}
+                                      className="rounded"
+                                  />
+                                  <span className="text-sm">Platební karta</span>
+                                </label>
+                                <label className="flex items-center space-x-2">
+                                  <input
+                                      type="checkbox"
+                                      name="allowQr"
+                                      defaultChecked={paymentConfig.allowQr}
+                                      className="rounded"
+                                  />
+                                  <span className="text-sm">QR platba</span>
+                                </label>
+                                <label className="flex items-center space-x-2">
+                                  <input
+                                      type="checkbox"
+                                      name="allowOnsite"
+                                      defaultChecked={paymentConfig.allowOnsite}
+                                      className="rounded"
+                                  />
+                                  <span className="text-sm">Na místě</span>
+                                </label>
+                                <label className="flex items-center space-x-2">
+                                  <input
+                                      type="checkbox"
+                                      name="allowCredit"
+                                      defaultChecked={paymentConfig.allowCredit}
+                                      className="rounded"
+                                  />
+                                  <span className="text-sm">Zákaznický kredit</span>
+                                </label>
+                              </>
+                          );
+                        })()}
+                      </div>
+                    </div>
+
+                    <div className={"flex-1"}>
+                      <label className="text-sm font-medium">Vlastní zpráva v e-mailu</label>
+                      <textarea
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-vertical"
+                          defaultValue={selectedClassType?.customEmailMessage || ""}
+                          maxLength={1000}
+                          name="customEmailMessage"
+                          placeholder="Zadejte vlastní zprávu, která se zobrazí v potvrzovacím e-mailu"
+                          rows={4}
+                      />
                     </div>
                   </div>
-
                   <div className="">
                     <Button
                       className="col-span-full"

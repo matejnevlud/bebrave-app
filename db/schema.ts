@@ -73,6 +73,7 @@ export const classTypesTable = pgTable("class_types", {
   duration: integer().notNull(), // Duration in minutes
   price: integer().notNull(), // Price in crowns
   allowedPaymentMethods: varchar({ length: 255 }).default("credit_card,qr,osobne"), // Comma-separated list of allowed payment methods
+  customEmailMessage: varchar({ length: 1000 }), // Custom email message for this class type
 });
 export const classTypesRelations = relations(classTypesTable, ({ many }) => ({
   trainerClassTypes: many(trainerClassTypesTable),
