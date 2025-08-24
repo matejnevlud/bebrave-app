@@ -39,6 +39,7 @@ import {
   getTrainers,
   updateClassType,
 } from "@/db/actions";
+import { parseAllowedPaymentMethods, createAllowedPaymentMethodsString } from "@/lib/utils/payment-methods";
 import {
   ClassType,
   ClassTypeWithRelations,
@@ -305,11 +306,21 @@ export default function LekcePage() {
 
       console.log(data);
 
+      // Handle payment methods
+      const paymentMethods = {
+        allowCreditCard: data.allowCreditCard === 'on',
+        allowQr: data.allowQr === 'on',
+        allowOnsite: data.allowOnsite === 'on',
+        allowCredit: data.allowCredit === 'on',
+      };
+      const allowedPaymentMethods = createAllowedPaymentMethodsString(paymentMethods);
+
       const updatedClassType: Partial<ClassType> = {
         name: data.name as string,
         duration: parseInt(data.duration as string, 10),
         defaultCapacity: parseInt(data.defaultCapacity as string, 10),
         price: parseInt(data.price as string),
+        allowedPaymentMethods: allowedPaymentMethods,
       };
 
       console.log(updatedClassType);
@@ -387,6 +398,15 @@ export default function LekcePage() {
         return;
       }
 
+      // Handle payment methods
+      const paymentMethods = {
+        allowCreditCard: data.allowCreditCard === 'on',
+        allowQr: data.allowQr === 'on',
+        allowOnsite: data.allowOnsite === 'on',
+        allowCredit: data.allowCredit === 'on',
+      };
+      const allowedPaymentMethods = createAllowedPaymentMethodsString(paymentMethods);
+
       const newClassType: Partial<ClassType> = {
         name: data.name as string,
         duration: parseInt(data.duration as string, 10),
@@ -394,6 +414,7 @@ export default function LekcePage() {
         price: parseInt(data.price as string),
         description: data.description as string,
         image: data.image as string, // Assuming you have an image URL or path
+        allowedPaymentMethods: allowedPaymentMethods,
       };
 
       console.log(newClassType);
@@ -591,6 +612,48 @@ export default function LekcePage() {
             type="file"
           />
 
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Povolené platební metody</label>
+            <div className="grid grid-cols-2 gap-2">
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  name="allowCreditCard"
+                  defaultChecked={true}
+                  className="rounded"
+                />
+                <span className="text-sm">Platební karta</span>
+              </label>
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  name="allowQr"
+                  defaultChecked={true}
+                  className="rounded"
+                />
+                <span className="text-sm">QR platba</span>
+              </label>
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  name="allowOnsite"
+                  defaultChecked={true}
+                  className="rounded"
+                />
+                <span className="text-sm">Na místě</span>
+              </label>
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  name="allowCredit"
+                  defaultChecked={false}
+                  className="rounded"
+                />
+                <span className="text-sm">Zákaznický kredit</span>
+              </label>
+            </div>
+          </div>
+
           <Button
             className=""
             color="success"
@@ -669,6 +732,58 @@ export default function LekcePage() {
                     labelPlacement="outside"
                     name="price"
                   />
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Povolené platební metody</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(() => {
+                        const paymentConfig = selectedClassType?.allowedPaymentMethods
+                          ? parseAllowedPaymentMethods(selectedClassType.allowedPaymentMethods)
+                          : { allowCreditCard: true, allowQr: true, allowOnsite: true, allowCredit: false };
+
+                        return (
+                          <>
+                            <label className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                name="allowCreditCard"
+                                defaultChecked={paymentConfig.allowCreditCard}
+                                className="rounded"
+                              />
+                              <span className="text-sm">Platební karta</span>
+                            </label>
+                            <label className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                name="allowQr"
+                                defaultChecked={paymentConfig.allowQr}
+                                className="rounded"
+                              />
+                              <span className="text-sm">QR platba</span>
+                            </label>
+                            <label className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                name="allowOnsite"
+                                defaultChecked={paymentConfig.allowOnsite}
+                                className="rounded"
+                              />
+                              <span className="text-sm">Na místě</span>
+                            </label>
+                            <label className="flex items-center space-x-2">
+                              <input
+                                type="checkbox"
+                                name="allowCredit"
+                                defaultChecked={paymentConfig.allowCredit}
+                                className="rounded"
+                              />
+                              <span className="text-sm">Zákaznický kredit</span>
+                            </label>
+                          </>
+                        );
+                      })()}
+                    </div>
+                  </div>
 
                   <div className="">
                     <Button

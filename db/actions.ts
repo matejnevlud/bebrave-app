@@ -31,7 +31,7 @@ import { picnicReservationEmail } from "@/db/picnic_reservation_email";
 // Keep inmemory last access token
 const CLOUD_ID = process.env.CLOUD_ID || "373067553";
 const REFRESH_TOKEN =
-  process.env.REFRESH_TOKEN || "f4813dc9dd81ebcc58dbefa452a3295c";
+   process.env.REFRESH_TOKEN || "f4813dc9dd81ebcc58dbefa452a3295c";
 var ACCESS_TOKEN: string | PromiseLike<string | null> | null = null;
 
 export async function getTrainers(): Promise<TrainerWithRelations[]> {
@@ -314,6 +314,11 @@ export async function createClassType(
       throw new Error("Missing required fields to create a class type");
     }
 
+    // Set default payment methods if not provided
+    if (!classTypeData.allowedPaymentMethods) {
+      classTypeData.allowedPaymentMethods = "credit_card,qr,osobne";
+    }
+
     // Insert the new class type into the database
     const [newClassType] = await db
       .insert(classTypesTable)
@@ -359,6 +364,11 @@ export async function updateClassType(
 
     //strip id from classTypeData if it exists
     if (classTypeData.id) delete classTypeData.id;
+
+    // Ensure allowedPaymentMethods is set if not provided
+    if (!classTypeData.allowedPaymentMethods) {
+      classTypeData.allowedPaymentMethods = "credit_card,qr,osobne";
+    }
 
     const updatedClassType = await db
       .update(classTypesTable)

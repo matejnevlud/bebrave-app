@@ -72,6 +72,7 @@ export const classTypesTable = pgTable("class_types", {
   defaultCapacity: integer().notNull(), // Maximum number of participants
   duration: integer().notNull(), // Duration in minutes
   price: integer().notNull(), // Price in crowns
+  allowedPaymentMethods: varchar({ length: 255 }).default("credit_card,qr,osobne"), // Comma-separated list of allowed payment methods
 });
 export const classTypesRelations = relations(classTypesTable, ({ many }) => ({
   trainerClassTypes: many(trainerClassTypesTable),

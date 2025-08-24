@@ -1,0 +1,1 @@
+ALTER TABLE "class_types" ADD COLUMN "allowedPaymentMethods" varchar(255) DEFAULT 'credit_card,qr,osobne';
