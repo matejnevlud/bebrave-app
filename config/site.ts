@@ -16,6 +16,10 @@ export const siteConfig = {
       label: "Instruktoři",
       href: "#instruktori",
     },
+    {
+      label: "Ceník",
+      href: "#cenik",
+    },
   ],
   navMenuItems: [
     {
@@ -29,6 +33,10 @@ export const siteConfig = {
     {
       label: "Instruktoři",
       href: "#instruktori",
+    },
+    {
+      label: "Ceník",
+      href: "#cenik",
     },
     {
       label: "Rezervace",

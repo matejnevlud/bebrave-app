@@ -1,5 +1,5 @@
 import { Button } from "@heroui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Coffee } from "lucide-react";
 import { Image as HeroImage } from "@heroui/image";
 import { Link } from "@heroui/link";
 
@@ -449,6 +449,47 @@ export default function Home() {
         <div>
           <Lectors />
         </div>
+
+        {/* Pricing Section */}
+        <div className="h-6" id="cenik" />
+        <section className="my-16 sm:my-24">
+          <div className="block flex-1 text-center sm:text-center mb-10 sm:mb-14">
+            <h2 className="font-sans font-bold text-3xl lg:text-6xl">
+              Ceník BeBrave
+            </h2>
+            <p className="text-default-500 mt-2 sm:mt-3">platný od 09/2025</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+            <div className="rounded-lg border border-default-200 p-6 bg-white/50 relative pb-20">
+              <h3 className="font-bold text-xl">Permanentka 10 vstupů</h3>
+              <p className="absolute bottom-4 right-6 text-4xl md:text-5xl font-extrabold">2200,-</p>
+              <p className="text-default-600 mt-3">Omezeno na 2 měsíce</p>
+            </div>
+
+            <div className="rounded-lg border border-default-200 p-6 bg-white/50 relative pb-20">
+              <h3 className="font-bold text-xl">Permanentka 10 vstupů</h3>
+              <div className="mt-3">
+                <span className="inline-flex items-center gap-2 rounded-full border border-primary-200 bg-primary-100 text-primary-800 px-3 py-1.5 text-xs font-semibold shadow-sm ring-1 ring-primary-200">
+                  <Coffee className="h-3.5 w-3.5" />
+                  <span>+ káva nebo protein ke každému vstupu</span>
+                </span>
+              </div>
+              <p className="absolute bottom-4 right-6 text-4xl md:text-5xl font-extrabold">2400,-</p>
+              <p className="text-default-600 mt-3">Omezeno na 2 měsíce</p>
+            </div>
+
+            <div className="rounded-lg border border-default-200 p-6 bg-white/50 relative pb-20">
+              <h3 className="font-bold text-xl">Měsíční permanentka</h3>
+              <p className="text-default-600 mt-1">Vstupově neomezená</p>
+              <p className="absolute bottom-4 right-6 text-4xl md:text-5xl font-extrabold">1900,-</p>
+            </div>
+          </div>
+
+          <p className="text-center text-default-700 mt-8">
+            V případě zájmu lze vystavit dárkový poukaz.
+          </p>
+        </section>
 
         <div className=" h-[30rem] mx-auto bg-black block mt-20 mb-[-5rem]">
           <div className="absolute left-0 right-0 flex justify-center bg-white">
