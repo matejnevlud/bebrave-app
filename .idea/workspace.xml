@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="878e36bd-1ad8-483a-aae1-c8c02b1128eb" name="Changes" comment="init base">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(web)/HomepageClassTypes.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/HomepageClassTypes.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(web)/Lectors.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/Lectors.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/components/blocks/PaymentMethodRadio.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/blocks/PaymentMethodRadio.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/actions.ts" afterDir="false" />
-    </list>
+    <list default="true" id="878e36bd-1ad8-483a-aae1-c8c02b1128eb" name="Changes" comment="init base" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
