@@ -42,8 +42,12 @@
       <change beforePath="$PROJECT_DIR$/app/global-error.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/global-error.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/providers.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/providers.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/uploads/[query]/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/app/uploads/[query]/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/blocks/PaymentMethodRadio.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/blocks/PaymentMethodRadio.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/actions.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/db/schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/schema.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle/meta/_journal.json" beforeDir="false" afterPath="$PROJECT_DIR$/drizzle/meta/_journal.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/utils/payment-methods.ts" beforeDir="false" afterPath="$PROJECT_DIR$/lib/utils/payment-methods.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -182,7 +186,7 @@
       <workItem from="1756038531156" duration="394000" />
       <workItem from="1757424479265" duration="6610000" />
       <workItem from="1757435102185" duration="103000" />
-      <workItem from="1757435210522" duration="6289000" />
+      <workItem from="1757435210522" duration="7684000" />
     </task>
     <task id="LOCAL-00001" summary="init base">
       <option name="closed" value="true" />

@@ -1,5 +1,7 @@
 // Helper function to parse allowed payment methods string
-export function parseAllowedPaymentMethods(allowedPaymentMethods: string | null): {
+export function parseAllowedPaymentMethods(
+  allowedPaymentMethods: string | null,
+): {
   allowCreditCard: boolean;
   allowQr: boolean;
   allowOnsite: boolean;
@@ -15,13 +17,13 @@ export function parseAllowedPaymentMethods(allowedPaymentMethods: string | null)
     };
   }
 
-  const methods = allowedPaymentMethods.split(',').map(m => m.trim());
+  const methods = allowedPaymentMethods.split(",").map((m) => m.trim());
 
   return {
-    allowCreditCard: methods.includes('credit_card'),
-    allowQr: methods.includes('qr'),
-    allowOnsite: methods.includes('osobne'),
-    allowCredit: methods.includes('kredit'),
+    allowCreditCard: methods.includes("credit_card"),
+    allowQr: methods.includes("qr"),
+    allowOnsite: methods.includes("osobne"),
+    allowCredit: methods.includes("kredit"),
   };
 }
 
@@ -34,10 +36,10 @@ export function createAllowedPaymentMethodsString(methods: {
 }): string {
   const allowedMethods: string[] = [];
 
-  if (methods.allowCreditCard) allowedMethods.push('credit_card');
-  if (methods.allowQr) allowedMethods.push('qr');
-  if (methods.allowOnsite) allowedMethods.push('osobne');
-  if (methods.allowCredit) allowedMethods.push('kredit');
+  if (methods.allowCreditCard) allowedMethods.push("credit_card");
+  if (methods.allowQr) allowedMethods.push("qr");
+  if (methods.allowOnsite) allowedMethods.push("osobne");
+  if (methods.allowCredit) allowedMethods.push("kredit");
 
-  return allowedMethods.join(',');
+  return allowedMethods.join(",");
 }

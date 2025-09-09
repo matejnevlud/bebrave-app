@@ -9,9 +9,9 @@ const AUTH_STORAGE_KEY = "admin_authenticated";
 
 export function authenticateAdmin(username: string, password: string): boolean {
   return (
-      username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password
-  ) || (
-      username === "lektor" && password === "bebrave"
+    (username === ADMIN_CREDENTIALS.username &&
+      password === ADMIN_CREDENTIALS.password) ||
+    (username === "lektor" && password === "bebrave")
   );
 }
 
