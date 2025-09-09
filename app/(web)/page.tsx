@@ -9,6 +9,9 @@ import HLSPlayerControls from "@/components/HLSPlayerControls";
 import HomepageClassTypes from "@/app/(web)/HomepageClassTypes";
 import { getHomepageClassTypes, getTrainers } from "@/db/actions";
 
+// Disable static generation for this page
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   // Fetch data server-side for better performance
   // measure time
