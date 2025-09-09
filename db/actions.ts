@@ -1372,6 +1372,8 @@ export async function dotyposGetCustomerCreditBalanceByEmailAndPhone(
 
     // double check if emails match
     if (customer.email != email) return { customer: null, balance: null };
+    if (phone.length < 9) return { customer: null, balance: null };
+
   } catch (error) {
     if (axios.isAxiosError(error) && (error.response?.status == 404 || error.response?.status == 400)) {
       console.log(`Customer not found for email: ${email} and phone: ${phone}`);
