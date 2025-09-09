@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {
     Avatar,
     DatePicker,
@@ -13,7 +13,7 @@ import {
     TimeInput,
     useDisclosure,
 } from "@heroui/react";
-import { SVGProps } from "react";
+import {SVGProps} from "react";
 import {
     Table,
     TableHeader,
@@ -24,11 +24,11 @@ import {
     Tooltip,
     ChipProps,
 } from "@heroui/react";
-import { getLocalTimeZone, today } from "@internationalized/date";
-import { Button } from "@heroui/button";
-import { ModalBody, ModalHeader } from "@heroui/modal";
-import { I18nProvider } from "@react-aria/i18n";
-import { Input } from "@heroui/input";
+import {getLocalTimeZone, today} from "@internationalized/date";
+import {Button} from "@heroui/button";
+import {ModalBody, ModalHeader} from "@heroui/modal";
+import {I18nProvider} from "@react-aria/i18n";
+import {Input} from "@heroui/input";
 
 import {
     createClass,
@@ -40,7 +40,7 @@ import {
     getTrainers,
     updateClassType,
 } from "@/db/actions";
-import { parseAllowedPaymentMethods, createAllowedPaymentMethodsString } from "@/lib/utils/payment-methods";
+import {parseAllowedPaymentMethods, createAllowedPaymentMethodsString} from "@/lib/utils/payment-methods";
 import {
     ClassType,
     ClassTypeWithRelations,
@@ -53,10 +53,10 @@ type IconSvgProps = SVGProps<SVGSVGElement> & {
 };
 
 const columns = [
-    { name: "NAME", uid: "name" },
-    { name: "ROLE", uid: "role" },
-    { name: "STATUS", uid: "status" },
-    { name: "ACTIONS", uid: "actions" },
+    {name: "NAME", uid: "name"},
+    {name: "ROLE", uid: "role"},
+    {name: "STATUS", uid: "status"},
+    {name: "ACTIONS", uid: "actions"},
 ];
 
 const users = [
@@ -309,7 +309,7 @@ export default function LekcePage() {
 
         return classes.filter((c) => c.classTypeId === selectedClassType.id);
     }, [selectedClassType, classes]);
-    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
 
     function openReservationModal(c: ClassTypeWithRelations) {
         setSelectedClassType(c);
@@ -555,7 +555,7 @@ export default function LekcePage() {
                                     </Button>
                                     <Tooltip color="danger" content="Smazat typ lekce">
                     <span className="text-lg text-danger cursor-pointer active:opacity-50" onClick={() => handleDeleteClassType(item.id)}>
-                      <DeleteIcon />
+                      <DeleteIcon/>
                     </span>
                                     </Tooltip>
                                 </div>
@@ -774,8 +774,6 @@ export default function LekcePage() {
                                     />
 
 
-
-
                                     <div className="space-y-2 col-span-full flex gap-4">
 
                                         <div className="">
@@ -784,7 +782,7 @@ export default function LekcePage() {
                                                 {(() => {
                                                     const paymentConfig = selectedClassType?.allowedPaymentMethods
                                                         ? parseAllowedPaymentMethods(selectedClassType.allowedPaymentMethods)
-                                                        : { allowCreditCard: true, allowQr: true, allowOnsite: true, allowCredit: false };
+                                                        : {allowCreditCard: true, allowQr: true, allowOnsite: true, allowCredit: false};
 
                                                     return (
                                                         <>
@@ -884,7 +882,7 @@ export default function LekcePage() {
                           <span className="font-medium text-medium">
                             {new Date(item?.date ?? 0).toLocaleDateString(
                                 "cs-CZ",
-                                { weekday: "long" },
+                                {weekday: "long"},
                             )}{" "}
                               {new Date(item?.date ?? 0).toLocaleDateString()}{" "}
                               {item.time}
@@ -909,7 +907,7 @@ export default function LekcePage() {
                                                 >
                                                     <Tooltip color="danger" content="Smazat lekci">
                             <span className="text-lg text-danger cursor-pointer active:opacity-50">
-                              <DeleteIcon />
+                              <DeleteIcon/>
                             </span>
                                                     </Tooltip>
                                                 </TableCell>

@@ -329,7 +329,7 @@ function ReservationPage() {
         }
     };
 
-    const [creditBalance, setCreditBalance] = useState<number|null>(null);
+    const [creditBalance, setCreditBalance] = useState<number | null>(null);
     const [hasFreeEntry, setHasFreeEntry] = useState<boolean>(false);
 
     const handleEmailPhoneChangeForCreditCustomer = async (newFormData: ReservationFormData) => {
