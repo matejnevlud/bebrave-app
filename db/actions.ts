@@ -634,6 +634,9 @@ export async function createReservation(
       "Došlo k chybě při vytváření rezervace. Zkuste to prosím znovu později.",
     );
   }
+  
+  // Default return if no conditions match
+  return Promise.resolve(true);
 }
 
 // Process payment result and finalize reservation
@@ -1370,7 +1373,7 @@ export async function dotyposGetCustomerCreditBalanceByEmailAndPhone(
     // double check if emails match
     if (customer.email != email) return { customer: null, balance: null };
   } catch (error) {
-    if (error.response?.status == 404 || error.response?.status == 400) {
+    if (axios.isAxiosError(error) && (error.response?.status == 404 || error.response?.status == 400)) {
       console.log(`Customer not found for email: ${email} and phone: ${phone}`);
     } else {
       console.error(`Error fetching customer account from Dotypos:`, error);
@@ -1396,7 +1399,7 @@ export async function dotyposGetCustomerCreditBalanceByEmailAndPhone(
 
     return { customer, balance };
   } catch (error) {
-    if (error.response?.status == 404 || error.response?.status == 400) {
+    if (axios.isAxiosError(error) && (error.response?.status == 404 || error.response?.status == 400)) {
       console.log(
         `Customer credit account not found for email: ${email} and phone: ${phone}`,
       );

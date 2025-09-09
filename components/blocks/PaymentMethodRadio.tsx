@@ -154,12 +154,12 @@ const PaymentMethodRadioGroup = React.forwardRef<
           description={
             props.creditBalance === null
               ? "Vyplňte svůj email a telefon"
-              : props.creditBalance >= props.price
+              : props.creditBalance >= (props.price || 0)
                 ? `Zůstatek (${props.creditBalance} Kč)`
                 : `Nízký zůstatek (${props.creditBalance} Kč)`
           }
           icon={<Icon height={30} icon="akar-icons:coin" width={30} />}
-          isDisabled={props.creditBalance < props.price}
+          isDisabled={(props.creditBalance || 0) < (props.price || 0)}
           label={"Zákaznický kredit"}
           name="paymentMethod"
           value="kredit"

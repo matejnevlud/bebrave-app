@@ -44,7 +44,7 @@ export default function HomepageClassTypes({
                 justifyContent: index % 2 === 1 ? "flex-end" : "flex-start",
               }}
             >
-              {classType.trainerClassTypes.map((tct) => (
+              {classType.trainerClassTypes.map((tct: any) => (
                 <div key={tct.trainer.id}>
                   <img
                     alt={tct.trainer.name}
