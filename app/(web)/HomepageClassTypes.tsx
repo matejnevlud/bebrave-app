@@ -1,22 +1,16 @@
 "use client";
 import { Image as HeroImage } from "@heroui/image";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
-import { getHomepageClassTypes } from "@/db/actions";
 import { ClassTypeWithRelations } from "@/db/schema";
-import TrainersForClass from "@/app/(web)/TrainersForClass";
 
-export default function HomepageClassTypes() {
-  const [classTypes, setClassTypes] = useState<ClassTypeWithRelations[]>([]);
+interface HomepageClassTypesProps {
+  classTypes: ClassTypeWithRelations[];
+}
 
-  useEffect(() => {
-    (async () => {
-      const data = await getHomepageClassTypes();
-
-      setClassTypes(data);
-    })();
-  }, []);
-
+export default function HomepageClassTypes({
+  classTypes,
+}: HomepageClassTypesProps) {
   return (
     <>
       {classTypes.map((classType, index) => (
@@ -44,10 +38,25 @@ export default function HomepageClassTypes() {
             <h1 className="font-sans font-bold text-2xl sm:text-4xl">
               {classType.name}
             </h1>
-            <TrainersForClass
-              classTypeName={classType.name}
-              right={index % 2 === 1}
-            />
+            <div
+              className="flex items-center gap-8 flex-wrap mt-4 h-10"
+              style={{
+                justifyContent: index % 2 === 1 ? "flex-end" : "flex-start",
+              }}
+            >
+              {classType.trainerClassTypes.map((tct) => (
+                <div key={tct.trainer.id}>
+                  <img
+                    alt={tct.trainer.name}
+                    className="inline-flex me-2 hover:scale-125 transition-transform duration-200 w-10 h-10 rounded-full"
+                    src={tct.trainer.profilePicture as any}
+                  />
+                  <span className="text-medium font-medium">
+                    {tct.trainer.name}
+                  </span>
+                </div>
+              ))}
+            </div>
             <p className="mt-4">
               {classType.homepageText || classType.description}
             </p>

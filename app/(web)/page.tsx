@@ -7,8 +7,19 @@ import Lectors from "@/app/(web)/Lectors";
 import HlsPlayer from "@/components/HLSPlayer";
 import HLSPlayerControls from "@/components/HLSPlayerControls";
 import HomepageClassTypes from "@/app/(web)/HomepageClassTypes";
+import { getHomepageClassTypes, getTrainers } from "@/db/actions";
 
-export default function Home() {
+export default async function Home() {
+  // Fetch data server-side for better performance
+  // measure time
+  const start = Date.now();
+  const [homepageClassTypes, trainers] = await Promise.all([
+    getHomepageClassTypes(),
+    getTrainers(),
+  ]);
+  const end = Date.now();
+  console.log("Homepage data fetching time: " + (end - start) + "ms");
+
   return (
     <div className="">
       <div className="max-w-none w-screen ml-[-1.5rem] aspect-[3/4] sm:aspect-[3/2] lg:aspect-[2/1] 2xl:aspect-[21/9]   bg-white">
@@ -111,7 +122,7 @@ export default function Home() {
           </div>
         </div>
 
-        <HomepageClassTypes />
+        <HomepageClassTypes classTypes={homepageClassTypes} />
 
         <div className="h-6" id="instruktori" />
 
@@ -127,7 +138,7 @@ export default function Home() {
         </div>
 
         <div>
-          <Lectors />
+          <Lectors trainers={trainers} />
         </div>
 
         {/* Pricing Section */}

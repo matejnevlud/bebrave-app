@@ -1,21 +1,14 @@
 "use client";
 import { Card, CardHeader, Image } from "@heroui/react";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
-import { getTrainers } from "@/db/actions";
 import { TrainerWithRelations } from "@/db/schema";
 
-export default function Lectors() {
-  const [trainers, setTrainers] = useState<TrainerWithRelations[]>([]);
+interface LectorsProps {
+  trainers: TrainerWithRelations[];
+}
 
-  useEffect(() => {
-    (async () => {
-      const data = await getTrainers();
-
-      setTrainers(data);
-    })();
-  }, []);
-
+export default function Lectors({ trainers }: LectorsProps) {
   return (
     <div className=" gap-8 grid grid-cols-12 grid-rows-2 px-0">
       {trainers.map((trainer) => (
