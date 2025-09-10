@@ -1,5 +1,6 @@
 "use client";
-
+// @ts-ignore
+import confetti from "canvas-confetti";
 import {
     Image,
     Card,
@@ -13,15 +14,13 @@ import {
     Chip,
     Alert,
 } from "@heroui/react";
-import React, { Fragment, useEffect, useState } from "react";
-import { today, getLocalTimeZone, CalendarDate } from "@internationalized/date";
-import { I18nProvider } from "@react-aria/i18n";
-import { Button } from "@heroui/button";
-import { Input } from "@heroui/input";
-// @ts-ignore
-import confetti from "canvas-confetti";
-import { Link } from "@heroui/link";
-import { Icon } from "@iconify/react";
+import React, {Fragment, useEffect, useState} from "react";
+import {today, getLocalTimeZone, CalendarDate} from "@internationalized/date";
+import {I18nProvider} from "@react-aria/i18n";
+import {Button} from "@heroui/button";
+import {Input} from "@heroui/input";
+import {Link} from "@heroui/link";
+import {Icon} from "@iconify/react";
 import dynamic from "next/dynamic";
 
 import PaymentMethodRadioGroup from "@/components/blocks/PaymentMethodRadio";
@@ -39,83 +38,10 @@ import {
     getClassTypes,
     getTrainers,
 } from "@/db/actions";
-import { FormStorage, ReservationFormData } from "@/lib/utils/form-storage";
+import {FormStorage, ReservationFormData} from "@/lib/utils/form-storage";
+import {useSearchParams} from "next/navigation";
 
-const users = [
-    {
-        id: 1,
-        name: "Tony Reichert",
-        role: "CEO",
-        team: "Management",
-        status: "active",
-        age: "29",
-        avatar: "/photos/nahledy/bebrave-17.jpg",
-        email: "tony.reichert@example.com",
-    },
-    {
-        id: 2,
-        name: "Zoey Lang",
-        role: "Tech Lead",
-        team: "Development",
-        status: "paused",
-        age: "25",
-        avatar: "/photos/nahledy/bebrave-18.jpg",
-        email: "zoey.lang@example.com",
-    },
-    {
-        id: 3,
-        name: "Jane Fisher",
-        role: "Sr. Dev",
-        team: "Development",
-        status: "active",
-        age: "22",
-        avatar: "/photos/nahledy/bebrave-19.jpg",
-        email: "jane.fisher@example.com",
-    },
-    {
-        id: 4,
-        name: "William Howard",
-        role: "C.M.",
-        team: "Marketing",
-        status: "vacation",
-        age: "28",
-        avatar: "/photos/nahledy/bebrave-20.jpg",
-        email: "william.howard@example.com",
-    },
-    {
-        id: 5,
-        name: "Kristen Copper",
-        role: "S. Manager",
-        team: "Sales",
-        status: "active",
-        age: "24",
-        avatar: "/photos/nahledy/bebrave-21.jpg",
-        email: "kristen.cooper@example.com",
-    },
-    {
-        id: 6,
-        name: "Brian Kim",
-        role: "P. Manager",
-        team: "Management",
-        age: "29",
-        avatar: "/photos/nahledy/bebrave-22.jpg",
-        email: "brian.kim@example.com",
-        status: "active",
-    },
-];
-
-type User = {
-    id: number;
-    name: string;
-    role: string;
-    team: string;
-    status: string;
-    age: string;
-    avatar: string;
-    email: string;
-};
-
-function ReservationPage() {
+function ReservationPage(props) {
     const [selected, setSelected] = useState("videos");
 
     const [trainers, setTrainers] = useState<TrainerWithRelations[]>([]);
@@ -126,6 +52,10 @@ function ReservationPage() {
     const [isFetchingData, setIsFetchingData] = useState<boolean>(true);
     const [isHydrated, setIsHydrated] = useState(false);
     const [currentDate, setCurrentDate] = useState<CalendarDate | null>(null);
+
+
+    // get query params
+    const searchParams = useSearchParams();
 
     async function fetchData() {
         const t = await getTrainers();
@@ -157,6 +87,19 @@ function ReservationPage() {
             setFormData(savedData);
         }
     }, []);
+
+    // determine if already has preselected class from query params
+    useEffect(() => {
+        const classId = searchParams.get("classId");
+        if (classId && classes.length > 0) {
+            const selectedClass = classes.find((c) => c.id.toString() === classId);
+            console.log("Selected class from query params:", selectedClass);
+            if (selectedClass) {
+                setSelectedClass(selectedClass as ClassWithRelations);
+
+            }
+        }
+    }, [classes, searchParams]);
 
     // Moved to useEffect to prevent hydration issues
     // Disabled ranges will be handled after hydration
@@ -310,7 +253,7 @@ function ReservationPage() {
             formData.phone,
         ).then((data) => {
             setCreditBalance(data.balance);
-            setHasFreeEntry(data.customer._discountGroupId === "1772210398527043");
+            setHasFreeEntry(data.customer?._discountGroupId === "1772210398527043");
             console.log("customer from useEffect", data.customer);
             console.log("balance from useEffect", data.balance);
         });
@@ -321,7 +264,7 @@ function ReservationPage() {
         field: keyof ReservationFormData,
         value: string,
     ) => {
-        const newFormData = { ...formData, [field]: value };
+        const newFormData = {...formData, [field]: value};
 
         setFormData(newFormData);
         FormStorage.saveFormData(newFormData);
@@ -635,7 +578,7 @@ function ReservationPage() {
                               </span>
                                                         </div>
                                                     )}
-                                                    <div className="flex-1" />
+                                                    <div className="flex-1"/>
                                                     {!hasClassFreeSpot(c) && (
                                                         <Chip
                                                             className={"sm:hidden"}
@@ -701,7 +644,7 @@ function ReservationPage() {
                         color={"foreground"}
                         onPress={() => setSelectedClass(null)}
                     >
-                        <Icon className="inline-block me-2" icon={"weui:back-filled"} />
+                        <Icon className="inline-block me-2" icon={"weui:back-filled"}/>
                     </Link>
                     <h2 className="text-xl text-center font-bold pt-6">
                         {isHydrated
@@ -852,7 +795,7 @@ function ReservationPage() {
                                         color={"success"}
                                         title="Vstup na tuto lekci máte zdarma."
                                     />
-                                    <input name="paymentMethod" type="hidden" value="free" />
+                                    <input name="paymentMethod" type="hidden" value="free"/>
                                 </div>
                             ) : (
                                 <PaymentMethodRadioGroup

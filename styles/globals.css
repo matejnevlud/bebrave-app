@@ -15,3 +15,72 @@
 .animate-pulse-scale {
     animation: pulse-scale 2.0s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+
+/* Add new animation called "wiggle" which will scale up the button, quickly shake it and then scale it back down */
+@keyframes wiggle {
+    0%, 100% {
+        transform: scale(1) rotate(0);
+    }
+
+    20% {
+        transform: rotate(0) scale(1.0);
+    }
+
+    22% {
+        transform: rotate(0) scale(1.0);
+    }
+
+    25% {
+        transform: rotate(-5deg) scale(1.12);
+    }
+
+    27% {
+        transform: rotate(0) scale(1.12);
+    }
+
+    29% {
+        transform: rotate(5deg) scale(1.12);
+    }
+
+    31% {
+        transform: rotate(0) scale(1.12);
+    }
+
+    33% {
+        transform: rotate(-5deg) scale(1.12);
+    }
+
+    35% {
+        transform: rotate(0) scale(1.12);
+    }
+
+    37% {
+        transform: rotate(5deg) scale(1.12);
+    }
+
+    39% {
+        transform: rotate(0) scale(1.12);
+    }
+
+    41% {
+        transform: rotate(-5deg) scale(1.12);
+    }
+
+    43% {
+        transform: rotate(0) scale(1.12);
+    }
+
+    47% {
+        transform: scale(1);
+    }
+
+
+
+
+
+
+}
+
+.animate-wiggle {
+    animation: wiggle 3.2s ease-in-out infinite;
+}

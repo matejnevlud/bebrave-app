@@ -1,9 +1,9 @@
 "use client";
 
 import React from "react";
-import { ScrollShadow } from "@heroui/react";
+import {ScrollShadow} from "@heroui/react";
 
-import { items } from "./sidebar-items";
+import {items} from "./sidebar-items";
 
 import Sidebar from "@/components/admin/sidebar";
 
@@ -21,17 +21,17 @@ import Sidebar from "@/components/admin/sidebar";
  * ```
  */
 export default function Component() {
-  return (
-    <div className="h-full min-h-[48rem]">
-      <div className="h-full w-72 border-r-small border-divider p-6">
-        <div className="flex items-center gap-2 px-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground" />
-          <span className="text-small font-bold uppercase">Acme</span>
+    return (
+        <div className="h-full min-h-[48rem]">
+            <div className="h-full w-72 border-r-small border-divider p-6">
+                <div className="flex items-center gap-2 px-2">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-foreground"/>
+                    <span className="text-small font-bold uppercase">Acme</span>
+                </div>
+                <ScrollShadow className="h-full max-h-full py-[10vh]">
+                    <Sidebar defaultSelectedKey="home" items={items}/>
+                </ScrollShadow>
+            </div>
         </div>
-        <ScrollShadow className="h-full max-h-full py-[10vh]">
-          <Sidebar defaultSelectedKey="home" items={items} />
-        </ScrollShadow>
-      </div>
-    </div>
-  );
+    );
 }
