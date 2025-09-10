@@ -7,7 +7,7 @@ import Lectors from "@/app/(web)/Lectors";
 import HlsPlayer from "@/components/HLSPlayer";
 import HLSPlayerControls from "@/components/HLSPlayerControls";
 import HomepageClassTypes from "@/app/(web)/HomepageClassTypes";
-import {getHomepageClassTypes, getTrainers} from "@/db/actions";
+import {getHomepageClassTypes, getPromoClassType, getTrainers} from "@/db/actions";
 import {Avatar, Card, CardBody, Image} from "@heroui/react";
 import React from "react";
 import PromoBanner from "@/app/(web)/PromoBanner";
@@ -19,9 +19,10 @@ export default async function Home() {
     // Fetch data server-side for better performance
     // measure time
     const start = Date.now();
-    const [homepageClassTypes, trainers] = await Promise.all([
+    const [homepageClassTypes, trainers, promoClassType] = await Promise.all([
         getHomepageClassTypes(),
         getTrainers(),
+        getPromoClassType(),
     ]);
     const end = Date.now();
     console.log("Homepage data fetching time: " + (end - start) + "ms");
@@ -60,9 +61,12 @@ export default async function Home() {
                 </div>
 
 
+                {promoClassType && (
+
                 <div className="flex flex-col my-10 flex-1 w-full">
-                    <PromoBanner classType={homepageClassTypes[1]}/>
+                    <PromoBanner classType={promoClassType}/>
                 </div>
+                    )}
 
 
                 <div

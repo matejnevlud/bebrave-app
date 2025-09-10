@@ -95,8 +95,11 @@ function ReservationPage(props) {
             const selectedClass = classes.find((c) => c.id.toString() === classId);
             console.log("Selected class from query params:", selectedClass);
             if (selectedClass) {
-                setSelectedClass(selectedClass as ClassWithRelations);
-
+                if (hasClassFreeSpot(selectedClass as ClassWithRelations)) {
+                    setSelectedClass(selectedClass as ClassWithRelations);
+                } else {
+                    setSelectedClassType(selectedClass.classType);
+                }
             }
         }
     }, [classes, searchParams]);

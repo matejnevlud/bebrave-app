@@ -85,6 +85,7 @@ export const classTypesTable = pgTable("class_types", {
   customEmailMessage: varchar({ length: 1000 }), // Custom email message for this class type
   homepageText: text(),
   isShownOnHomepage: boolean().default(false),
+  isShownAsPromo: boolean().default(false),
 });
 export const classTypesRelations = relations(classTypesTable, ({ many }) => ({
   trainerClassTypes: many(trainerClassTypesTable),

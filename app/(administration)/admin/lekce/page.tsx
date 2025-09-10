@@ -37,7 +37,7 @@ import {
     deleteClassType,
     getClasses,
     getClassTypes,
-    getTrainers,
+    getTrainers, setAllClassTypesNotShownAsPromo,
     updateClassType,
 } from "@/db/actions";
 import {
@@ -349,6 +349,7 @@ export default function LekcePage() {
                 customEmailMessage: data.customEmailMessage as string,
                 homepageText: data.homepageText as string,
                 isShownOnHomepage: data.isShownOnHomepage === "on",
+                isShownAsPromo: data.isShownAsPromo === "on",
                 description: data.description as string,
             };
 
@@ -361,6 +362,7 @@ export default function LekcePage() {
             console.log(updatedClassType);
             console.log("Selected trainers:", trainerIds);
 
+            await setAllClassTypesNotShownAsPromo();
             const fetched = await updateClassType(
                 selectedClassType?.id,
                 updatedClassType,
@@ -648,17 +650,6 @@ export default function LekcePage() {
                             placeholder="Zadejte text který se zobrazí na homepage (pokud není zadán, použije se popis lekce)"
                             rows={4}
                         />
-                    </div>
-
-                    <div className="space-y-2">
-                        <label className="flex items-center space-x-2">
-                            <input
-                                className="rounded"
-                                name="isShownOnHomepage"
-                                type="checkbox"
-                            />
-                            <span className="text-sm font-medium">Zobrazit na homepage</span>
-                        </label>
                     </div>
 
                     <NumberInput
@@ -984,8 +975,22 @@ export default function LekcePage() {
                                                 type="checkbox"
                                             />
                                             <span className="text-sm font-medium">
-                        Zobrazit na homepage
-                      </span>
+                                            Zobrazit na homepage
+                                          </span>
+                                        </label>
+
+                                        <label className="flex items-center space-x-2">
+                                            <input
+                                                className="rounded"
+                                                defaultChecked={
+                                                    selectedClassType?.isShownAsPromo || false
+                                                }
+                                                name="isShownAsPromo"
+                                                type="checkbox"
+                                            />
+                                            <span className="text-sm font-medium">
+                                            Zobrazit jako akci
+                                          </span>
                                         </label>
                                     </div>
                                     <div className="">
