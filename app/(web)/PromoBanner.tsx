@@ -15,15 +15,9 @@ export default function PromoBanner({ classType }: any) {
         <div
             key={'promo'}
             className={`relative flex flex-col md:flex-row gap-8 mt-10 overflow-visible ${index % 2 === 1 ? "md:flex-row-reverse" : ""}`}
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, type: "spring", bounce: 0.4 }}
         >
             <div
                 className="flex-[1] block overflow-visible relative"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
             >
                 {/* Special event badge */}
                 <div
@@ -35,8 +29,6 @@ export default function PromoBanner({ classType }: any) {
                 </div>
                 
                 <div
-                    whileHover={{ scale: 1.02 }}
-                    transition={{ type: "spring", stiffness: 300 }}
                     className="relative overflow-hidden rounded-xl"
                 >
                     <HeroImage
@@ -66,9 +58,6 @@ export default function PromoBanner({ classType }: any) {
                     style={{
                         justifyContent: index % 2 === 1 ? "flex-end" : "flex-start",
                     }}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6 }}
                 >
                     {classType.trainerClassTypes.map((tct: any, idx: number) => (
                         <div
@@ -88,9 +77,6 @@ export default function PromoBanner({ classType }: any) {
                 </div>
                 <p
                     className="mt-6 text-lg leading-relaxed text-gray-600 dark:text-gray-300 text-center md:text-right"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.8 }}
                 >
                     {classType.homepageText || classType.description}
                 </p>

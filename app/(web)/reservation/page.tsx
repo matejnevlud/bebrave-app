@@ -41,7 +41,7 @@ import {
 import {FormStorage, ReservationFormData} from "@/lib/utils/form-storage";
 import {useSearchParams} from "next/navigation";
 
-function ReservationPage(props) {
+function ReservationPage() {
     const [selected, setSelected] = useState("videos");
 
     const [trainers, setTrainers] = useState<TrainerWithRelations[]>([]);

@@ -6,12 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="878e36bd-1ad8-483a-aae1-c8c02b1128eb" name="Changes" comment="init base">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(administration)/admin/lekce/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(administration)/admin/lekce/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(web)/PromoBanner.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/PromoBanner.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/(web)/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/(web)/reservation/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/reservation/page.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/actions.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/schema.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
