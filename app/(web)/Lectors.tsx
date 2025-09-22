@@ -25,7 +25,7 @@ export default function Lectors({trainers}: LectorsProps) {
                             style={{textShadow: "2px 2px 8px rgba(0, 0, 0, 0.2)"}}
                         >
                             {trainer.trainerClassTypes
-                                .map((tct) => tct.classType.name)
+                                .map((tct) => tct.classType?.name)
                                 .join(", ")}
                         </p>
                         <h4
