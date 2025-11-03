@@ -33,11 +33,11 @@ export default function PromoBanner({ classType }: any) {
                 >
                     <HeroImage
                         isBlurred
-                        alt={`${classType.name} class image`}
+                        alt={`${classType?.name} class image`}
                         className="rounded-xl hover:scale-105 transition-all duration-300 shadow-xl"
                         height={"30em"}
                         src={
-                            `https://bebravestudio.cz/${classType.image}` ||
+                            `https://bebravestudio.cz/${classType?.image}` ||
                             "https://imagedelivery.net/eo8aTqb-9sQsvXZHFngPsQ/6d2f366d-4444-43c2-09cd-56ce13324c00/public"
                         }
                         style={{objectFit: "cover", objectPosition: "50% 50%"}}
@@ -51,7 +51,7 @@ export default function PromoBanner({ classType }: any) {
                 <h1
                     className="font-sans font-bold text-3xl sm:text-5xl text-gray-900 dark:text-white text-center md:text-right"
                 >
-                    {classType.name}
+                    {classType?.name}
                 </h1>
                 <div
                     className="flex items-center gap-6 flex-wrap mt-6"
@@ -61,16 +61,16 @@ export default function PromoBanner({ classType }: any) {
                 >
                     {classType.trainerClassTypes.map((tct: any, idx: number) => (
                         <div
-                            key={tct.trainer.id}
+                            key={tct.trainer?.id}
                             className="flex items-center gap-3"
                         >
                             <img
-                                alt={tct.trainer.name}
+                                alt={tct.trainer?.name}
                                 className="w-10 h-10 rounded-full object-cover object-top border-2 border-gray-200 shadow-sm"
-                                src={`https://bebravestudio.cz/${tct.trainer.profilePicture}`}
+                                src={`https://bebravestudio.cz/${tct.trainer?.profilePicture}`}
                             />
                             <span className="text-medium font-medium text-gray-700 dark:text-gray-300">
-                                {tct.trainer.name}
+                                {tct.trainer?.name}
                             </span>
                         </div>
                     ))}

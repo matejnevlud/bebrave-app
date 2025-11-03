@@ -6,7 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="878e36bd-1ad8-483a-aae1-c8c02b1128eb" name="Changes" comment="init base">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db/actions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/db/actions.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(administration)/admin/lekce/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(administration)/admin/lekce/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(web)/Lectors.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/Lectors.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/(web)/PromoBanner.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/(web)/PromoBanner.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -25,6 +27,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;matejnevlud&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;git@github.com:matejnevlud/bebrave-app.git&quot;,
+    &quot;accountId&quot;: &quot;efdf84b4-dd4e-465a-8dac-3795598fed37&quot;
+  }
+}</component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
 }</component>
@@ -56,6 +70,7 @@
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;com.augmentcode.intellij.settings&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;ts.external.directory.path&quot;: &quot;/Users/matejnevlud/github/bebrave-app/node_modules/typescript/lib&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -94,7 +109,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-f27c65a3e318-JavaScript-WS-251.23774.424" />
+        <option value="bundled-js-predefined-d6986cc7102b-9c94529fcfe0-JavaScript-WS-252.26199.162" />
       </set>
     </attachedChunks>
   </component>
@@ -146,6 +161,11 @@
       <workItem from="1757424479265" duration="6610000" />
       <workItem from="1757435102185" duration="103000" />
       <workItem from="1757435210522" duration="8062000" />
+      <workItem from="1757614954211" duration="52000" />
+      <workItem from="1758533092004" duration="144000" />
+      <workItem from="1758549771026" duration="7000" />
+      <workItem from="1761651237415" duration="74000" />
+      <workItem from="1762180975836" duration="1382000" />
     </task>
     <task id="LOCAL-00001" summary="init base">
       <option name="closed" value="true" />

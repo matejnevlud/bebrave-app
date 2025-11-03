@@ -567,17 +567,17 @@ export default function LekcePage() {
                                     size="md"
                                     src={item.image as any}
                                 />
-                                <b>{item.name}</b>
+                                <b>{item?.name}</b>
                             </TableCell>
 
-                            <TableCell>({item.duration} min)</TableCell>
+                            <TableCell>({item?.duration} min)</TableCell>
 
                             <TableCell>
-                                <b>{item.price}</b>
+                                <b>{item?.price}</b>
                             </TableCell>
 
                             <TableCell>
-                                {item.isShownOnHomepage ? (
+                                {item?.isShownOnHomepage ? (
                                     <span className="text-green-600 font-medium">✓ Ano</span>
                                 ) : (
                                     <span className="text-gray-400">Ne</span>
@@ -592,7 +592,7 @@ export default function LekcePage() {
                                     <Tooltip color="danger" content="Smazat typ lekce">
                     <span
                         className="text-lg text-danger cursor-pointer active:opacity-50"
-                        onClick={() => handleDeleteClassType(item.id)}
+                        onClick={() => handleDeleteClassType(item?.id)}
                     >
                       <DeleteIcon/>
                     </span>
@@ -710,7 +710,7 @@ export default function LekcePage() {
                         selectionMode="multiple"
                     >
                         {(trainer) => (
-                            <SelectItem key={trainer.id}>{trainer.name}</SelectItem>
+                            <SelectItem key={trainer?.id}>{trainer?.name}</SelectItem>
                         )}
                     </Select>
 
@@ -862,7 +862,7 @@ export default function LekcePage() {
                                         selectionMode="multiple"
                                     >
                                         {(trainer) => (
-                                            <SelectItem key={trainer.id}>{trainer.name}</SelectItem>
+                                            <SelectItem key={trainer?.id}>{trainer?.name}</SelectItem>
                                         )}
                                     </Select>
 
@@ -1109,8 +1109,8 @@ export default function LekcePage() {
                                         placeholder="Vyberte ze seznamu"
                                     >
                                         {(trainerKV) => (
-                                            <SelectItem key={trainerKV.id}>
-                                                {trainerKV.name}
+                                            <SelectItem key={trainerKV?.id}>
+                                                {trainerKV?.name}
                                             </SelectItem>
                                         )}
                                     </Select>
@@ -1125,8 +1125,8 @@ export default function LekcePage() {
                                         placeholder="Vyberte ze seznamu"
                                     >
                                         {(trainerKV) => (
-                                            <SelectItem key={trainerKV.id}>
-                                                {trainerKV.name}
+                                            <SelectItem key={trainerKV?.id}>
+                                                {trainerKV?.name}
                                             </SelectItem>
                                         )}
                                     </Select>
