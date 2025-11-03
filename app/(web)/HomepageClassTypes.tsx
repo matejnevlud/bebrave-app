@@ -51,6 +51,7 @@ export default function HomepageClassTypes({
                                         className="inline-flex me-2 hover:scale-125 transition-transform duration-200 w-10 h-10 rounded-full object-cover object-top"
                                         src={`https://bebravestudio.cz/${tct.trainer?.profilePicture}`}
                                     />
+                                    
                                     <span className="text-medium font-medium">
                     {tct.trainer?.name}
                   </span>
