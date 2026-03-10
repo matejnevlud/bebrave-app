@@ -127,6 +127,15 @@ function ReservationPage() {
   const [isVoucherChecking, setIsVoucherChecking] = useState<boolean>(false);
   const [voucherError, setVoucherError] = useState<string>("");
 
+  useEffect(() => {
+    if (!selectedClass) return;
+
+    setVoucherCode("");
+    setIsVoucherValid(false);
+    setIsVoucherChecking(false);
+    setVoucherError("");
+  }, [selectedClass]);
+
   const [formData, setFormData] = useState<ReservationFormData>({
     firstName: "",
     lastName: "",
@@ -838,7 +847,6 @@ function ReservationPage() {
                       labelPlacement="outside"
                       placeholder="Zadejte kód voucheru"
                       value={voucherCode}
-                      onBlur={handleVoucherCheck}
                       onClear={() => {
                         setVoucherCode("");
                         setIsVoucherValid(false);
@@ -860,7 +868,7 @@ function ReservationPage() {
                         variant="flat"
                         onPress={handleVoucherCheck}
                       >
-                        Ověřit
+                        Použít
                       </Button>
                     )}
                     {isVoucherValid && (
