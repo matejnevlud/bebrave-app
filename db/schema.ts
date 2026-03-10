@@ -25,7 +25,7 @@ export const trainersTable = pgTable("trainers", {
   email: varchar({ length: 255 }).notNull().unique(),
   bio: varchar({ length: 500 }),
   expertise: varchar({ length: 255 }),
-  profilePicture: varchar({ length: 255 }), // URL to the trainer's profile picture
+  profilePicture: varchar({ length: 255 }),
   ...timestamps,
 });
 export const trainersRelations = relations(trainersTable, ({ many }) => ({
@@ -75,21 +75,23 @@ export const classTypesTable = pgTable("class_types", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   name: varchar({ length: 255 }).notNull(),
   description: varchar({ length: 500 }).notNull(),
-  image: varchar({ length: 255 }), // URL to the class type image
-  defaultCapacity: integer().notNull(), // Maximum number of participants
-  duration: integer().notNull(), // Duration in minutes
-  price: integer().notNull(), // Price in crowns
+  image: varchar({ length: 255 }),
+  defaultCapacity: integer().notNull(),
+  duration: integer().notNull(),
+  price: integer().notNull(),
   allowedPaymentMethods: varchar({ length: 255 }).default(
     "credit_card,qr,osobne",
-  ), // Comma-separated list of allowed payment methods
-  customEmailMessage: varchar({ length: 1000 }), // Custom email message for this class type
+  ),
+  customEmailMessage: varchar({ length: 1000 }),
   homepageText: text(),
   isShownOnHomepage: boolean().default(false),
   isShownAsPromo: boolean().default(false),
+  isVoucherEligible: boolean().default(true),
 });
 export const classTypesRelations = relations(classTypesTable, ({ many }) => ({
   trainerClassTypes: many(trainerClassTypesTable),
   classes: many(classesTable),
+  vouchers: many(vouchersTable),
 }));
 
 export type Class = typeof classesTable.$inferSelect;
@@ -103,11 +105,11 @@ export const classesTable = pgTable("classes", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   classTypeId: integer().notNull(),
   trainerId: integer().notNull(),
-  secondTrainerId: integer(), // Optional secondary trainer
-  date: varchar({ length: 50 }).notNull(), // Date in YYYY-MM-DD format
-  time: varchar({ length: 5 }).notNull(), // Time in HH:MM format
+  secondTrainerId: integer(),
+  date: varchar({ length: 50 }).notNull(),
+  time: varchar({ length: 5 }).notNull(),
   location: varchar({ length: 255 }).notNull(),
-  capacity: integer().notNull(), // Maximum number of participants
+  capacity: integer().notNull(),
   ...timestamps,
 });
 export const classesRelations = relations(classesTable, ({ one, many }) => ({
@@ -128,25 +130,48 @@ export const classesRelations = relations(classesTable, ({ one, many }) => ({
   reservations: many(reservationsTable),
 }));
 
+export type Voucher = typeof vouchersTable.$inferSelect;
+export const vouchersTable = pgTable("vouchers", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  code: varchar({ length: 20 }).notNull().unique(),
+  classTypeId: integer(),
+  status: varchar({ length: 20 }).default("available"),
+  validFrom: timestamp().defaultNow().notNull(),
+  validUntil: timestamp().notNull(),
+  usedAt: timestamp(),
+  reservationId: integer(),
+  createdAt: timestamp().defaultNow().notNull(),
+});
+export const vouchersRelations = relations(vouchersTable, ({ one }) => ({
+  classType: one(classTypesTable, {
+    fields: [vouchersTable.classTypeId],
+    references: [classTypesTable.id],
+  }),
+  reservation: one(reservationsTable, {
+    fields: [vouchersTable.reservationId],
+    references: [reservationsTable.id],
+  }),
+}));
+
 export type Reservation = typeof reservationsTable.$inferSelect;
 export const reservationsTable = pgTable("reservations", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
   userId: varchar({ length: 255 }),
   classId: integer().notNull(),
-  status: varchar({ length: 50 }).notNull(), // e.g., 'confirmed', 'cancelled'
+  status: varchar({ length: 50 }).notNull(),
   firstName: varchar({ length: 255 }),
   lastName: varchar({ length: 255 }),
   email: varchar({ length: 255 }),
   phone: varchar({ length: 255 }),
-  // Payment tracking fields
-  paymentMethod: varchar({ length: 50 }), // 'on_site', 'qr_payment', 'credit_card', 'customer_credit'
-  paymentStatus: varchar({ length: 50 }), // 'pending', 'completed', 'failed', 'cancelled'
-  paymentTransactionId: varchar({ length: 255 }), // Nexi transaction ID
-  paymentAmount: integer(), // Amount in smallest currency unit (cents)
-  paymentCurrency: varchar({ length: 3 }).default("CZK"), // Currency code
-  paymentSecurityToken: varchar({ length: 255 }), // Nexi security token for validation
-  paymentHostedPageUrl: varchar({ length: 500 }), // URL for payment redirect
-  paymentCompletedAt: timestamp(), // When payment was completed
+  paymentMethod: varchar({ length: 50 }),
+  paymentStatus: varchar({ length: 50 }),
+  paymentTransactionId: varchar({ length: 255 }),
+  paymentAmount: integer(),
+  paymentCurrency: varchar({ length: 3 }).default("CZK"),
+  paymentSecurityToken: varchar({ length: 255 }),
+  paymentHostedPageUrl: varchar({ length: 500 }),
+  paymentCompletedAt: timestamp(),
+  voucherId: integer(),
   ...timestamps,
 });
 export const reservationsRelations = relations(
@@ -164,19 +189,23 @@ export const reservationsRelations = relations(
       fields: [reservationsTable.id],
       references: [invoicesTable.reservationId],
     }),
+    voucher: one(vouchersTable, {
+      fields: [reservationsTable.voucherId],
+      references: [vouchersTable.id],
+    }),
   }),
 );
 
 export type Invoice = typeof invoicesTable.$inferSelect;
 export const invoicesTable = pgTable("invoices", {
   id: integer().primaryKey().generatedAlwaysAsIdentity(),
-  invoiceNumber: integer().notNull().unique(), // Sequential invoice number
+  invoiceNumber: integer().notNull().unique(),
   reservationId: integer().notNull(),
-  amount: integer().notNull(), // Amount in cents
+  amount: integer().notNull(),
   currency: varchar({ length: 3 }).default("CZK"),
-  vatRate: integer().default(0), // VAT rate in percentage (0 for no VAT)
-  vatAmount: integer().default(0), // VAT amount in cents
-  totalAmount: integer().notNull(), // Total amount including VAT in cents
+  vatRate: integer().default(0),
+  vatAmount: integer().default(0),
+  totalAmount: integer().notNull(),
   description: varchar({ length: 500 }),
   customerName: varchar({ length: 255 }),
   customerEmail: varchar({ length: 255 }),
@@ -184,10 +213,10 @@ export const invoicesTable = pgTable("invoices", {
   customerAddress: varchar({ length: 500 }),
   issueDate: timestamp().defaultNow().notNull(),
   dueDate: timestamp(),
-  duzp: timestamp(), // Date of taxable supply (class date)
-  paymentMethod: varchar({ length: 50 }), // 'on_site', 'qr_payment', 'credit_card', 'customer_credit'
-  status: varchar({ length: 50 }).default("issued"), // 'issued', 'paid', 'cancelled'
-  pdfUrl: varchar({ length: 500 }), // URL to generated PDF
+  duzp: timestamp(),
+  paymentMethod: varchar({ length: 50 }),
+  status: varchar({ length: 50 }).default("issued"),
+  pdfUrl: varchar({ length: 500 }),
   ...timestamps,
 });
 export const invoicesRelations = relations(invoicesTable, ({ one }) => ({
