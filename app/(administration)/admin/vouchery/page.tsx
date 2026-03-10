@@ -322,63 +322,6 @@ export default function VouchersPage() {
 
       <div className="space-y-6">
         <div>
-          <h2 className="text-lg font-semibold mb-3">Nepoužité vouchery</h2>
-          <Table
-            isHeaderSticky
-            removeWrapper
-            bottomContent={
-              isLoading ? (
-                <div className="flex w-full justify-center">
-                  <p>Načítání...</p>
-                </div>
-              ) : null
-            }
-          >
-            <TableHeader>
-              <TableColumn>KÓD</TableColumn>
-              <TableColumn>TYP LEKCE</TableColumn>
-              <TableColumn>STAV</TableColumn>
-              <TableColumn>PLATNOST DO</TableColumn>
-            </TableHeader>
-            <TableBody
-              emptyContent="Žádné nepoužité vouchery"
-              items={unusedVouchers}
-            >
-              {(item) => (
-                <TableRow key={item.id}>
-                  <TableCell>
-                    <code className="bg-default-100 px-2 py-1 rounded font-mono">
-                      {item.code}
-                    </code>
-                  </TableCell>
-                  <TableCell>
-                    {item.classType?.name || "Všechny typy"}
-                  </TableCell>
-                  <TableCell>
-                    <Chip
-                      color={
-                        new Date(item.validUntil) < new Date()
-                          ? "danger"
-                          : "success"
-                      }
-                      size="sm"
-                      variant="flat"
-                    >
-                      {new Date(item.validUntil) < new Date()
-                        ? "Expirován"
-                        : "Dostupný"}
-                    </Chip>
-                  </TableCell>
-                  <TableCell>
-                    {new Date(item.validUntil).toLocaleDateString("cs-CZ")}
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
-
-        <div>
           <h2 className="text-lg font-semibold mb-3">Použité vouchery</h2>
           <Table isHeaderSticky removeWrapper>
             <TableHeader>
@@ -441,6 +384,63 @@ export default function VouchersPage() {
                         ? "Odesláno"
                         : "Označit jako odesláno"}
                     </Button>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        <div>
+          <h2 className="text-lg font-semibold mb-3">Nepoužité vouchery</h2>
+          <Table
+            isHeaderSticky
+            removeWrapper
+            bottomContent={
+              isLoading ? (
+                <div className="flex w-full justify-center">
+                  <p>Načítání...</p>
+                </div>
+              ) : null
+            }
+          >
+            <TableHeader>
+              <TableColumn>KÓD</TableColumn>
+              <TableColumn>TYP LEKCE</TableColumn>
+              <TableColumn>STAV</TableColumn>
+              <TableColumn>PLATNOST DO</TableColumn>
+            </TableHeader>
+            <TableBody
+              emptyContent="Žádné nepoužité vouchery"
+              items={unusedVouchers}
+            >
+              {(item) => (
+                <TableRow key={item.id}>
+                  <TableCell>
+                    <code className="bg-default-100 px-2 py-1 rounded font-mono">
+                      {item.code}
+                    </code>
+                  </TableCell>
+                  <TableCell>
+                    {item.classType?.name || "Všechny typy"}
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      color={
+                        new Date(item.validUntil) < new Date()
+                          ? "danger"
+                          : "success"
+                      }
+                      size="sm"
+                      variant="flat"
+                    >
+                      {new Date(item.validUntil) < new Date()
+                        ? "Expirován"
+                        : "Dostupný"}
+                    </Chip>
+                  </TableCell>
+                  <TableCell>
+                    {new Date(item.validUntil).toLocaleDateString("cs-CZ")}
                   </TableCell>
                 </TableRow>
               )}
