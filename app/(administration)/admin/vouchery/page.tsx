@@ -26,14 +26,27 @@ import {
   getClassTypes,
   getVouchers,
   getVoucherStats,
+  markVoucherRedeemedInSlevomat,
   updateClassTypesVoucherEligibility,
 } from "@/db/actions";
 import { ClassType, Voucher } from "@/db/schema";
 
+type VoucherWithDetails = Voucher & {
+  classType?: ClassType;
+  reservation?: {
+    firstName?: string | null;
+    lastName?: string | null;
+    email?: string | null;
+    class?: {
+      date: string;
+      time: string;
+      classType?: ClassType;
+    } | null;
+  } | null;
+};
+
 export default function VouchersPage() {
-  const [vouchers, setVouchers] = useState<
-    (Voucher & { classType?: ClassType })[]
-  >([]);
+  const [vouchers, setVouchers] = useState<VoucherWithDetails[]>([]);
   const [classTypes, setClassTypes] = useState<ClassType[]>([]);
   const [stats, setStats] = useState({
     total: 0,
@@ -44,7 +57,9 @@ export default function VouchersPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSavingEligibility, setIsSavingEligibility] = useState(false);
-  const [filter, setFilter] = useState<string>("all");
+  const [isMarkingSlevomatVoucherId, setIsMarkingSlevomatVoucherId] = useState<
+    number | null
+  >(null);
   const [generateCount, setGenerateCount] = useState<number>(10);
   const [selectedClassType, setSelectedClassType] = useState<string>("all");
   const [ineligibleClassTypes, setIneligibleClassTypes] = useState<Set<string>>(
@@ -64,7 +79,7 @@ export default function VouchersPage() {
         getVoucherStats(),
       ]);
 
-      setVouchers(voucherData as (Voucher & { classType?: ClassType })[]);
+      setVouchers(voucherData as VoucherWithDetails[]);
       setClassTypes(classTypeData as ClassType[]);
       setStats(statsData);
 
@@ -120,18 +135,28 @@ export default function VouchersPage() {
     }
   }
 
-  const filteredVouchers = vouchers.filter((v) => {
-    if (filter === "all") return true;
-    if (filter === "available") {
-      return v.status === "available" && new Date(v.validUntil) >= new Date();
-    }
-    if (filter === "used") return v.status === "used";
-    if (filter === "expired") {
-      return v.status === "available" && new Date(v.validUntil) < new Date();
-    }
+  async function handleMarkRedeemedInSlevomat(voucherId: number) {
+    setIsMarkingSlevomatVoucherId(voucherId);
+    try {
+      const success = await markVoucherRedeemedInSlevomat(voucherId);
 
-    return true;
-  });
+      if (!success) {
+        alert("Voucher se nepodařilo označit jako odeslaný do Slevomatu");
+      }
+
+      await fetchData();
+    } catch (error) {
+      console.error("Error marking voucher as redeemed in Slevomat:", error);
+      alert("Voucher se nepodařilo označit jako odeslaný do Slevomatu");
+    } finally {
+      setIsMarkingSlevomatVoucherId(null);
+    }
+  }
+
+  const usedVouchers = vouchers.filter((voucher) => voucher.status === "used");
+  const unusedVouchers = vouchers.filter(
+    (voucher) => voucher.status !== "used",
+  );
 
   const now = today(getLocalTimeZone());
   const sixMonthsLater = now.add({ months: 6 });
@@ -295,80 +320,134 @@ export default function VouchersPage() {
 
       <Divider />
 
-      <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Seznam voucherů</h2>
-        <Select
-          className="w-48"
-          label="Filtr"
-          labelPlacement="outside-left"
-          selectedKeys={new Set([filter])}
-          onSelectionChange={(keys) => setFilter(Array.from(keys)[0] as string)}
-        >
-          <SelectItem key="all">Vše</SelectItem>
-          <SelectItem key="available">Dostupné</SelectItem>
-          <SelectItem key="used">Použité</SelectItem>
-          <SelectItem key="expired">Expirované</SelectItem>
-        </Select>
-      </div>
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-lg font-semibold mb-3">Nepoužité vouchery</h2>
+          <Table
+            isHeaderSticky
+            removeWrapper
+            bottomContent={
+              isLoading ? (
+                <div className="flex w-full justify-center">
+                  <p>Načítání...</p>
+                </div>
+              ) : null
+            }
+          >
+            <TableHeader>
+              <TableColumn>KÓD</TableColumn>
+              <TableColumn>TYP LEKCE</TableColumn>
+              <TableColumn>STAV</TableColumn>
+              <TableColumn>PLATNOST DO</TableColumn>
+            </TableHeader>
+            <TableBody
+              emptyContent="Žádné nepoužité vouchery"
+              items={unusedVouchers}
+            >
+              {(item) => (
+                <TableRow key={item.id}>
+                  <TableCell>
+                    <code className="bg-default-100 px-2 py-1 rounded font-mono">
+                      {item.code}
+                    </code>
+                  </TableCell>
+                  <TableCell>
+                    {item.classType?.name || "Všechny typy"}
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      color={
+                        new Date(item.validUntil) < new Date()
+                          ? "danger"
+                          : "success"
+                      }
+                      size="sm"
+                      variant="flat"
+                    >
+                      {new Date(item.validUntil) < new Date()
+                        ? "Expirován"
+                        : "Dostupný"}
+                    </Chip>
+                  </TableCell>
+                  <TableCell>
+                    {new Date(item.validUntil).toLocaleDateString("cs-CZ")}
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
 
-      <Table
-        isHeaderSticky
-        removeWrapper
-        bottomContent={
-          isLoading ? (
-            <div className="flex w-full justify-center">
-              <p>Načítání...</p>
-            </div>
-          ) : null
-        }
-      >
-        <TableHeader>
-          <TableColumn>KÓD</TableColumn>
-          <TableColumn>TYP LEKCE</TableColumn>
-          <TableColumn>STAV</TableColumn>
-          <TableColumn>PLATNOST DO</TableColumn>
-          <TableColumn>POUŽITO</TableColumn>
-        </TableHeader>
-        <TableBody emptyContent="Žádné vouchery" items={filteredVouchers}>
-          {(item) => (
-            <TableRow key={item.id}>
-              <TableCell>
-                <code className="bg-default-100 px-2 py-1 rounded font-mono">
-                  {item.code}
-                </code>
-              </TableCell>
-              <TableCell>{item.classType?.name || "Všechny typy"}</TableCell>
-              <TableCell>
-                <Chip
-                  color={
-                    item.status === "used"
-                      ? "default"
-                      : new Date(item.validUntil) < new Date()
-                        ? "danger"
-                        : "success"
-                  }
-                  size="sm"
-                  variant="flat"
-                >
-                  {item.status === "used"
-                    ? "Použit"
-                    : new Date(item.validUntil) < new Date()
-                      ? "Expirován"
-                      : "Dostupný"}
-                </Chip>
-              </TableCell>
-              <TableCell>
-                {new Date(item.validUntil).toLocaleDateString("cs-CZ")}
-              </TableCell>
-              <TableCell>
-                {item.usedAt
-                  ? new Date(item.usedAt).toLocaleDateString("cs-CZ")
-                  : "-"}
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+        <div>
+          <h2 className="text-lg font-semibold mb-3">Použité vouchery</h2>
+          <Table isHeaderSticky removeWrapper>
+            <TableHeader>
+              <TableColumn>KÓD</TableColumn>
+              <TableColumn>TYP LEKCE</TableColumn>
+              <TableColumn>POUŽITO</TableColumn>
+              <TableColumn>POUŽIL</TableColumn>
+              <TableColumn>POUŽITO NA LEKCI</TableColumn>
+              <TableColumn>SLEVOMAT ODESLÁNO</TableColumn>
+              <TableColumn>AKCE</TableColumn>
+            </TableHeader>
+            <TableBody
+              emptyContent="Žádné použité vouchery"
+              items={usedVouchers}
+            >
+              {(item) => (
+                <TableRow key={item.id}>
+                  <TableCell>
+                    <code className="bg-default-100 px-2 py-1 rounded font-mono">
+                      {item.code}
+                    </code>
+                  </TableCell>
+                  <TableCell>
+                    {item.classType?.name || "Všechny typy"}
+                  </TableCell>
+                  <TableCell>
+                    {item.usedAt
+                      ? new Date(item.usedAt).toLocaleDateString("cs-CZ")
+                      : "-"}
+                  </TableCell>
+                  <TableCell>
+                    {[item.reservation?.firstName, item.reservation?.lastName]
+                      .filter(Boolean)
+                      .join(" ") ||
+                      item.reservation?.email ||
+                      "-"}
+                  </TableCell>
+                  <TableCell>
+                    {item.reservation?.class
+                      ? `${item.reservation.class.classType?.name || "Lekce"} (${item.reservation.class.date} ${item.reservation.class.time})`
+                      : "-"}
+                  </TableCell>
+                  <TableCell>
+                    {item.slevomatRedeemedAt
+                      ? new Date(item.slevomatRedeemedAt).toLocaleString(
+                          "cs-CZ",
+                        )
+                      : "Neodesláno"}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      color="primary"
+                      isDisabled={Boolean(item.slevomatRedeemedAt)}
+                      isLoading={isMarkingSlevomatVoucherId === item.id}
+                      size="sm"
+                      variant={item.slevomatRedeemedAt ? "flat" : "solid"}
+                      onPress={() => handleMarkRedeemedInSlevomat(item.id)}
+                    >
+                      {item.slevomatRedeemedAt
+                        ? "Odesláno"
+                        : "Označit jako odesláno"}
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </div>
     </div>
   );
 }

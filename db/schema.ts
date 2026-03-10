@@ -139,6 +139,7 @@ export const vouchersTable = pgTable("vouchers", {
   validFrom: timestamp().defaultNow().notNull(),
   validUntil: timestamp().notNull(),
   usedAt: timestamp(),
+  slevomatRedeemedAt: timestamp(),
   reservationId: integer(),
   createdAt: timestamp().defaultNow().notNull(),
 });

@@ -2165,6 +2165,35 @@ export async function redeemVoucher(
   }
 }
 
+export async function markVoucherRedeemedInSlevomat(
+  voucherId: number,
+): Promise<boolean> {
+  try {
+    const voucher = await db.query.vouchersTable.findFirst({
+      where: eq(vouchersTable.id, voucherId),
+    });
+
+    if (!voucher || voucher.status !== "used" || voucher.slevomatRedeemedAt) {
+      return false;
+    }
+
+    await db
+      .update(vouchersTable)
+      .set({
+        slevomatRedeemedAt: new Date(),
+      })
+      .where(
+        and(eq(vouchersTable.id, voucherId), eq(vouchersTable.status, "used")),
+      );
+
+    return true;
+  } catch (error) {
+    console.error("Error marking voucher as redeemed in Slevomat:", error);
+
+    return false;
+  }
+}
+
 export async function getVouchers(filters?: {
   status?: string;
   classTypeId?: number;
@@ -2176,6 +2205,15 @@ export async function getVouchers(filters?: {
         : undefined,
       with: {
         classType: true,
+        reservation: {
+          with: {
+            class: {
+              with: {
+                classType: true,
+              },
+            },
+          },
+        },
       },
       orderBy: [desc(vouchersTable.createdAt)],
     });
