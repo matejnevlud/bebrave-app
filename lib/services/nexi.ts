@@ -52,6 +52,7 @@ export interface NexiOperation {
   operationCurrency?: string;
   operationId: string;
   operationResult?: string;
+  operationTime?: string;
   operationType?: string;
   orderId?: string;
 }
@@ -168,6 +169,15 @@ export class NexiPaymentService {
   async getOrderOperations(orderId: string): Promise<NexiOperation[]> {
     const result = await this.request<{ operations?: NexiOperation[] }>(
       `/orders/${encodeURIComponent(orderId)}`,
+    );
+
+    return result.operations || [];
+  }
+
+  async findOrderOperations(orderId: string): Promise<NexiOperation[]> {
+    const query = new URLSearchParams({ orderId });
+    const result = await this.request<{ operations?: NexiOperation[] }>(
+      `/operations?${query.toString()}`,
     );
 
     return result.operations || [];

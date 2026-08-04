@@ -19,21 +19,70 @@ import { getAdminSession, isSuperAdminRequest } from "@/lib/server-auth";
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
-const findCaptureOperation = (
-  operations: NexiOperation[],
-): NexiOperation | null =>
-  operations.find(
-    (operation) =>
-      operation.operationType === "CAPTURE" &&
-      operation.operationResult === "EXECUTED",
-  ) ||
-  operations.find((operation) => operation.operationType === "CAPTURE") ||
-  null;
-
 const findRefundAction = (
   actions: NexiRefundAction[],
 ): NexiRefundAction | null =>
   actions.find((action) => action.action === "REFUND") || null;
+
+const getOperationPriority = (operation: NexiOperation): number => {
+  if (operation.operationType === "CAPTURE") return 0;
+  if (operation.operationType === "AUTHORIZATION") return 1;
+
+  return 2;
+};
+
+const findRefundableOperation = async (
+  orderId: string,
+): Promise<NexiOperation | null> => {
+  const [orderOperations, matchingOperations] = await Promise.all([
+    nexiPaymentService.getOrderOperations(orderId),
+    nexiPaymentService.findOrderOperations(orderId),
+  ]);
+  const uniqueOperations = Array.from(
+    new Map(
+      [...orderOperations, ...matchingOperations].map((operation) => [
+        operation.operationId,
+        operation,
+      ]),
+    ).values(),
+  ).sort((first, second) => {
+    const priorityDifference =
+      getOperationPriority(first) - getOperationPriority(second);
+
+    if (priorityDifference !== 0) return priorityDifference;
+
+    return (second.operationTime || "").localeCompare(
+      first.operationTime || "",
+    );
+  });
+
+  for (const operation of uniqueOperations) {
+    try {
+      const actions = await nexiPaymentService.getRefundActions(
+        operation.operationId,
+      );
+
+      if (findRefundAction(actions)) return operation;
+    } catch (error) {
+      console.warn(
+        `Unable to load XPay actions for ${operation.operationType || "unknown"} operation`,
+        error,
+      );
+    }
+  }
+
+  if (uniqueOperations.length > 0) {
+    console.warn(
+      "No refundable XPay operation found",
+      uniqueOperations.map((operation) => ({
+        operationResult: operation.operationResult,
+        operationType: operation.operationType,
+      })),
+    );
+  }
+
+  return null;
+};
 
 const getReservationAndCapture = async (reservationId: number) => {
   const reservation = await db.query.reservationsTable.findFirst({
@@ -51,18 +100,17 @@ const getReservationAndCapture = async (reservationId: number) => {
   let captureOperationId = reservation.paymentOperationId;
 
   if (!captureOperationId) {
-    const operations = await nexiPaymentService.getOrderOperations(
+    const refundableOperation = await findRefundableOperation(
       reservation.paymentTransactionId,
     );
-    const captureOperation = findCaptureOperation(operations);
 
-    if (!captureOperation) {
+    if (!refundableOperation) {
       throw new Error(
-        "No captured XPay payment was found for this reservation",
+        "No refundable XPay payment was found for this reservation",
       );
     }
 
-    captureOperationId = captureOperation.operationId;
+    captureOperationId = refundableOperation.operationId;
     await db
       .update(reservationsTable)
       .set({ paymentOperationId: captureOperationId, updatedAt: new Date() })
