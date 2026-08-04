@@ -710,7 +710,11 @@ export default function AdminPage() {
               </TableCell>
 
               <TableCell>
-                <Button color="primary" size="md">
+                <Button
+                  color="primary"
+                  size="md"
+                  onPress={() => openReservationModal(item)}
+                >
                   Detail
                 </Button>
               </TableCell>
