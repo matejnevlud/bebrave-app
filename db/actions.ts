@@ -1,6 +1,6 @@
 "use server";
 
-import { desc, eq, max, sql, and, gte, lt } from "drizzle-orm";
+import { desc, eq, max, sql, and, gte, lt, isNull } from "drizzle-orm";
 import axios from "axios";
 
 import { db } from "@/db";
@@ -231,8 +231,10 @@ export async function getPromoClassType(): Promise<ClassTypeWithRelations> {
 
 export async function getClasses(
   includePastDays: number = 0,
+  includeCancelled: boolean = false,
 ): Promise<ClassWithRelations[]> {
   let data = await db.query.classesTable.findMany({
+    where: includeCancelled ? undefined : isNull(classesTable.deletedAt),
     with: {
       classType: true,
       trainer: true,
@@ -354,9 +356,10 @@ export async function updateClass(
 
 export async function deleteClass(classId: number): Promise<boolean> {
   try {
-    // Delete the class from the database
-    const result = await db
-      .delete(classesTable)
+    // Soft delete, so the cancelled class stays visible in the admin overview
+    await db
+      .update(classesTable)
+      .set({ deletedAt: new Date(), updatedAt: new Date() })
       .where(eq(classesTable.id, classId));
 
     return true;

@@ -286,7 +286,7 @@ export default function AdminPage() {
   async function fetchData() {
     const t = await getTrainers();
     const ct = await getClassTypes();
-    const c = await getClasses(1);
+    const c = await getClasses(1, true);
 
     console.log(t);
     console.log(c);
@@ -395,7 +395,7 @@ export default function AdminPage() {
         await fetchData();
 
         // Find the updated class and set it as selected
-        const updatedClasses = await getClasses(1);
+        const updatedClasses = await getClasses(1, true);
         const updatedClass = updatedClasses.find(
           (c) => c.id === selectedClass?.id,
         );
@@ -504,7 +504,7 @@ export default function AdminPage() {
       }
 
       await fetchData();
-      const updatedClasses = await getClasses(1);
+      const updatedClasses = await getClasses(1, true);
       const updatedClass = updatedClasses.find(
         (item) => item.id === selectedClass?.id,
       );
@@ -632,7 +632,8 @@ export default function AdminPage() {
                 "h-[4.5rem] hover:bg-default-100 cursor-pointer" +
                 (lastClassInEachDay.includes(item.id)
                   ? "  border-b-gray-200  border-b-1.5"
-                  : "")
+                  : "") +
+                (item.deletedAt ? " opacity-50 grayscale" : "")
               }
               onClick={() => openReservationModal(item)}
             >
@@ -659,7 +660,14 @@ export default function AdminPage() {
                   size="md"
                   src={item.classType?.image as any}
                 />
-                <b>{item.classType?.name}</b>
+                <b className={item.deletedAt ? "line-through" : ""}>
+                  {item.classType?.name}
+                </b>
+                {item.deletedAt && (
+                  <Chip className="ml-2" size="sm" variant="flat">
+                    Zrušeno
+                  </Chip>
+                )}
               </TableCell>
               <TableCell>
                 <Avatar
