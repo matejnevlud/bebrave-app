@@ -24,6 +24,10 @@ const findRefundAction = (
 ): NexiRefundAction | null =>
   actions.find((action) => action.action === "REFUND") || null;
 
+const isCompletedRefund = (operation: NexiOperation): boolean =>
+  operation.operationResult === "REFUNDED" ||
+  operation.operationResult === "EXECUTED";
+
 const getOperationPriority = (operation: NexiOperation): number => {
   if (operation.operationType === "CAPTURE") return 0;
   if (operation.operationType === "AUTHORIZATION") return 1;
@@ -339,7 +343,7 @@ export async function POST(
 
       throw error;
     }
-    const isCompleted = refundOperation.operationResult === "REFUNDED";
+    const isCompleted = isCompletedRefund(refundOperation);
 
     if (!isCompleted) {
       return NextResponse.json(
