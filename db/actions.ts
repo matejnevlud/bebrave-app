@@ -1,7 +1,6 @@
 "use server";
 
 import { desc, eq, max, sql, and, gte, lt } from "drizzle-orm";
-import { Resend } from "resend";
 import axios from "axios";
 
 import { db } from "@/db";
@@ -35,11 +34,11 @@ import { nexiPaymentService } from "@/lib/services/nexi";
 import { PDFInvoiceService } from "@/lib/services/pdf-invoice";
 import { generateSecureInvoicePdfUrl } from "@/lib/invoice-security";
 import { picnicReservationEmail } from "@/db/picnic_reservation_email";
+import { createResendClient } from "@/lib/services/resend";
 
 // Keep inmemory last access token
-const CLOUD_ID = process.env.CLOUD_ID || "373067553";
-const REFRESH_TOKEN =
-  process.env.REFRESH_TOKEN || "f4813dc9dd81ebcc58dbefa452a3295c";
+const CLOUD_ID = process.env.CLOUD_ID || "";
+const REFRESH_TOKEN = process.env.REFRESH_TOKEN || "";
 var ACCESS_TOKEN: string | PromiseLike<string | null> | null = null;
 
 export async function getTrainers(): Promise<TrainerWithRelations[]> {
@@ -750,6 +749,8 @@ export async function processPaymentResult(
       throw new Error("Reservation not found");
     }
 
+    if (reservation.paymentStatus === "completed") return true;
+
     if (paymentResult.success) {
       // Update reservation status
       await db
@@ -1114,7 +1115,7 @@ async function sendConfirmationEmail(
     htmlString = htmlString.replace("{{invoice_info}}", invoiceUrlText);
 
     // Send email using Resend
-    const resend = new Resend("re_fPhhnprW_2SD7UaFhoM9ZdPo7bhWeMqxc");
+    const resend = createResendClient();
 
     // Prepare email data
     const emailData: any = {
@@ -2017,7 +2018,7 @@ export async function sendMonthlyInvoiceSummaryEmail(
       .replace(/{{generation_date}}/g, new Date().toLocaleDateString("cs-CZ"));
 
     // Send email using Resend with PDF attachment
-    const resend = new Resend("re_fPhhnprW_2SD7UaFhoM9ZdPo7bhWeMqxc");
+    const resend = createResendClient();
 
     const result = await resend.emails.send({
       from: "BeBrave Studio <info@bebravestudio.cz>",

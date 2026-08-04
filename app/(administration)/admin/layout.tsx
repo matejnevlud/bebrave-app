@@ -28,7 +28,8 @@ export default function BlogLayout({
     }
   }, [mounted, pathname, router]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await fetch("/api/admin/auth/logout", { method: "POST" });
     clearAuthSession();
     router.push("/admin/login");
   };

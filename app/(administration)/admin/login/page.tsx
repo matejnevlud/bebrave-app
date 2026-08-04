@@ -7,7 +7,7 @@ import { Card, CardBody, CardHeader } from "@heroui/card";
 import { useRouter } from "next/navigation";
 
 import { Logo } from "@/components/icons";
-import { authenticateAdmin, setAuthSession } from "@/lib/auth";
+import { setAuthSession } from "@/lib/auth";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -21,14 +21,30 @@ export default function LoginPage() {
     setIsLoading(true);
     setError("");
 
-    if (authenticateAdmin(username, password)) {
+    try {
+      const response = await fetch("/api/admin/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password, username }),
+      });
+
+      if (!response.ok) {
+        const result = (await response.json()) as { error?: string };
+
+        setError(result.error || "Invalid username or password");
+
+        return;
+      }
+
       setAuthSession(username);
       router.push("/admin");
-    } else {
-      setError("Invalid username or password");
+    } catch {
+      setError("Unable to sign in. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   return (

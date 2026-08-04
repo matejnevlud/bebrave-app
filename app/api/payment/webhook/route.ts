@@ -20,6 +20,7 @@ export async function POST(request: NextRequest) {
     const currency = body.operation?.operationCurrency || body.currency;
     const status = body.operation?.operationResult || body.status;
     const operation = body.operation;
+    const operationType = body.operation?.operationType;
 
     if (!orderId) {
       console.error("Missing orderId in webhook", {
@@ -52,6 +53,32 @@ export async function POST(request: NextRequest) {
         { error: "Reservation not found" },
         { status: 404 },
       );
+    }
+
+    if (
+      !body.securityToken ||
+      body.securityToken !== reservation.paymentSecurityToken
+    ) {
+      console.error("Invalid Nexi webhook security token", { orderId });
+
+      return NextResponse.json(
+        { error: "Invalid security token" },
+        { status: 401 },
+      );
+    }
+
+    if (operationType && operationType !== "CAPTURE") {
+      return NextResponse.json({
+        message: "Notification acknowledged",
+        operationType,
+      });
+    }
+
+    if (transactionId) {
+      await db
+        .update(reservationsTable)
+        .set({ paymentOperationId: transactionId, updatedAt: new Date() })
+        .where(eq(reservationsTable.id, reservation.id));
     }
 
     // Parse payment result from webhook

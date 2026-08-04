@@ -6,7 +6,7 @@ const createWorkingNexiOrder = async () => {
 
     // Sandbox environment
     const testBaseUrl = 'https://xpaysandbox.nexigroup.com/api/phoenix-0.0/psp/api/v1';
-    const testApiKey = 'bcf67740-9013-4dd9-bbfb-02debdf7206f';
+    const testApiKey = process.env.NEXI_API_KEY;
 
     // Generate unique IDs
     const orderId = 'bebrave-' + Date.now();
@@ -107,7 +107,7 @@ const createMinimalWorkingOrder = async () => {
     console.log('🔧 Testing Minimal Working Order...');
 
     const testBaseUrl = 'https://xpaysandbox.nexigroup.com/api/phoenix-0.0/psp/api/v1';
-    const testApiKey = 'bcf67740-9013-4dd9-bbfb-02debdf7206f';
+    const testApiKey = process.env.NEXI_API_KEY;
 
     const minimalOrder = {
         paymentSession: {

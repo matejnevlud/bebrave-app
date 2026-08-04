@@ -1,19 +1,6 @@
 "use client";
 
-const ADMIN_CREDENTIALS = {
-  username: "admin",
-  password: "admin",
-};
-
 const AUTH_STORAGE_KEY = "admin_authenticated";
-
-export function authenticateAdmin(username: string, password: string): boolean {
-  return (
-    (username === ADMIN_CREDENTIALS.username &&
-      password === ADMIN_CREDENTIALS.password) ||
-    (username === "lektor" && password === "belektor")
-  );
-}
 
 export function setAuthSession(username: string): void {
   if (typeof window !== "undefined") {

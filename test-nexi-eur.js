@@ -4,7 +4,7 @@ const testEurOrder = async () => {
     console.log('💳 Testing with EUR currency (as in docs)...');
 
     const testBaseUrl = 'https://xpaysandbox.nexigroup.com/api/phoenix-0.0/psp/api/v1';
-    const testApiKey = 'bcf67740-9013-4dd9-bbfb-02debdf7206f';
+    const testApiKey = process.env.NEXI_API_KEY;
 
     // Use exact structure from documentation
     const orderData = {
@@ -85,7 +85,7 @@ const testAlternativeKey = async () => {
     console.log('\n🔑 Testing with alternative API key...');
 
     const testBaseUrl = 'https://xpaysandbox.nexigroup.com/api/phoenix-0.0/psp/api/v1';
-    const altApiKey = 'c25f1119-07af-4ad0-b978-b297f62a4320'; // explicit accounting
+    const altApiKey = process.env.NEXI_EXPLICIT_API_KEY;
 
     const simpleOrder = {
         paymentSession: {

@@ -1,15 +1,10 @@
-import { Resend } from "resend";
-
 import { PDFInvoiceService } from "./pdf-invoice";
+import { createResendClient } from "./resend";
 
 import { generateSecureInvoicePdfUrl } from "@/lib/invoice-security";
 import { getInvoice } from "@/db/actions";
 
 export class EmailInvoiceService {
-  private static readonly resend = new Resend(
-    "re_fPhhnprW_2SD7UaFhoM9ZdPo7bhWeMqxc",
-  );
-
   /**
    * Send invoice email with PDF attachment
    */
@@ -58,7 +53,7 @@ export class EmailInvoiceService {
       const emailHtml = this.generateInvoiceEmailHTML(invoice);
 
       // Send email with PDF attachment using remote URL
-      const result = await this.resend.emails.send({
+      const result = await createResendClient().emails.send({
         from: "BeBrave Studio <info@bebravestudio.cz>",
         to: [email],
         subject: emailSubject,
@@ -260,7 +255,7 @@ export class EmailInvoiceService {
       const reminderSubject = `Připomínka faktury ${invoice.invoiceNumber} - BeBrave Studio`;
       const reminderHtml = this.generateReminderEmailHTML(invoice);
 
-      const result = await this.resend.emails.send({
+      const result = await createResendClient().emails.send({
         from: "BeBrave Studio <info@bebravestudio.cz>",
         to: [invoice.customerEmail],
         subject: reminderSubject,

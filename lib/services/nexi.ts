@@ -47,18 +47,41 @@ export interface PaymentResult {
   error?: string;
 }
 
+export interface NexiOperation {
+  operationAmount?: string;
+  operationCurrency?: string;
+  operationId: string;
+  operationResult?: string;
+  operationType?: string;
+  orderId?: string;
+}
+
+export interface NexiRefundAction {
+  action: string;
+  currency: string;
+  defaultAmount: string;
+  maxAmount: string;
+  minAmount: string;
+}
+
+export interface NexiRefundResponse {
+  operationId: string;
+  operationTime: string;
+}
+
 export class NexiPaymentService {
   private readonly apiKey: string;
   private readonly baseUrl: string;
   private readonly environment: string;
 
   constructor() {
-    this.apiKey =
-      process.env.NEXI_API_KEY || "93090771-37ae-46ea-b7b4-f4d5fce98908"; // Default test key
+    this.environment = process.env.NEXI_ENVIRONMENT || "test";
+    this.apiKey = process.env.NEXI_API_KEY || "";
     this.baseUrl =
       process.env.NEXI_API_URL ||
-      "https://xpay.nexigroup.com/api/phoenix-0.0/psp/api/v1";
-    this.environment = process.env.NEXI_ENVIRONMENT || "test";
+      (this.environment === "test"
+        ? "https://xpaysandbox.nexigroup.com/api/phoenix-0.0/psp/api/v1"
+        : "https://xpay.nexigroup.com/api/phoenix-0.0/psp/api/v1");
   }
 
   /**
@@ -140,6 +163,74 @@ export class NexiPaymentService {
         `Failed to create payment session: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     }
+  }
+
+  async getOrderOperations(orderId: string): Promise<NexiOperation[]> {
+    const result = await this.request<{ operations?: NexiOperation[] }>(
+      `/orders/${encodeURIComponent(orderId)}`,
+    );
+
+    return result.operations || [];
+  }
+
+  async getOperation(operationId: string): Promise<NexiOperation> {
+    return this.request<NexiOperation>(
+      `/operations/${encodeURIComponent(operationId)}`,
+    );
+  }
+
+  async getRefundActions(operationId: string): Promise<NexiRefundAction[]> {
+    const result = await this.request<{ actions?: NexiRefundAction[] }>(
+      `/operations/${encodeURIComponent(operationId)}/actions`,
+    );
+
+    return result.actions || [];
+  }
+
+  async refundOperation(
+    operationId: string,
+    amount: number,
+    currency: string,
+    description: string,
+    idempotencyKey: string,
+  ): Promise<NexiRefundResponse> {
+    return this.request<NexiRefundResponse>(
+      `/operations/${encodeURIComponent(operationId)}/refunds`,
+      {
+        method: "POST",
+        headers: {
+          "Idempotency-Key": idempotencyKey,
+        },
+        body: JSON.stringify({
+          amount: amount.toString(),
+          currency,
+          description,
+        }),
+      },
+    );
+  }
+
+  private async request<T>(path: string, init?: RequestInit): Promise<T> {
+    if (!this.apiKey) throw new Error("NEXI_API_KEY is not configured");
+
+    const response = await fetch(`${this.baseUrl}${path}`, {
+      ...init,
+      headers: {
+        "Content-Type": "application/json",
+        "Correlation-Id": generateUUIDv4(),
+        "X-API-KEY": this.apiKey,
+        ...init?.headers,
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text();
+
+      throw new Error(`Nexi API Error: ${response.status} - ${errorBody}`);
+    }
+
+    return response.json() as Promise<T>;
   }
 
   /**

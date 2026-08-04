@@ -10,8 +10,8 @@
 ### API Details
 
 - **Base URL**: `https://xpay.nexigroup.com/api/phoenix-0.0/psp/api/v1`
-- **Test API Key (Explicit)**: `c25f1119-07af-4ad0-b978-b297f62a4320`
-- **Test API Key (Implicit)**: `bcf67740-9013-4dd9-bbfb-02debdf7206f`
+- **Test API Key (Explicit)**: configure `NEXI_EXPLICIT_API_KEY`
+- **Test API Key (Implicit)**: configure `NEXI_API_KEY`
 - **Header Format**: `X-API-KEY`
 
 ### Test Results

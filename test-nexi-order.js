@@ -6,7 +6,7 @@ const createNexiOrder = async () => {
 
     // Use sandbox environment
     const testBaseUrl = 'https://xpaysandbox.nexigroup.com/api/phoenix-0.0/psp/api/v1';
-    const testApiKey = 'bcf67740-9013-4dd9-bbfb-02debdf7206f';
+    const testApiKey = process.env.NEXI_API_KEY;
 
     // Proper order structure based on Nexi XPay patterns
     const orderData = {
@@ -100,7 +100,7 @@ const testOrderVariants = async () => {
 
 const createMinimalOrder = async () => {
     const testBaseUrl = 'https://xpaysandbox.nexigroup.com/api/phoenix-0.0/psp/api/v1';
-    const testApiKey = 'bcf67740-9013-4dd9-bbfb-02debdf7206f';
+    const testApiKey = process.env.NEXI_API_KEY;
 
     // Minimal required fields
     const minimalOrder = {

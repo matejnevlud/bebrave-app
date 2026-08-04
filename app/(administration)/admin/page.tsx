@@ -50,6 +50,7 @@ import {
   ClassWithRelations,
   TrainerWithRelations,
 } from "@/db/schema";
+import { isSuperAdmin } from "@/lib/auth";
 
 type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
@@ -278,6 +279,9 @@ export default function AdminPage() {
   const [classes, setClasses] = useState<ClassWithRelations[]>([]);
 
   const [isFetchingData, setIsFetchingData] = useState<boolean>(true);
+  const [refundingReservationId, setRefundingReservationId] = useState<
+    number | null
+  >(null);
 
   async function fetchData() {
     const t = await getTrainers();
@@ -405,6 +409,114 @@ export default function AdminPage() {
     } catch (error) {
       console.error("Error cancelling reservation:", error);
       alert("Došlo k chybě při rušení rezervace. Zkuste to prosím znovu.");
+    }
+  }
+
+  async function handleRefundReservation(reservationId: number) {
+    setRefundingReservationId(reservationId);
+
+    try {
+      const availabilityResponse = await fetch(
+        `/api/admin/reservations/${reservationId}/refund`,
+        { cache: "no-store" },
+      );
+      const availability = (await availabilityResponse.json()) as {
+        currency?: string;
+        error?: string;
+        maxAmount?: number;
+        minAmount?: number;
+      };
+
+      if (!availabilityResponse.ok) {
+        throw new Error(availability.error || "Refund is not available");
+      }
+
+      const maxAmount = availability.maxAmount || 0;
+      const minAmount = availability.minAmount || 1;
+      const enteredAmount = prompt(
+        `Částka k vrácení v ${availability.currency || "CZK"}:`,
+        (maxAmount / 100).toFixed(2),
+      );
+
+      if (enteredAmount === null) return;
+
+      const normalizedAmount = enteredAmount.trim().replace(",", ".");
+
+      if (!/^\d+(\.\d{1,2})?$/.test(normalizedAmount)) {
+        throw new Error(
+          "Zadejte platnou částku s nejvýše dvěma desetinnými místy.",
+        );
+      }
+
+      const amount = Math.round(Number(normalizedAmount) * 100);
+
+      if (amount < minAmount || amount > maxAmount) {
+        throw new Error(
+          `Částka musí být mezi ${(minAmount / 100).toFixed(2)} a ${(maxAmount / 100).toFixed(2)} ${availability.currency || "CZK"}.`,
+        );
+      }
+
+      if (
+        !confirm(
+          `Opravdu chcete přes XPay vrátit ${(amount / 100).toFixed(2)} ${availability.currency || "CZK"}?`,
+        )
+      ) {
+        return;
+      }
+
+      const refundRequestStorageKey = `xpay-refund-${reservationId}-${amount}`;
+      const requestId =
+        sessionStorage.getItem(refundRequestStorageKey) || crypto.randomUUID();
+
+      sessionStorage.setItem(refundRequestStorageKey, requestId);
+
+      const refundResponse = await fetch(
+        `/api/admin/reservations/${reservationId}/refund`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount,
+            requestId,
+          }),
+        },
+      );
+      const refundResult = (await refundResponse.json()) as {
+        error?: string;
+        operationId?: string;
+        status?: string;
+      };
+
+      if (!refundResponse.ok && refundResponse.status !== 202) {
+        throw new Error(refundResult.error || "Refund failed");
+      }
+
+      sessionStorage.removeItem(refundRequestStorageKey);
+
+      if (refundResponse.status === 202) {
+        alert(
+          `XPay refund byl přijat a čeká na dokončení. Operace: ${refundResult.operationId || "neuvedena"}`,
+        );
+      } else {
+        alert("Platba byla úspěšně vrácena přes XPay.");
+      }
+
+      await fetchData();
+      const updatedClasses = await getClasses();
+      const updatedClass = updatedClasses.find(
+        (item) => item.id === selectedClass?.id,
+      );
+
+      if (updatedClass) setSelectedClass(updatedClass);
+    } catch (error) {
+      console.error("Error refunding reservation:", error);
+      alert(
+        error instanceof Error ? error.message : "Platbu se nepodařilo vrátit.",
+      );
+    } finally {
+      setRefundingReservationId(null);
     }
   }
 
@@ -788,26 +900,35 @@ export default function AdminPage() {
                               color={
                                 item.paymentStatus === "completed"
                                   ? "success"
-                                  : item.paymentStatus === "failed"
-                                    ? "danger"
-                                    : item.paymentStatus === "cancelled"
-                                      ? "danger"
-                                      : item.paymentStatus === "pending"
-                                        ? "warning"
-                                        : "default"
+                                  : item.paymentStatus === "refunded"
+                                    ? "default"
+                                    : item.paymentStatus ===
+                                        "partially_refunded"
+                                      ? "warning"
+                                      : item.paymentStatus === "failed"
+                                        ? "danger"
+                                        : item.paymentStatus === "cancelled"
+                                          ? "danger"
+                                          : item.paymentStatus === "pending"
+                                            ? "warning"
+                                            : "default"
                               }
                               size="sm"
                               variant="flat"
                             >
                               {item.paymentStatus === "completed"
                                 ? "Uhrazeno"
-                                : item.paymentStatus === "failed"
-                                  ? "Neúspěšná"
-                                  : item.paymentStatus === "cancelled"
-                                    ? "Zrušena"
-                                    : item.paymentStatus === "pending"
-                                      ? "Čeká"
-                                      : item.paymentStatus}
+                                : item.paymentStatus === "refunded"
+                                  ? "Vráceno"
+                                  : item.paymentStatus === "partially_refunded"
+                                    ? "Částečně vráceno"
+                                    : item.paymentStatus === "failed"
+                                      ? "Neúspěšná"
+                                      : item.paymentStatus === "cancelled"
+                                        ? "Zrušena"
+                                        : item.paymentStatus === "pending"
+                                          ? "Čeká"
+                                          : item.paymentStatus}
                             </Chip>
                             {item.paymentMethod && (
                               <span className="text-tiny text-default-500">
@@ -825,16 +946,35 @@ export default function AdminPage() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          {item.status === "confirmed" && (
-                            <Button
-                              color="danger"
-                              size="sm"
-                              variant="flat"
-                              onPress={() => handleCancelReservation(item.id)}
-                            >
-                              Zrušit
-                            </Button>
-                          )}
+                          <div className="flex flex-col gap-2">
+                            {isSuperAdmin() &&
+                              item.paymentMethod === "credit_card" &&
+                              (item.paymentStatus === "completed" ||
+                                item.paymentStatus ===
+                                  "partially_refunded") && (
+                                <Button
+                                  color="warning"
+                                  isLoading={refundingReservationId === item.id}
+                                  size="sm"
+                                  variant="flat"
+                                  onPress={() =>
+                                    handleRefundReservation(item.id)
+                                  }
+                                >
+                                  Vrátit platbu
+                                </Button>
+                              )}
+                            {item.status === "confirmed" && (
+                              <Button
+                                color="danger"
+                                size="sm"
+                                variant="flat"
+                                onPress={() => handleCancelReservation(item.id)}
+                              >
+                                Zrušit
+                              </Button>
+                            )}
+                          </div>
                         </TableCell>
                       </TableRow>
                     )}

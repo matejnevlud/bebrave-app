@@ -1,8 +1,12 @@
 import crypto from "crypto";
 
-// Secret key for invoice access tokens - should be in environment variables in production
-const INVOICE_SECRET =
-  process.env.INVOICE_SECRET || "bebrave-invoice-secret-key-2024";
+const getInvoiceSecret = (): string => {
+  const secret = process.env.INVOICE_SECRET;
+
+  if (!secret) throw new Error("INVOICE_SECRET is not configured");
+
+  return secret;
+};
 
 /**
  * Generates a secure hash for invoice access
@@ -13,7 +17,7 @@ export function generateInvoiceAccessToken(
   customerEmail: string,
   createdAt: Date,
 ): string {
-  const data = `${invoiceId}:${customerEmail}:${createdAt.getTime()}:${INVOICE_SECRET}`;
+  const data = `${invoiceId}:${customerEmail}:${createdAt.getTime()}:${getInvoiceSecret()}`;
 
   return crypto
     .createHash("sha256")

@@ -167,7 +167,9 @@ export const reservationsTable = pgTable("reservations", {
   paymentMethod: varchar({ length: 50 }),
   paymentStatus: varchar({ length: 50 }),
   paymentTransactionId: varchar({ length: 255 }),
+  paymentOperationId: varchar({ length: 255 }),
   paymentAmount: integer(),
+  refundedAmount: integer().default(0).notNull(),
   paymentCurrency: varchar({ length: 3 }).default("CZK"),
   paymentSecurityToken: varchar({ length: 255 }),
   paymentHostedPageUrl: varchar({ length: 500 }),
@@ -177,7 +179,7 @@ export const reservationsTable = pgTable("reservations", {
 });
 export const reservationsRelations = relations(
   reservationsTable,
-  ({ one }) => ({
+  ({ many, one }) => ({
     user: one(usersTable, {
       fields: [reservationsTable.userId],
       references: [usersTable.id],
@@ -193,6 +195,32 @@ export const reservationsRelations = relations(
     voucher: one(vouchersTable, {
       fields: [reservationsTable.voucherId],
       references: [vouchersTable.id],
+    }),
+    refunds: many(paymentRefundsTable),
+  }),
+);
+
+export type PaymentRefund = typeof paymentRefundsTable.$inferSelect;
+export const paymentRefundsTable = pgTable("payment_refunds", {
+  id: integer().primaryKey().generatedAlwaysAsIdentity(),
+  reservationId: integer().notNull(),
+  captureOperationId: varchar({ length: 255 }).notNull(),
+  refundOperationId: varchar({ length: 255 }),
+  amount: integer().notNull(),
+  currency: varchar({ length: 3 }).notNull(),
+  status: varchar({ length: 50 }).default("requested").notNull(),
+  description: varchar({ length: 500 }),
+  idempotencyKey: varchar({ length: 255 }).notNull().unique(),
+  requestedBy: varchar({ length: 255 }).notNull(),
+  error: text(),
+  ...timestamps,
+});
+export const paymentRefundsRelations = relations(
+  paymentRefundsTable,
+  ({ one }) => ({
+    reservation: one(reservationsTable, {
+      fields: [paymentRefundsTable.reservationId],
+      references: [reservationsTable.id],
     }),
   }),
 );
