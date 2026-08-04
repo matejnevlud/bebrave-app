@@ -286,7 +286,7 @@ export default function AdminPage() {
   async function fetchData() {
     const t = await getTrainers();
     const ct = await getClassTypes();
-    const c = await getClasses();
+    const c = await getClasses(1);
 
     console.log(t);
     console.log(c);
@@ -395,7 +395,7 @@ export default function AdminPage() {
         await fetchData();
 
         // Find the updated class and set it as selected
-        const updatedClasses = await getClasses();
+        const updatedClasses = await getClasses(1);
         const updatedClass = updatedClasses.find(
           (c) => c.id === selectedClass?.id,
         );
@@ -504,7 +504,7 @@ export default function AdminPage() {
       }
 
       await fetchData();
-      const updatedClasses = await getClasses();
+      const updatedClasses = await getClasses(1);
       const updatedClass = updatedClasses.find(
         (item) => item.id === selectedClass?.id,
       );

@@ -229,7 +229,9 @@ export async function getPromoClassType(): Promise<ClassTypeWithRelations> {
   return data as any;
 }
 
-export async function getClasses(): Promise<ClassWithRelations[]> {
+export async function getClasses(
+  includePastDays: number = 0,
+): Promise<ClassWithRelations[]> {
   let data = await db.query.classesTable.findMany({
     with: {
       classType: true,
@@ -247,11 +249,19 @@ export async function getClasses(): Promise<ClassWithRelations[]> {
     return dateA.getTime() - dateB.getTime();
   });
 
-  // Filter out classes that are in the past
+  // Filter out classes that are in the past. When includePastDays is set,
+  // keep everything from the start of that day (e.g. 1 = since midnight yesterday).
+  const cutoff = new Date();
+
+  if (includePastDays > 0) {
+    cutoff.setDate(cutoff.getDate() - includePastDays);
+    cutoff.setHours(0, 0, 0, 0);
+  }
+
   data = data.filter((classItem) => {
     const classDate = new Date(classItem.date + "T" + classItem.time);
 
-    return classDate.getTime() >= Date.now();
+    return classDate.getTime() >= cutoff.getTime();
   });
 
   return data as ClassWithRelations[];
