@@ -51,6 +51,7 @@ function ReservationPage() {
   const [classTypes, setClassTypes] = useState<ClassType[]>([]);
 
   const [isFetchingData, setIsFetchingData] = useState<boolean>(true);
+  const [dataError, setDataError] = useState<string>("");
   const [isHydrated, setIsHydrated] = useState(false);
   const [currentDate, setCurrentDate] = useState<CalendarDate | null>(null);
 
@@ -58,19 +59,29 @@ function ReservationPage() {
   const searchParams = useSearchParams();
 
   async function fetchData() {
-    const t = await getTrainers();
-    const ct = await getClassTypes();
-    const c = await getClasses();
+    setIsFetchingData(true);
+    setDataError("");
 
-    console.log(t);
-    console.log(c);
-    console.log(ct);
+    try {
+      const [t, ct, c] = await Promise.all([
+        getTrainers(),
+        getClassTypes(),
+        getClasses(),
+      ]);
 
-    setTrainers(t);
-    setClassTypes(ct);
-    setClasses(c);
+      console.log(t);
+      console.log(c);
+      console.log(ct);
 
-    setIsFetchingData(false);
+      setTrainers(t);
+      setClassTypes(ct);
+      setClasses(c);
+    } catch (error) {
+      console.error("Error loading reservation data:", error);
+      setDataError("Rezervační data se nepodařilo načíst.");
+    } finally {
+      setIsFetchingData(false);
+    }
   }
 
   useEffect(() => {
@@ -265,15 +276,25 @@ function ReservationPage() {
   const [disableOnsite, setDisableOnsite] = useState<boolean>(false);
 
   useEffect(() => {
-    dotyposGetCustomerCreditBalanceByEmailAndPhone(
-      formData.email,
-      formData.phone,
-    ).then((data) => {
-      setCreditBalance(data.balance);
-      setHasFreeEntry(data.customer?._discountGroupId === "1772210398527043");
-      console.log("customer from useEffect", data.customer);
-      console.log("balance from useEffect", data.balance);
-    });
+    if (!selectedClass) return;
+
+    const email = formData.email.trim();
+    const phone = formData.phone.replace(/\D/g, "");
+
+    if (!email.includes("@") || phone.length < 9) return;
+
+    dotyposGetCustomerCreditBalanceByEmailAndPhone(email, phone)
+      .then((data) => {
+        setCreditBalance(data.balance);
+        setHasFreeEntry(data.customer?._discountGroupId === "1772210398527043");
+        console.log("customer from useEffect", data.customer);
+        console.log("balance from useEffect", data.balance);
+      })
+      .catch((error) => {
+        console.error("Error loading customer credit:", error);
+        setCreditBalance(null);
+        setHasFreeEntry(false);
+      });
   }, [selectedClass]);
 
   // Handle form field changes and save to localStorage
@@ -297,8 +318,15 @@ function ReservationPage() {
   const handleEmailPhoneChangeForCreditCustomer = async (
     newFormData: ReservationFormData,
   ) => {
-    const phone = newFormData.phone;
-    const email = newFormData.email;
+    const phone = newFormData.phone.replace(/\D/g, "");
+    const email = newFormData.email.trim();
+
+    if (!email.includes("@") || phone.length < 9) {
+      setCreditBalance(null);
+      setHasFreeEntry(false);
+
+      return;
+    }
 
     // Step 1. get customer by phone and email from dotypos
     // Step 2. get customer account to dertermine amount of credits available
@@ -390,6 +418,18 @@ function ReservationPage() {
   return (
     <div className="mx-auto flex flex-col items-center justify-center gap-4 pt-4 max-w-7xl">
       <h1 className="text-4xl font-sans font-bold">Rezervační systém</h1>
+
+      {dataError && (
+        <Alert
+          color="danger"
+          endContent={
+            <Button color="danger" size="sm" variant="flat" onPress={fetchData}>
+              Zkusit znovu
+            </Button>
+          }
+          title={dataError}
+        />
+      )}
 
       <HorizontalSteps
         currentStep={determineStep()}
