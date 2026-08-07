@@ -67,7 +67,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (operationType && operationType !== "CAPTURE") {
+    const isCapturedAuthorization =
+      operationType === "AUTHORIZATION" &&
+      status === "EXECUTED" &&
+      operation?.additionalData?.status === "CAPTURED";
+
+    if (
+      operationType &&
+      operationType !== "CAPTURE" &&
+      !isCapturedAuthorization
+    ) {
       return NextResponse.json({
         message: "Notification acknowledged",
         operationType,
