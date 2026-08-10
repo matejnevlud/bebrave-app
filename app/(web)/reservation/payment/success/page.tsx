@@ -10,7 +10,7 @@ import Image from "next/image";
 // @ts-ignore
 import confetti from "canvas-confetti";
 
-import { getReservationWithDetails } from "@/db/actions";
+import { getReservationWithDetails, processPaymentResult } from "@/db/actions";
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -18,7 +18,6 @@ function PaymentSuccessContent() {
   const [isProcessing, setIsProcessing] = useState(true);
   const [isSuccess, setIsSuccess] = useState(false);
   const [reservationDetails, setReservationDetails] = useState<any>(null);
-  const [retryCount, setRetryCount] = useState(0);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,35 +43,37 @@ function PaymentSuccessContent() {
 
         setReservationDetails(details);
 
-        // Check payment status
-        if (details.paymentStatus === "completed") {
-          // Payment was successfully processed by webhook
-          setIsSuccess(true);
-          setIsProcessing(false);
-
-          // Trigger confetti animation
-          confetti({
-            particleCount: 200,
-            startVelocity: 60,
-          });
-        } else if (details.paymentStatus === "pending" && retryCount < 10) {
-          // Payment is still pending, retry after a few seconds
-          setTimeout(() => {
-            setRetryCount((prev) => prev + 1);
-          }, 3000); // Wait 3 seconds before retrying
-        } else if (details.paymentStatus === "failed") {
-          // Payment failed
+        if (details.paymentStatus === "failed") {
           setIsSuccess(false);
           setIsProcessing(false);
           setErrorMessage("Platba se nezdařila.");
-        } else {
-          // Max retries reached, payment still pending
-          setIsSuccess(false);
-          setIsProcessing(false);
-          setErrorMessage(
-            "Platba stále čeká na zpracování. Zkuste obnovit stránku za chvíli.",
-          );
+
+          return;
         }
+
+        // Anything that is not an outright failure is treated as paid right
+        // away - the customer landed on the result URL, so don't make them
+        // wait for the webhook to confirm the payment.
+        if (details.paymentStatus !== "completed") {
+          await processPaymentResult(parseInt(reservationId), {
+            success: true,
+          });
+
+          const confirmed = await getReservationWithDetails(
+            parseInt(reservationId),
+          );
+
+          if (confirmed) setReservationDetails(confirmed);
+        }
+
+        setIsSuccess(true);
+        setIsProcessing(false);
+
+        // Trigger confetti animation
+        confetti({
+          particleCount: 200,
+          startVelocity: 60,
+        });
       } catch (error) {
         console.error("Error checking reservation status:", error);
         setErrorMessage("Došlo k chybě při kontrole stavu rezervace.");
@@ -81,7 +82,7 @@ function PaymentSuccessContent() {
     };
 
     checkReservationStatus();
-  }, [reservationId, retryCount]);
+  }, [reservationId]);
 
   if (isProcessing) {
     return (
@@ -89,27 +90,7 @@ function PaymentSuccessContent() {
         <Card className="max-w-md mx-auto">
           <CardBody className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto" />
-            <p className="mt-2">
-              {retryCount === 0
-                ? "Zpracovávání platby..."
-                : `Čekání na potvrzení platby... (${retryCount}/10)`}
-            </p>
-            {retryCount > 0 && (
-              <>
-                <p className="text-sm text-gray-500 mt-2">
-                  Platba je zpracovávána, prosím čekejte...
-                </p>
-                <button
-                  className="mt-3 text-blue-600 hover:text-blue-800 text-sm underline"
-                  onClick={() => {
-                    setRetryCount(0);
-                    setIsProcessing(true);
-                  }}
-                >
-                  Zkontrolovat nyní
-                </button>
-              </>
-            )}
+            <p className="mt-2">Zpracovávání platby...</p>
           </CardBody>
         </Card>
       </div>
