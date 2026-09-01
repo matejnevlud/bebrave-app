@@ -1,6 +1,6 @@
 "use server";
 
-import { desc, eq, max, sql, and, gte, lt, isNull } from "drizzle-orm";
+import { desc, eq, max, or, sql, and, gte, lt, isNull } from "drizzle-orm";
 import axios from "axios";
 
 import { db } from "@/db";
@@ -248,7 +248,7 @@ export async function getClasses(
     const dateA = new Date(a.date + "T" + a.time);
     const dateB = new Date(b.date + "T" + b.time);
 
-    return dateA.getTime() - dateB.getTime();
+    return dateA.getTime() - dateB.getTime() || a.id - b.id;
   });
 
   // Filter out classes that are in the past. When includePastDays is set,
@@ -267,6 +267,62 @@ export async function getClasses(
   });
 
   return data as ClassWithRelations[];
+}
+
+export async function getOlderClasses(
+  beforeDate: string,
+  beforeTime: string,
+  beforeId: number,
+  includeCancelled: boolean = false,
+  pageSize: number = 50,
+): Promise<{ classes: ClassWithRelations[]; hasMore: boolean }> {
+  const olderThanCursor = or(
+    lt(classesTable.date, beforeDate),
+    and(
+      eq(classesTable.date, beforeDate),
+      or(
+        lt(classesTable.time, beforeTime),
+        and(eq(classesTable.time, beforeTime), lt(classesTable.id, beforeId)),
+      ),
+    ),
+  );
+  const data = await db.query.classesTable.findMany({
+    where: includeCancelled
+      ? olderThanCursor
+      : and(isNull(classesTable.deletedAt), olderThanCursor),
+    orderBy: [
+      desc(classesTable.date),
+      desc(classesTable.time),
+      desc(classesTable.id),
+    ],
+    limit: pageSize + 1,
+    with: {
+      classType: true,
+      trainer: true,
+      secondTrainer: true,
+      reservations: true,
+    },
+  });
+  const hasMore = data.length > pageSize;
+  const classes = data.slice(0, pageSize).reverse();
+
+  return { classes: classes as ClassWithRelations[], hasMore };
+}
+
+export async function getClassById(
+  classId: number,
+): Promise<ClassWithRelations | null> {
+  const classWithRelations = await db.query.classesTable.findFirst({
+    where: eq(classesTable.id, classId),
+    with: {
+      classType: true,
+      trainer: true,
+      secondTrainer: true,
+      reservations: true,
+    },
+  });
+
+  return (classWithRelations as ClassWithRelations | undefined) ?? null;
 }
 
 export async function createClass(

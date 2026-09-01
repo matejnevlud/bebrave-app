@@ -38,8 +38,10 @@ import { ModalBody, ModalHeader } from "@heroui/modal";
 import { I18nProvider } from "@react-aria/i18n";
 
 import {
+  getClassById,
   getClasses,
   getClassTypes,
+  getOlderClasses,
   getTrainers,
   updateClass,
   cancelReservation,
@@ -279,6 +281,9 @@ export default function AdminPage() {
   const [classes, setClasses] = useState<ClassWithRelations[]>([]);
 
   const [isFetchingData, setIsFetchingData] = useState<boolean>(true);
+  const [isLoadingOlderClasses, setIsLoadingOlderClasses] =
+    useState<boolean>(false);
+  const [hasOlderClasses, setHasOlderClasses] = useState<boolean>(true);
   const [refundingReservationId, setRefundingReservationId] = useState<
     number | null
   >(null);
@@ -302,6 +307,49 @@ export default function AdminPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  async function loadOlderClasses() {
+    const oldestClass = classes[0];
+
+    if (!oldestClass || isLoadingOlderClasses) return;
+
+    setIsLoadingOlderClasses(true);
+
+    try {
+      const olderClasses = await getOlderClasses(
+        oldestClass.date,
+        oldestClass.time,
+        oldestClass.id,
+        true,
+      );
+
+      setClasses((currentClasses) => [
+        ...olderClasses.classes,
+        ...currentClasses,
+      ]);
+      setHasOlderClasses(olderClasses.hasMore);
+    } catch (error) {
+      console.error("Error loading older classes:", error);
+      alert("Starší lekce se nepodařilo načíst. Zkuste to prosím znovu.");
+    } finally {
+      setIsLoadingOlderClasses(false);
+    }
+  }
+
+  async function refreshSelectedClass() {
+    if (!selectedClass) return;
+
+    const updatedClass = await getClassById(selectedClass.id);
+
+    if (!updatedClass) return;
+
+    setSelectedClass(updatedClass);
+    setClasses((currentClasses) =>
+      currentClasses.map((classItem) =>
+        classItem.id === updatedClass.id ? updatedClass : classItem,
+      ),
+    );
+  }
 
   const lastClassInEachDay = useMemo(() => {
     if (classes.length === 0) return [];
@@ -391,18 +439,7 @@ export default function AdminPage() {
       const success = await cancelReservation(reservationId);
 
       if (success) {
-        // Refresh the data by fetching fresh data
-        await fetchData();
-
-        // Find the updated class and set it as selected
-        const updatedClasses = await getClasses(1, true);
-        const updatedClass = updatedClasses.find(
-          (c) => c.id === selectedClass?.id,
-        );
-
-        if (updatedClass) {
-          setSelectedClass(updatedClass);
-        }
+        await refreshSelectedClass();
       } else {
         alert("Nepodařilo se zrušit rezervaci. Zkuste to prosím znovu.");
       }
@@ -503,13 +540,7 @@ export default function AdminPage() {
         alert("Platba byla úspěšně vrácena přes XPay.");
       }
 
-      await fetchData();
-      const updatedClasses = await getClasses(1, true);
-      const updatedClass = updatedClasses.find(
-        (item) => item.id === selectedClass?.id,
-      );
-
-      if (updatedClass) setSelectedClass(updatedClass);
+      await refreshSelectedClass();
     } catch (error) {
       console.error("Error refunding reservation:", error);
       alert(
@@ -611,7 +642,20 @@ export default function AdminPage() {
         </TableBody>
       </Table>
 
-      <Table removeWrapper aria-label="Example empty table" rowHeight={80}>
+      <div className="mb-4 flex justify-start">
+        <Button
+          isDisabled={isFetchingData || !hasOlderClasses}
+          isLoading={isLoadingOlderClasses}
+          variant="bordered"
+          onPress={loadOlderClasses}
+        >
+          {hasOlderClasses
+            ? "Načíst starší"
+            : "Všechny starší lekce jsou načtené"}
+        </Button>
+      </div>
+
+      <Table removeWrapper aria-label="Přehled lekcí" rowHeight={80}>
         <TableHeader>
           <TableColumn>ČAS</TableColumn>
           <TableColumn>NÁZEV LEKCE</TableColumn>
