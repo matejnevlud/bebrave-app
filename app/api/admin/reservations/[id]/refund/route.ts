@@ -35,19 +35,61 @@ const getOperationPriority = (operation: NexiOperation): number => {
   return 2;
 };
 
+const getHostedPagePaymentId = (
+  hostedPageUrl: string | null,
+): string | null => {
+  if (!hostedPageUrl) return null;
+
+  try {
+    const url = new URL(hostedPageUrl);
+
+    return (
+      url.searchParams.get("paymentid") || url.searchParams.get("paymentId")
+    );
+  } catch {
+    return null;
+  }
+};
+
 const findRefundableOperation = async (
   orderId: string,
+  candidateOperationIds: string[],
 ): Promise<NexiOperation | null> => {
-  const [orderOperations, matchingOperations] = await Promise.all([
-    nexiPaymentService.getOrderOperations(orderId),
-    nexiPaymentService.findOrderOperations(orderId),
-  ]);
+  const [orderOperationsResult, matchingOperationsResult] =
+    await Promise.allSettled([
+      nexiPaymentService.getOrderOperations(orderId),
+      nexiPaymentService.findOrderOperations(orderId),
+    ]);
+  const orderOperations =
+    orderOperationsResult.status === "fulfilled"
+      ? orderOperationsResult.value
+      : [];
+  const matchingOperations =
+    matchingOperationsResult.status === "fulfilled"
+      ? matchingOperationsResult.value
+      : [];
+  const candidateOperations: NexiOperation[] = candidateOperationIds.map(
+    (operationId) => ({ operationId }),
+  );
+
+  if (orderOperationsResult.status === "rejected") {
+    console.warn("Unable to load XPay order operations", {
+      error: orderOperationsResult.reason,
+      orderId,
+    });
+  }
+  if (matchingOperationsResult.status === "rejected") {
+    console.warn("Unable to search XPay operations", {
+      error: matchingOperationsResult.reason,
+      orderId,
+    });
+  }
+
   const uniqueOperations = Array.from(
     new Map(
-      [...orderOperations, ...matchingOperations].map((operation) => [
-        operation.operationId,
-        operation,
-      ]),
+      [...orderOperations, ...matchingOperations, ...candidateOperations].map(
+        (operation) => [operation.operationId, operation],
+      ),
     ).values(),
   ).sort((first, second) => {
     const priorityDifference =
@@ -104,8 +146,12 @@ const getReservationAndCapture = async (reservationId: number) => {
   let captureOperationId = reservation.paymentOperationId;
 
   if (!captureOperationId) {
+    const hostedPagePaymentId = getHostedPagePaymentId(
+      reservation.paymentHostedPageUrl,
+    );
     const refundableOperation = await findRefundableOperation(
       reservation.paymentTransactionId,
+      hostedPagePaymentId ? [hostedPagePaymentId] : [],
     );
 
     if (!refundableOperation) {
