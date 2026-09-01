@@ -30,15 +30,18 @@ export default function LoginPage() {
         body: JSON.stringify({ password, username }),
       });
 
-      if (!response.ok) {
-        const result = (await response.json()) as { error?: string };
+      const result = (await response.json()) as {
+        error?: string;
+        role?: string;
+      };
 
+      if (!response.ok) {
         setError(result.error || "Invalid username or password");
 
         return;
       }
 
-      setAuthSession(username);
+      setAuthSession(username, result.role);
       router.push("/admin");
     } catch {
       setError("Unable to sign in. Please try again.");

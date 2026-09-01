@@ -7,7 +7,12 @@ import { Button } from "@heroui/button";
 import Sidebar from "@/components/admin/sidebar";
 import { items } from "@/app/(administration)/admin/sidebar-items";
 import { Logo } from "@/components/icons";
-import { isAuthenticated, clearAuthSession, isSuperAdmin } from "@/lib/auth";
+import {
+  isAuthenticated,
+  clearAuthSession,
+  isSuperAdmin,
+  verifyAdminSession,
+} from "@/lib/auth";
 
 export default function BlogLayout({
   children,
@@ -23,9 +28,19 @@ export default function BlogLayout({
   }, []);
 
   useEffect(() => {
-    if (mounted && pathname !== "/admin/login" && !isAuthenticated()) {
+    if (!mounted || pathname === "/admin/login") return;
+
+    if (!isAuthenticated()) {
       router.push("/admin/login");
+
+      return;
     }
+
+    // The server session cookie expires after 12h while the localStorage flag
+    // does not, so re-check it to avoid a signed-in UI that gets 403s.
+    verifyAdminSession().then((valid) => {
+      if (!valid) router.push("/admin/login");
+    });
   }, [mounted, pathname, router]);
 
   const handleLogout = async () => {

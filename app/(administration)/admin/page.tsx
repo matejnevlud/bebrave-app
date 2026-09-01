@@ -464,6 +464,12 @@ export default function AdminPage() {
         minAmount?: number;
       };
 
+      if (availabilityResponse.status === 403) {
+        throw new Error(
+          "Vaše přihlášení vypršelo. Přihlaste se prosím znovu jako admin.",
+        );
+      }
+
       if (!availabilityResponse.ok) {
         throw new Error(availability.error || "Refund is not available");
       }
@@ -525,6 +531,12 @@ export default function AdminPage() {
         operationId?: string;
         status?: string;
       };
+
+      if (refundResponse.status === 403) {
+        throw new Error(
+          "Vaše přihlášení vypršelo. Přihlaste se prosím znovu jako admin.",
+        );
+      }
 
       if (!refundResponse.ok && refundResponse.status !== 202) {
         throw new Error(refundResult.error || "Refund failed");
