@@ -38,7 +38,7 @@ export function authenticateAdminCredentials(
   const lectorUsername = process.env.LECTOR_USERNAME || "lektor";
   const lectorPassword =
     process.env.LECTOR_PASSWORD ||
-    (process.env.NODE_ENV !== "production" ? "belektor" : undefined);
+    (process.env.NODE_ENV !== "production" ? "bravelektor" : undefined);
 
   let role: AdminRole | null = null;
 
